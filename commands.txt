@@ -1,0 +1,4 @@
+/send -  send file to telegram
+/chdir - change current directory
+/mkdir - make a directory
+/geturl - download url
