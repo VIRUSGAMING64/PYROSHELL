@@ -1,51 +1,55 @@
-from pyrogram import *
+from pyrogram.emoji import *
 from pyrogram.types import *
+from pyrogram.connection import *
+from pyrogram import *
+from pyrogram.client import *
+from pyrogram.errors import *
+from pyrogram.storage import *
+from pyrogram.methods import *
+from pyrogram.enums import *
 import time
 import Gvar
 from datatypes import *
 import threading as th
-import Handler
+import Utils
 import os
 import ENV
 
-bot = Client("bot", api_id=Gvar.API_ID, api_hash=Gvar.API_HASH)
 Gvar.HAND = ENV.MAIN()
+bot = Client(
+    "bot",
+    api_id=Gvar.API_ID,
+    api_hash=Gvar.API_HASH,
+    workers=Gvar.WORKERS,
+    bot_token=Gvar.TOKEN,
+)
 
 
-def init():
-    while not bot.is_connected:
-        time.sleep(0.001)
-    for i in Gvar.ADMINS:
-        bot.send_message(i, "bot started...")
-
-
-core1 = th.Thread(target=init)
-core1.start()
-
-
-def QUERY_HANDLER(client: Client, message: Message):
-    USER = Handler.FindUser(message.chat.id)
+def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
+    USER = Utils.FindUser(message.chat.id)
     if USER == None:
         TEMP_USER = [
-            message.chat.id,
-            message.id,
-            0,  # chdir
-            0,  # mkdir
-            0,  # send
-            0,  # GETURL
-            Gvar.ROOT + "\\" + str(TEMP_USER[ID]),
-            0,  # other vars
-            0,  # other vars
-            0,  # other vars
-            0,  # other vars
-            0,  # other vars
-            0,  # other vars
-            0,  # other vars
-            0,  # other vars
-            0,  # other vars
-            0,  # other vars
-            0,  # other vars
-            0,  # other vars
+            message.chat.id,  # ID  0
+            message.id,  # LAST_MESSAGE_ID 1
+            0,  # CHDIR 2
+            0,  # MKDIR 3
+            0,  # SEND 4
+            0,  # GETURL 5
+            Gvar.ROOT + "\\" + str(message.chat.id),  # PATH 6
+            0,  # ASKING 7
+            0,  # WRITING 8
+            0,  # GETING_NOTEPAD_NAME 9
+            0,  # WRITING_FILEPATH 10
+            0,  # BOT_LAST_MESSAGE_ID 11
+            0,  # other vars 12
+            0,  # other vars 13
+            0,  # other vars 14
+            0,  # other vars 15
+            0,  # other vars 16
+            0,  # other vars 17
+            0,  # other vars 18
+            0,  # other vars 19
+            0,  # other vars 20
         ]
         USER = len(Gvar.DATA)
         Gvar.DATA.append(TEMP_USER)
@@ -64,58 +68,94 @@ def QUERY_HANDLER(client: Client, message: Message):
                 pass
             os.chdir(Gvar.DATA[USER][PATH])
     Gvar.QUEUE_DOWNLOAD.append([message, USER])
-    RES = Handler.USER_PROCCESS(USER, message)
-    message.reply(RES)
+    RES = Utils.USER_PROCCESS(USER, message)
+    Gvar.DATA[USER][BOT_LAST_MESSAGE_ID] = bot.send_message(message.chat.id, RES).id
     Gvar.DATA[USER][LAST_MESSAGE_ID] = message.id
     Gvar.HAND.save()
     pass
 
 
-def CORE0():
+def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
+    message.answer(
+        results=[
+            InlineQueryResultArticle(
+                title="Installation",
+                input_message_content=InputTextMessageContent("pip install pyrogram"),
+                description="How to install Pyrogram",
+            ),
+        ],
+        cache_time=1,
+    )
+
+
+def DIRECT_MESSAGE_QUEUE_HANDLER():
     while 1:
         if len(Gvar.QUEUE_DIRECT) == 0:
             time.sleep(0.001)
             continue
-        QUERY_HANDLER(Gvar.QUEUE_DIRECT[0][0], Gvar.QUEUE_DIRECT[0][1])
+        DIRECT_REQUEST_HANDLER(Gvar.QUEUE_DIRECT[0][0], Gvar.QUEUE_DIRECT[0][1])
         Gvar.QUEUE_DIRECT.pop(0)
 
 
-def progress(total, cant):
-    print(f"{cant} of {total}")
+def INLINE_MESSAGE_QUEUE_HANDLER():
+    while 1:
+        if len(Gvar.QUEUE_INLINE) == 0:
+            time.sleep(0.5)
+            continue
+        INLINE_REQUEST_HANDLER(Gvar.QUEUE_INLINE[0][0], Gvar.QUEUE_INLINE[0][1])
+        Gvar.QUEUE_INLINE.pop(0)
+
+
+def progress(cant, total, USER):
+    if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
+        Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
+            Gvar.DATA[USER][ID], f"Downloaded: {cant} of {total}"
+        )
+    else:
+        bot.edit_message_text(
+            Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], f"Downloaded: {cant} of {total}"
+        )
     pass
 
 
-def DOWN():
-    while 1:
-        if len(Gvar.QUEUE_DOWNLOAD) < 1:
-            time.sleep(1)
-            continue
-        res = DownloadMedia(Gvar.QUEUE_DOWNLOAD[0])
-        if res == 1:
-            Gvar.QUEUE_DOWNLOAD.pop(0)
-
-
-def DownloadMedia(data):
+def DOWNLOAD_HANDLER(data):
     msg = data[0]
     USER = data[1]
     if Gvar.DOWNLOADING == 0:
         if msg.media != None:
             try:
                 Gvar.DOWNLOADING = 1
+                Gvar.DATA[USER][LAST_MESSAGE_ID] = bot.send_message(
+                    Gvar.DATA[USER][ID], "Donloading..."
+                ).id
                 bot.download_media(
                     msg,
                     Gvar.DATA[USER][PATH] + "/",
                     progress=progress,
+                    progress_args=[USER],
                 )
                 msg.reply("Downloaded")
             except:
                 msg.reply("Error downloading media")
             finally:
+                Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
                 Gvar.DOWNLOADING = 0
                 return 1
         return 1
     else:
         return 0
+
+
+def DOWNLOAD_QUEUE_HANDLER():
+    while 1:
+        if len(Gvar.QUEUE_DOWNLOAD) < 1:
+            time.sleep(1)
+            continue
+        res = DOWNLOAD_HANDLER(Gvar.QUEUE_DOWNLOAD[0])
+        if res == 1:
+            Gvar.QUEUE_DOWNLOAD.pop(0)
+        else:
+            time.sleep(1)
 
 
 @bot.on_inline_query()
@@ -128,25 +168,45 @@ async def on_inline_query(client: Client, message: Message):
 async def on_private_message(client: Client, message: Message):
     Gvar.QUEUE_DIRECT.append([client, message])
     pass
+@bot.on_message(filters.group)
+async def on_private_message(client: Client, message: Message):
+    if message.mentioned:
+        Gvar.QUEUE_DIRECT.append([client, message])
+    pass
 
 
-@bot.on_edited_message()
-async def on_edit_message(client, message):
-    await on_private_message(client, message)
+@bot.on_edited_message(filters.group)
+async def on_edit_private_message(client, message:Message):
+    print(message.mentioned)
+    if message.mentioned:
+        await on_private_message(client, message)
 
 
-"""
-DATA[0] = chatid
-DATA[1] = LAST_MESSAGE_ID
-DATA[2] = chdir
-DATA[3] = mkdir
-DATA[4] = send
-DATA[5] = urlget 
-DATA[6] = PATH
-"""
+def init():
+    while not bot.is_connected:
+        time.sleep(0.001)
+    for i in Gvar.ADMINS:
+        bot.send_message(i, "bot started...")
+    commands = []
+    for i in Gvar.BOT_COMMANDS:
+        AUX_COMMAND = BotCommand(i[0], i[1])
+        commands.append(AUX_COMMAND)
+    try:
+        pass  # bot.set_bot_commands(commands)
+    except Exception as e:
+        for i in Gvar.ADMINS:
+            bot.send_message(i, str(e))
 
-DOWNLOADER = th.Thread(target=DOWN)
-CORE = th.Thread(target=CORE0)
-DOWNLOADER.start()
-CORE.start()
+
+ADMIN_START_ALERT_AND_BOT_INIT = th.Thread(target=init)
+ADMIN_START_ALERT_AND_BOT_INIT.start()
+
+# Thread
+CORE0 = th.Thread(target=DIRECT_MESSAGE_QUEUE_HANDLER)
+CORE1 = th.Thread(target=INLINE_MESSAGE_QUEUE_HANDLER)
+CORE2 = th.Thread(target=DOWNLOAD_QUEUE_HANDLER)
+
+CORE0.start()
+CORE1.start()
+CORE2.start()
 bot.run()

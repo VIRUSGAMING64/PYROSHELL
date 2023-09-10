@@ -3,10 +3,14 @@ from datatypes import *
 import Gvar
 import os
 import ENV
+from pyrogram.emoji import *
 from pyrogram.types import *
 import threading as th
 import time
-
+def debug(arg):
+    f = open("debug.txt","a")
+    f.write(str(arg))
+    f.close()
 
 def FindUser(user):
     i = 0
@@ -44,11 +48,32 @@ def mkdir(USER, msg: str):
         pass
 
 
-def geturl(USER, msg:str):
-    return "/geturl in progress"
-    #TODO
-    pass
+def __geturl(url,filename):
+    try:
+        Dn = uq.urlopen(url)
+        D = Dn.read(1024 * 1024)
+        file = open(filename,"w")
+        while D:
+            file.write(D)
+            D = Dn.read(1024 * 1024)
+        file.close()
+    except Exception as e:
+        return "Error: " + str(e) 
 
+def geturl(USER, msg: str):
+    if msg.startswith("/geturl"):
+        try:
+            msg = msg.split(' ')
+            return __geturl(msg[1],msg[2])
+        except:
+            return "command sintaxis: /geturl URL FILENAME"
+    else:
+        try:
+            msg = msg.split(' ')
+            return __geturl(msg[0],msg[1])
+        except:
+            return "incorrect link and filename format"   
+            
 
 def chdir(USER, msg):
     if not msg.startswith("/chdir") and Gvar.DATA[USER][CHDIR] != 1:
@@ -138,7 +163,7 @@ def chdir(USER, msg):
                 Gvar.DATA[USER][PATH] = Gvar.DATA[USER][PATH] + "\\" + DIR
                 return "Changed to: " + os.getcwd()
             except Exception as e:
-                return str(e)
+                return "Error on chdir: " + str(e)
         except Exception as e:
             print(e)
             return "Impossible change directory"
@@ -146,12 +171,12 @@ def chdir(USER, msg):
     except Exception as e:
         print(e)
         Gvar.DATA[USER][CHDIR] = 1
-        return "send dir name"
+        return "send directory name"
 
 
 def ls():
     try:
-        sstr = "IN THIS DIRL:\n"
+        sstr = "IN THIS DIRL " + os.getcwd() + ": \n"
         ls = os.listdir()
         ls.sort()
         for i in ls:
@@ -159,18 +184,119 @@ def ls():
                 sstr += "   [dir] " + i + "\n"
             elif os.path.isfile(i):
                 sstr += "   [file] " + i + "\n"
+            elif os.path.islink(i):
+                sstr += "   [link] " + i + "\n"
             else:
                 sstr += "   [other] " + i + "\n"
         return sstr
     except Exception as e:
-        return str(e)
+        print("Error: " + str(e))
+        return "Error: " + str(e)
 
 
-def USER_PROCCESS(USER, message:Message):
+def NOTEPAD(USER, msg):
+    if Gvar.DATA[USER][GETING_NOTEPAD_NAME] == 1:
+        Gvar.DATA[USER][GETING_NOTEPAD_NAME] = 0
+        try:
+            msg = msg.split(" ")
+            msg = msg[0]
+            file = open(msg, "w")
+            Gvar.DATA[USER][WRITING_FILEPATH] = msg
+            Gvar.DATA[USER][WRITING] = 1
+            file.close()
+            return "file created"
+        except Exception as e:
+            print(e)
+            return "Error: " + str(e)
+    try:
+        if msg.startswith("/note"):
+            msg = msg.split(" ")
+        try:
+            msg = msg[1]
+            try:
+                file = open(msg, "w")
+                file.close()
+                Gvar.DATA[USER][WRITING] = 1
+                Gvar.DATA[USER][WRITING_FILEPATH] = msg
+            except Exception as e:
+                return "Error: " + str(e)
+        except:
+            Gvar.DATA[USER][GETING_NOTEPAD_NAME] = 1
+            return "send filename: "
+    except Exception as e:
+        print(e)
+        return "Error: " + str(e)
+
+
+def WRITER(USER, msg):
+    if msg.startswith("/note"):
+        Gvar.DATA[USER][WRITING] = 0
+        Gvar.DATA[USER][WRITING_FILEPATH] = 0
+        return "Closed file"
+    else:
+        try:
+            try:
+                file = open(Gvar.DATA[USER][WRITING_FILEPATH], "a")
+                total = file.write(msg)
+                return f"Writed {total} bytes"
+            except:
+                return "Error writing file"
+        except Exception as e:
+            print(e)
+            return "Error: " + str(e)
+
+
+def cat(USER, msg:str):
+    if Gvar.DATA[USER][CATING] == 1:
+        Gvar.DATA[USER][CATING] = 0
+        try:
+            msg = msg.split(" ")
+            msg = msg[0]
+        except Exception as e:
+            print(e)
+            return "Error: " + str(e)
+    elif msg.startswith("/cat"):
+        try:
+            msg = msg.split(' ')
+            msg = msg[1]
+
+        except Exception as e:
+            print(e)
+            Gvar.DATA[USER][CATING] = 1
+            return "Send file name"
+    else:
+        return "SINTAXIS ERROR: " + msg + " is /cat FILE"
+    try:
+        file = open(msg, "r")
+        return file.read(Gvar.MAX_MESSAGE_LENGTH)
+    except Exception as e:
+        print("Error on cat:", e)
+        return "Error on cat: " + str(e)
+
+def tree(user,msg):
+    return "Work in progress"
+
+def spider(user,msg):
+    return "Work in progress"
+
+def USER_PROCCESS(USER, message: Message):
     CHAT_ID = Gvar.DATA[USER][ID]
     MSG = str(message.text)
     RES = ""
-    if MSG.startswith("/cd"):
+    
+    if Gvar.DATA[USER][WRITING] == 1:
+        return WRITER(USER, MSG)
+    elif MSG.startswith("/tree"):
+        return tree(USER,MSG)
+    elif MSG.startswith("/news"):
+        return Gvar.NEWS #change in time
+    elif MSG.startswith("/help"):
+        return Gvar.HELP
+    elif MSG.startswith("/spider"):
+        return spider(USER,MSG)
+    elif MSG.startswith("/note") or Gvar.DATA[USER][GETING_NOTEPAD_NAME]:
+        return NOTEPAD(USER, MSG)
+    elif MSG.startswith("/cd"):
         return os.getcwd()
     elif MSG.startswith("/ls"):
         return ls()
@@ -180,6 +306,8 @@ def USER_PROCCESS(USER, message:Message):
         return mkdir(USER, MSG)
     elif MSG.startswith("/geturl") or Gvar.DATA[USER][GETURL]:
         return geturl(USER, MSG)
+    elif MSG.startswith("/cat") or Gvar.DATA[USER][CATING]:
+        return cat(USER, MSG)
     else:
         return "None"
     pass
