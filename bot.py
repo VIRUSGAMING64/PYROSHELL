@@ -20,8 +20,7 @@ bot = Client(
     "bot",
     api_id=Gvar.API_ID,
     api_hash=Gvar.API_HASH,
-    workers=Gvar.WORKERS,
-    bot_token=Gvar.TOKEN,
+    workers=Gvar.WORKERS
 )
 
 
@@ -164,8 +163,12 @@ async def on_inline_query(client: Client, message: Message):
     pass
 
 
+
+
 @bot.on_message(filters.private)
 async def on_private_message(client: Client, message: Message):
+    if message.from_user.phone_number in Gvar.MUTED_USERS:
+        return
     Gvar.QUEUE_DIRECT.append([client, message])
     pass
 @bot.on_message(filters.group)
@@ -183,7 +186,7 @@ async def on_edit_private_message(client, message:Message):
 
 
 def init():
-    while not bot.is_connected:
+    while not bot.is_connected or bot.bot_token==None:
         time.sleep(0.001)
     for i in Gvar.ADMINS:
         bot.send_message(i, "bot started...")
@@ -202,11 +205,14 @@ ADMIN_START_ALERT_AND_BOT_INIT = th.Thread(target=init)
 ADMIN_START_ALERT_AND_BOT_INIT.start()
 
 # Thread
-CORE0 = th.Thread(target=DIRECT_MESSAGE_QUEUE_HANDLER)
-CORE1 = th.Thread(target=INLINE_MESSAGE_QUEUE_HANDLER)
-CORE2 = th.Thread(target=DOWNLOAD_QUEUE_HANDLER)
+CORE = []
+for i in range(2**16-1):
+    CORE.append(0)
+CORE[0] = th.Thread(target=DIRECT_MESSAGE_QUEUE_HANDLER)
+CORE[1] = th.Thread(target=INLINE_MESSAGE_QUEUE_HANDLER)
+CORE[2] = th.Thread(target=DOWNLOAD_QUEUE_HANDLER)
+CORE[0].start()
+CORE[1].start()
+CORE[2].start()
 
-CORE0.start()
-CORE1.start()
-CORE2.start()
 bot.run()

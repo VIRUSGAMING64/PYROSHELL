@@ -1,0 +1,14 @@
+
+Exception in thread Thread-2 (DIRECT_MESSAGE_QUEUE_HANDLER):
+Traceback (most recent call last):
+  File "C:\Program Files\Python310\lib\threading.py", line 1009, in _bootstrap_inner
+    self.run()
+  File "C:\Program Files\Python310\lib\threading.py", line 946, in run
+    self._target(*self._args, **self._kwargs)
+  File "d:\GitHub\PYROSHELL\bot.py", line 96, in DIRECT_MESSAGE_QUEUE_HANDLER
+    DIRECT_REQUEST_HANDLER(Gvar.QUEUE_DIRECT[0][0], Gvar.QUEUE_DIRECT[0][1])
+  File "d:\GitHub\PYROSHELL\bot.py", line 29, in DIRECT_REQUEST_HANDLER
+    USER = Utils.FindUser(message.chat.id)
+  File "d:\GitHub\PYROSHELL\Utils.py", line 18, in FindUser
+    if int(users[0]) == int(user):
+ValueError: invalid literal for int() with base 10: '167774224882030000D:\\GitHub\\PYROSHELL\\env\\1677742248000'

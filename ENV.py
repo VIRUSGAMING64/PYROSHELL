@@ -2,15 +2,17 @@ from datatypes import *
 import Gvar
 import os
 
+
 class MAIN:
     FILE = Gvar.ROOT + "datas.V"
     OFILE = None
+
     def __init__(self):
         try:
             F = open(self.FILE, "r")
             MEM = ""
             while 1:
-                D = F.read(1024*1024)
+                D = F.read(1024 * 1024)
                 if D:
                     MEM += D
                 else:
@@ -31,7 +33,6 @@ class MAIN:
         except Exception as e:
             print(e)
             pass
-
 
     def save(self):
         self.OFILE = open(self.FILE, "w")

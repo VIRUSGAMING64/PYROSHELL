@@ -11,14 +11,15 @@ HAND = ""
 FILEROOT = os.getcwd()
 ROOT = os.getcwd() + "\\env"  # for envs
 QUEUE_INLINE = []
-QUEUE_DIRECT = []
-USER_VARIABLES = 21
-QUEUE_DOWNLOAD = []
-DOWNLOADING = 0
-DATA = []
-MAX_MESSAGE_LENGTH = 4096
-WORKERS = os.cpu_count()
-TOKEN = None  # bot token
+MUTED_USERS = [] #Use in format "code"+"number"
+QUEUE_DIRECT = [] #queue for direct messages
+USER_VARIABLES = 21 
+QUEUE_DOWNLOAD = [] # queue of downloads
+DOWNLOADING = 0 # if 1 user downloading 
+DATA = [] # all users and variables
+MAX_MESSAGE_LENGTH = 4096 
+WORKERS = os.cpu_count() 
+TOKEN = None  # bot token 
 
 BOT_COMMANDS = [
     ["/help", "send help"],
