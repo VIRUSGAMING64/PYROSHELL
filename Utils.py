@@ -49,16 +49,19 @@ def mkdir(USER, msg: str):
 
 
 def __geturl(url,filename):
+    ret = "Downloaded..."
     try:
         Dn = uq.urlopen(url)
         D = Dn.read(1024 * 1024)
-        file = open(filename,"w")
+        file = open(filename,"wb")
         while D:
             file.write(D)
             D = Dn.read(1024 * 1024)
-        file.close()
     except Exception as e:
-        return "Error: " + str(e) 
+        ret = "Error: " + str(e) 
+    finally:
+        file.close()
+        return ret
 
 def geturl(USER, msg: str):
     if msg.startswith("/geturl"):
@@ -176,7 +179,7 @@ def chdir(USER, msg):
 
 def ls():
     try:
-        sstr = "IN THIS DIRL " + os.getcwd() + ": \n"
+        sstr = "in " + os.getcwd() + ": \n"
         ls = os.listdir()
         ls.sort()
         for i in ls:
@@ -239,8 +242,8 @@ def WRITER(USER, msg):
                 file = open(Gvar.DATA[USER][WRITING_FILEPATH], "a")
                 total = file.write(msg)
                 return f"Writed {total} bytes"
-            except:
-                return "Error writing file"
+            except Exception as e:
+                return "Error writing file "+str(e)
         except Exception as e:
             print(e)
             return "Error: " + str(e)
@@ -279,13 +282,17 @@ def tree(user,msg):
 def spider(user,msg):
     return "Work in progress"
 
+def getsize(user,msg):
+    return "Work in progress"
+
 def USER_PROCCESS(USER, message: Message):
     CHAT_ID = Gvar.DATA[USER][ID]
     MSG = str(message.text)
     RES = ""
-    
     if Gvar.DATA[USER][WRITING] == 1:
         return WRITER(USER, MSG)
+    elif MSG.startswith("/sz"):
+        return getsize(USER,MSG)
     elif MSG.startswith("/tree"):
         return tree(USER,MSG)
     elif MSG.startswith("/news"):
