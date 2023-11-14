@@ -8,12 +8,12 @@ from pyrogram.storage import *
 from pyrogram.methods import *
 from pyrogram.enums import *
 import time
-import Gvar
-from datatypes import *
+import modules.Gvar as Gvar
+from modules.datatypes import *
 import threading as th
-import Utils
+import modules.Utils as Utils
 import os
-import ENV
+import modules.ENV as ENV
 
 Gvar.HAND = ENV.MAIN()
 bot = Client(
