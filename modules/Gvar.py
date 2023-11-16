@@ -34,12 +34,11 @@ BOT_COMMANDS = [
 ]
 
 IN_PROGRESS = [
-    "download youtube videos",
-    "work with videos [combert x264 to x265]",
-    "download torrent",
-    "work with compresed files [ZIP]",
-    "/tree command [tree of directory]",
-    "/spider command [get all urls in a web page with deep X [default X = 0]]"
+    "download youtube videos", # libreria de jlsearch bot o buscar en github??
+    "work with videos [combert x264 to x265]", # ????
+    "download torrent", # ????
+    "work with compresed files [ZIP]", #esto creo que hay documentacion en los .7z
+    "/spider command [get all urls in a web page with deep X [default X = 0]]" # esto debe hacerse con HTTPHandler de urllib.request
 ]
 
 HELP = ""

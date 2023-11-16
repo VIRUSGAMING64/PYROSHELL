@@ -6,7 +6,6 @@ import os
 class MAIN:
     FILE = Gvar.ROOT + "datas.V"
     OFILE = None
-
     def __init__(self):
         try:
             F = open(self.FILE, "r")

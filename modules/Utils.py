@@ -2,6 +2,7 @@ import urllib.request as uq
 from datatypes import *
 import Gvar
 import os
+from tree import *
 import ENV
 from pyrogram.emoji import *
 from pyrogram.types import *
@@ -277,7 +278,11 @@ def cat(USER, msg:str):
         return "Error on cat: " + str(e)
 
 def tree(user,msg):
-    return "Work in progress"
+    dt = TreeMaker()
+    dt.show=False
+    dt.showfiles = True
+    dt.tree(Gvar.DATA[user][PATH])
+    return dt.trees
 
 def spider(user,msg):
     return "Work in progress"

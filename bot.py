@@ -67,7 +67,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
                 pass
             os.chdir(Gvar.DATA[USER][PATH])
     Gvar.QUEUE_DOWNLOAD.append([message, USER])
-    RES = Utils.USER_PROCCESS(USER, message)
+    RES = Utils.USER_PROCCESS(USER, message) # aqui hay que verificar que len(RES) no sea mayor que MAX_MESSAGE_LENGHT
     Gvar.DATA[USER][BOT_LAST_MESSAGE_ID] = bot.send_message(message.chat.id, RES).id
     Gvar.DATA[USER][LAST_MESSAGE_ID] = message.id
     Gvar.HAND.save()
@@ -90,7 +90,7 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
 def DIRECT_MESSAGE_QUEUE_HANDLER():
     while 1:
         if len(Gvar.QUEUE_DIRECT) == 0:
-            time.sleep(0.001)
+            time.sleep(0.01)
             continue
         DIRECT_REQUEST_HANDLER(Gvar.QUEUE_DIRECT[0][0], Gvar.QUEUE_DIRECT[0][1])
         Gvar.QUEUE_DIRECT.pop(0)
