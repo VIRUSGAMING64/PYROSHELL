@@ -15,6 +15,11 @@ import modules.Utils as Utils
 import os
 import modules.ENV as ENV
 
+def debug(e):
+    _debug = open("debug-bot.txt","a")
+    _debug.write(str(e) + "\n")
+    _debug.close()
+
 Gvar.HAND = ENV.MAIN()
 bot = Client(
     "bot",
@@ -54,16 +59,19 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
         Gvar.DATA.append(TEMP_USER)
     try:
         os.chdir(Gvar.DATA[USER][PATH])
-    except:
+    except Exception as e:
+        debug(e)
         try:
             os.mkdir(Gvar.DATA[USER][PATH])
             os.chdir(Gvar.DATA[USER][PATH])
         except Exception as e:
+            debug(e)
             bot.send_message(message.chat.id, "invalid directoy:    " + str(e))
             try:
-                Gvar.DATA[USER][PATH] = Gvar.ROOT + "\\" + str(message.chat.id)
+                Gvar.DATA[USER][PATH] = Gvar.ROOT + "\\" + str(message.from_user.id)+'-'+message.from_user.first_name
                 os.mkdir(Gvar.DATA[USER][PATH])
-            except:
+            except Exception as e:
+                debug(e)
                 pass
             os.chdir(Gvar.DATA[USER][PATH])
     Gvar.QUEUE_DOWNLOAD.append([message, USER])
@@ -134,7 +142,8 @@ def DOWNLOAD_HANDLER(data):
                     progress_args=[USER],
                 )
                 msg.reply("Downloaded")
-            except:
+            except Exception as e:
+                debug(e)
                 msg.reply("Error downloading media")
             finally:
                 Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
@@ -197,6 +206,7 @@ def init():
     try:
         pass  # bot.set_bot_commands(commands)
     except Exception as e:
+        debug(e)
         for i in Gvar.ADMINS:
             bot.send_message(i, str(e))
 

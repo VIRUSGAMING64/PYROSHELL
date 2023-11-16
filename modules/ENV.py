@@ -1,6 +1,12 @@
 from datatypes import *
 import Gvar
 import os
+def debug(e):
+    _debug = open("debug-env.txt","a")
+    _debug.write(str(e) + "\n")
+    _debug.close()
+
+
 
 
 class MAIN:

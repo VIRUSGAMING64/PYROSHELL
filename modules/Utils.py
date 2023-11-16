@@ -8,10 +8,12 @@ from pyrogram.emoji import *
 from pyrogram.types import *
 import threading as th
 import time
-def debug(arg):
-    f = open("debug.txt","a")
-    f.write(str(arg))
-    f.close()
+
+def debug(e):
+    _debug = open("debug-utils.txt","a")
+    _debug.write(str(e) + "\n")
+    _debug.close()
+
 
 def FindUser(user):
     i = 0
@@ -29,11 +31,13 @@ def mkdir(USER, msg: str):
             msg = msg.split(" ")
             os.mkdir(msg[0])
         except Exception as e:
+            debug(e)
             print(e)
             try:
                 os.mkdir(msg)
                 return "Directory created"
             except Exception as e:
+                debug(e)
                 print(e)
                 return "Error on create directory"
             pass
@@ -44,6 +48,7 @@ def mkdir(USER, msg: str):
         return "Directory created"
     except Exception as e:
         print(e)
+        debug(e)
         Gvar.DATA[USER][3] = 1
         return "Send directory name"
         pass
@@ -59,6 +64,7 @@ def __geturl(url,filename):
             file.write(D)
             D = Dn.read(1024 * 1024)
     except Exception as e:
+        debug(e)
         ret = "Error: " + str(e) 
     finally:
         file.close()
@@ -69,19 +75,19 @@ def geturl(USER, msg: str):
         try:
             msg = msg.split(' ')
             return __geturl(msg[1],msg[2])
-        except:
+        except Exception as e:
+            debug(e)
             return "command sintaxis: /geturl URL FILENAME"
     else:
         try:
             msg = msg.split(' ')
             return __geturl(msg[0],msg[1])
-        except:
+        except Exception as e:
+            debug(e)
             return "incorrect link and filename format"   
             
 
 def chdir(USER, msg):
-    if not msg.startswith("/chdir") and Gvar.DATA[USER][CHDIR] != 1:
-        return "Debuging..."
     if Gvar.DATA[USER][CHDIR] == 1:
         Gvar.DATA[USER][CHDIR] = 0
         try:
@@ -89,9 +95,11 @@ def chdir(USER, msg):
             try:
                 msg = msg[0]
             except Exception as e:
+                debug(e)
                 print(e, " one message")
         except Exception as e:
             print(e)
+            debug(e)
             pass
         if msg == "..":
             if os.path.dirname(os.getcwd()) == Gvar.ROOT:
@@ -125,14 +133,15 @@ def chdir(USER, msg):
                     Gvar.DATA[USER][PATH] = Gvar.DATA[USER][PATH] + "\\" + DIR
                     return "Changed to: " + os.getcwd()
                 except Exception as e:
+                    debug(e)
                     return e
 
             except Exception as e:
+                debug(e)
                 print(e)
                 return "Impossible change directory."
                 pass
         return
-
     try:
         msg = msg.split(" ")
         msg = msg[1]
@@ -167,12 +176,15 @@ def chdir(USER, msg):
                 Gvar.DATA[USER][PATH] = Gvar.DATA[USER][PATH] + "\\" + DIR
                 return "Changed to: " + os.getcwd()
             except Exception as e:
+                debug(e)
                 return "Error on chdir: " + str(e)
         except Exception as e:
+            debug(e)
             print(e)
             return "Impossible change directory"
             pass
     except Exception as e:
+        debug(e)
         print(e)
         Gvar.DATA[USER][CHDIR] = 1
         return "send directory name"
@@ -194,6 +206,7 @@ def ls():
                 sstr += "   [other] " + i + "\n"
         return sstr
     except Exception as e:
+        debug(e)
         print("Error: " + str(e))
         return "Error: " + str(e)
 
@@ -211,6 +224,7 @@ def NOTEPAD(USER, msg):
             return "file created"
         except Exception as e:
             print(e)
+            debug(e)
             return "Error: " + str(e)
     try:
         if msg.startswith("/note"):
@@ -223,12 +237,15 @@ def NOTEPAD(USER, msg):
                 Gvar.DATA[USER][WRITING] = 1
                 Gvar.DATA[USER][WRITING_FILEPATH] = msg
             except Exception as e:
+                debug(e)
                 return "Error: " + str(e)
-        except:
+        except Exception as e:
+            debug(e)
             Gvar.DATA[USER][GETING_NOTEPAD_NAME] = 1
             return "send filename: "
     except Exception as e:
         print(e)
+        debug(e)
         return "Error: " + str(e)
 
 
@@ -244,8 +261,10 @@ def WRITER(USER, msg):
                 total = file.write(msg)
                 return f"Writed {total} bytes"
             except Exception as e:
+                debug(e)
                 return "Error writing file "+str(e)
         except Exception as e:
+            debug(e)
             print(e)
             return "Error: " + str(e)
 
@@ -258,13 +277,15 @@ def cat(USER, msg:str):
             msg = msg[0]
         except Exception as e:
             print(e)
+            debug(e)
             return "Error: " + str(e)
     elif msg.startswith("/cat"):
         try:
             msg = msg.split(' ')
             msg = msg[1]
 
-        except Exception as e:
+        except Exception as e:    
+            debug(e)
             print(e)
             Gvar.DATA[USER][CATING] = 1
             return "Send file name"
@@ -274,6 +295,7 @@ def cat(USER, msg:str):
         file = open(msg, "r")
         return file.read(Gvar.MAX_MESSAGE_LENGTH)
     except Exception as e:
+        debug(e)
         print("Error on cat:", e)
         return "Error on cat: " + str(e)
 

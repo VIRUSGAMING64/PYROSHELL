@@ -45,6 +45,11 @@ class TreeMaker:
         for i in l:
             if i.startswith('.'):
                 continue
+            try:
+                if self.showfiles == False and os.path.isfile(dir):
+                    continue
+            except Exception as e:
+                continue
             os.chdir(dir)
             self.tree(dir + '\\'+i,prof+1)
             for k in range(self.spaces):
