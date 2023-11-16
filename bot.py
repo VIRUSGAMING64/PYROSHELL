@@ -9,12 +9,13 @@ from pyrogram.methods import *
 from pyrogram.enums import *
 import time
 import modules.Gvar as Gvar
+import modules.datatypes
 from modules.datatypes import *
 import threading as th
 import modules.Utils as Utils
 import os
 import modules.ENV as ENV
-
+from pyrogram import session
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
@@ -33,21 +34,21 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     USER = Utils.FindUser(message.chat.id)
     if USER == None:
         TEMP_USER = [
-            message.chat.id,  # ID  0
+            message.from_user.id,  # USER_ID  0
             message.id,  # LAST_MESSAGE_ID 1
             0,  # CHDIR 2
             0,  # MKDIR 3
             0,  # SEND 4
             0,  # GETURL 5
-            Gvar.ROOT + "\\" + str(message.chat.id),  # PATH 6
+            Gvar.ROOT + "\\" + str(message.from_user.id) + "-" + str(message.from_user.first_name1),  # PATH 6
             0,  # ASKING 7
             0,  # WRITING 8
             0,  # GETING_NOTEPAD_NAME 9
             0,  # WRITING_FILEPATH 10
             0,  # BOT_LAST_MESSAGE_ID 11
-            0,  # other vars 12
-            0,  # other vars 13
-            0,  # other vars 14
+            0,  # CATING 12
+            0,  # LAST_MESSAGE_DOWNLOAD_ID 13
+            message.chat.id,  # chat_id 14
             0,  # other vars 15
             0,  # other vars 16
             0,  # other vars 17
@@ -72,7 +73,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
                 os.mkdir(Gvar.DATA[USER][PATH])
             except Exception as e:
                 debug(e)
-                pass
+                return
             os.chdir(Gvar.DATA[USER][PATH])
     Gvar.QUEUE_DOWNLOAD.append([message, USER])
     RES = Utils.USER_PROCCESS(USER, message) # aqui hay que verificar que len(RES) no sea mayor que MAX_MESSAGE_LENGHT
@@ -112,18 +113,16 @@ def INLINE_MESSAGE_QUEUE_HANDLER():
         INLINE_REQUEST_HANDLER(Gvar.QUEUE_INLINE[0][0], Gvar.QUEUE_INLINE[0][1])
         Gvar.QUEUE_INLINE.pop(0)
 
-
 def progress(cant, total, USER):
     if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
-            Gvar.DATA[USER][ID], f"Downloaded: {cant} of {total}"
-        )
+            Gvar.DATA[USER][CHAT_ID], f"Downloaded: {cant} of {total}"
+        ).id
     else:
         bot.edit_message_text(
             Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], f"Downloaded: {cant} of {total}"
         )
     pass
-
 
 def DOWNLOAD_HANDLER(data):
     msg = data[0]
@@ -132,8 +131,8 @@ def DOWNLOAD_HANDLER(data):
         if msg.media != None:
             try:
                 Gvar.DOWNLOADING = 1
-                Gvar.DATA[USER][LAST_MESSAGE_ID] = bot.send_message(
-                    Gvar.DATA[USER][ID], "Donloading..."
+                Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
+                    Gvar.DATA[USER][CHAT_ID], "Donloading..."
                 ).id
                 bot.download_media(
                     msg,
@@ -141,7 +140,7 @@ def DOWNLOAD_HANDLER(data):
                     progress=progress,
                     progress_args=[USER],
                 )
-                msg.reply("Downloaded")
+                msg.reply("Downloaded !!!!")
             except Exception as e:
                 debug(e)
                 msg.reply("Error downloading media")
@@ -149,7 +148,8 @@ def DOWNLOAD_HANDLER(data):
                 Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
                 Gvar.DOWNLOADING = 0
                 return 1
-        return 1
+        else:
+            return 1
     else:
         return 0
 
@@ -165,13 +165,10 @@ def DOWNLOAD_QUEUE_HANDLER():
         else:
             time.sleep(1)
 
-
 @bot.on_inline_query()
 async def on_inline_query(client: Client, message: Message):
     Gvar.QUEUE_INLINE.append([client, message])
     pass
-
-
 
 
 @bot.on_message(filters.private)
@@ -181,18 +178,14 @@ async def on_private_message(client: Client, message: Message):
     Gvar.QUEUE_DIRECT.append([client, message])
     pass
 @bot.on_message(filters.group)
-async def on_private_message(client: Client, message: Message):
+async def on_group_message(client: Client, message: Message):
     if message.mentioned:
         Gvar.QUEUE_DIRECT.append([client, message])
     pass
 
-
-@bot.on_edited_message(filters.group)
+@bot.on_edited_message(filters.private)
 async def on_edit_private_message(client, message:Message):
-    print(message.mentioned)
-    if message.mentioned:
-        await on_private_message(client, message)
-
+    await on_private_message(client, message)
 
 def init():
     while not bot.is_connected or bot.bot_token==None:
@@ -204,17 +197,14 @@ def init():
         AUX_COMMAND = BotCommand(i[0], i[1])
         commands.append(AUX_COMMAND)
     try:
-        pass  # bot.set_bot_commands(commands)
+        pass  #repair this --> bot.set_bot_commands(commands)
     except Exception as e:
         debug(e)
         for i in Gvar.ADMINS:
             bot.send_message(i, str(e))
 
-
 ADMIN_START_ALERT_AND_BOT_INIT = th.Thread(target=init)
 ADMIN_START_ALERT_AND_BOT_INIT.start()
-
-# Thread
 CORE = []
 for i in range(2**16-1):
     CORE.append(0)

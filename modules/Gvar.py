@@ -4,7 +4,7 @@ import os
     if you don't see work in progress in
     github is because this work is local
 """
-ADMINS = [1659735368]
+ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINSS
 API_ID = 29695292
 API_HASH = "8b05ce00146edeeae7aafc4bea30e713"  # bot api
 HAND = ""

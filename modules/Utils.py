@@ -1,9 +1,10 @@
 import urllib.request as uq
-from datatypes import *
-import Gvar
+from modules.datatypes import *
+import modules.Gvar as Gvar
+from modules.copy_core import *
 import os
-from tree import *
-import ENV
+from modules.tree import *
+import modules.ENV as ENV
 from pyrogram.emoji import *
 from pyrogram.types import *
 import threading as th
@@ -312,11 +313,14 @@ def spider(user,msg):
 def getsize(user,msg):
     return "Work in progress"
 
+def copy(message:Message):
+    pass
+
 def USER_PROCCESS(USER, message: Message):
-    CHAT_ID = Gvar.DATA[USER][ID]
     MSG = str(message.text)
-    RES = ""
-    if Gvar.DATA[USER][WRITING] == 1:
+    if MSG.startswith("/cc"):
+        return copy(message)
+    elif Gvar.DATA[USER][WRITING] == 1:
         return WRITER(USER, MSG)
     elif MSG.startswith("/sz"):
         return getsize(USER,MSG)

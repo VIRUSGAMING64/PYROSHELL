@@ -1,5 +1,5 @@
-from datatypes import *
-import Gvar
+from modules.datatypes import *
+import modules.Gvar as Gvar
 import os
 def debug(e):
     _debug = open("debug-env.txt","a")
