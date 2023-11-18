@@ -1,21 +1,5 @@
-from pyrogram.emoji import *
-from pyrogram.types import *
-from pyrogram.connection import *
-from pyrogram import *
-from pyrogram.client import *
-from pyrogram.errors import *
-from pyrogram.storage import *
-from pyrogram.methods import *
-from pyrogram.enums import *
-import time
-import modules.Gvar as Gvar
-import modules.datatypes
-from modules.datatypes import *
-import threading as th
-import modules.Utils as Utils
-import os
-import modules.ENV as ENV
-from pyrogram import session
+from modules.imports import *
+
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
@@ -23,12 +7,11 @@ def debug(e):
 
 Gvar.HAND = ENV.MAIN()
 bot = Client(
-    "bot",
+    "virusgaming",
     api_id=Gvar.API_ID,
     api_hash=Gvar.API_HASH,
     workers=Gvar.WORKERS
 )
-
 
 def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     USER = Utils.FindUser(message.chat.id)
@@ -40,7 +23,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
             0,  # MKDIR 3
             0,  # SEND 4
             0,  # GETURL 5
-            Gvar.ROOT + "\\" + str(message.from_user.id) + "-" + str(message.from_user.first_name1),  # PATH 6
+            Gvar.ROOT + "\\" + str(message.from_user.id) + "_" + str(message.from_user.first_name),  # PATH 6
             0,  # ASKING 7
             0,  # WRITING 8
             0,  # GETING_NOTEPAD_NAME 9
@@ -69,7 +52,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
             debug(e)
             bot.send_message(message.chat.id, "invalid directoy:    " + str(e))
             try:
-                Gvar.DATA[USER][PATH] = Gvar.ROOT + "\\" + str(message.from_user.id)+'-'+message.from_user.first_name
+                Gvar.DATA[USER][PATH] = Gvar.ROOT + "\\" + str(message.from_user.id)+'_'+str(message.from_user.first_name)
                 os.mkdir(Gvar.DATA[USER][PATH])
             except Exception as e:
                 debug(e)
@@ -77,10 +60,12 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
             os.chdir(Gvar.DATA[USER][PATH])
     Gvar.QUEUE_DOWNLOAD.append([message, USER])
     RES = Utils.USER_PROCCESS(USER, message) # aqui hay que verificar que len(RES) no sea mayor que MAX_MESSAGE_LENGHT
+    Gvar.HAND.save()
+    if not RES:
+        return
     Gvar.DATA[USER][BOT_LAST_MESSAGE_ID] = bot.send_message(message.chat.id, RES).id
     Gvar.DATA[USER][LAST_MESSAGE_ID] = message.id
     Gvar.HAND.save()
-    pass
 
 
 def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard

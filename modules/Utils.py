@@ -315,7 +315,6 @@ def getsize(user,msg):
 
 def copy(message:Message):
     pass
-
 def USER_PROCCESS(USER, message: Message):
     MSG = str(message.text)
     if MSG.startswith("/cc"):
@@ -332,12 +331,12 @@ def USER_PROCCESS(USER, message: Message):
         return Gvar.HELP
     elif MSG.startswith("/spider"):
         return spider(USER,MSG)
-    elif MSG.startswith("/note") or Gvar.DATA[USER][GETING_NOTEPAD_NAME]:
-        return NOTEPAD(USER, MSG)
     elif MSG.startswith("/cd"):
         return os.getcwd()
     elif MSG.startswith("/ls"):
         return ls()
+    elif MSG.startswith("/note") or Gvar.DATA[USER][GETING_NOTEPAD_NAME]:
+        return NOTEPAD(USER, MSG)
     elif MSG.startswith("/chdir") or Gvar.DATA[USER][CHDIR]:
         return chdir(USER, MSG)
     elif MSG.startswith("/mkdir") or Gvar.DATA[USER][MKDIR]:
@@ -347,5 +346,5 @@ def USER_PROCCESS(USER, message: Message):
     elif MSG.startswith("/cat") or Gvar.DATA[USER][CATING]:
         return cat(USER, MSG)
     else:
-        return "None"
+        return None
     pass

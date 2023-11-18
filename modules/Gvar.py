@@ -4,6 +4,7 @@ import os
     if you don't see work in progress in
     github is because this work is local
 """
+TOKEN = "5769859964:AAEynJeldbDcJqDAPrjUbLjxwqCrjrgGqsQ"
 ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINSS
 API_ID = 29695292
 API_HASH = "8b05ce00146edeeae7aafc4bea30e713"  # bot api
@@ -22,7 +23,6 @@ WORKERS = os.cpu_count()
 TOKEN = None  # bot token 
 
 BOT_COMMANDS = [
-    ["/help", "send help"],
     ["/ls", "send files and dirs in this rute"],
     ["/cat", "get 4096 first bytes of file"],
     ["/geturl", "download url"],
@@ -31,6 +31,7 @@ BOT_COMMANDS = [
     ["/note", "make a file to write in her"],
     ["/cd", "show actual directory"],
     ["/news", "show work in progress"],
+    ["/help", "send help"],
 ]
 
 IN_PROGRESS = [
