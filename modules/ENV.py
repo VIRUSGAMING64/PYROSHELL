@@ -6,10 +6,7 @@ def debug(e):
     _debug.write(str(e) + "\n")
     _debug.close()
 
-
-
-
-class MAIN:
+class MAIN: 
     FILE = Gvar.ROOT + "datas.V"
     OFILE = None
     def __init__(self):

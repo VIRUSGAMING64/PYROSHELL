@@ -6,7 +6,7 @@ class TreeMaker:
     left = '>'
     spaces = 3
     trees = ""
-    show = False
+    show = True
     def __init__(self) -> None:
         pass
     def end(self,s):
@@ -69,3 +69,6 @@ class TreeMaker:
                 else:
                     self.trees += " " + self.up * 3
             lk+=1
+
+tr = TreeMaker()
+tr.tree(os.getcwd())

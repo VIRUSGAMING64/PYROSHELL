@@ -25,3 +25,4 @@ import threading as th
 import modules.Utils as Utils
 import os
 import modules.ENV as ENV
+Gvar.HAND = ENV.MAIN()

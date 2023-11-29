@@ -26,7 +26,7 @@ class CORE:
             r = int(1024**2 * self.BLOCK_SIZE)
             m = int((l+r)//2)
             cant = 0
-            tot = 100 # aqui hay que poner el tamaño
+            tot = os.path.getsize(Ifile)
             while(1):
                 now =T.time() 
                 line = Ifile.read(m)
@@ -36,7 +36,6 @@ class CORE:
                     try:
                         func(cant,tot,m,func_args)
                     except Exception as e:
-                        print("HERE!!: " + str(e))
                         func(cant,tot,m)
                     now2 = T.time()
                     if(((now2 - now) < 1) and (l <= r)):
@@ -51,3 +50,4 @@ class CORE:
             if(move == True):
                 os.remove(self.Ipath)
         Ttime = T.time()-starttime
+        return Ttime

@@ -8,21 +8,24 @@ TOKEN = "5769859964:AAEynJeldbDcJqDAPrjUbLjxwqCrjrgGqsQ"
 ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINSS
 API_ID = 29695292
 API_HASH = "8b05ce00146edeeae7aafc4bea30e713"  # bot api
-HAND = ""
+HAND = None
 FILEROOT = os.getcwd()
 ROOT = os.getcwd() + "\\env"  # for envs
 QUEUE_INLINE = []
 MUTED_USERS = [] #Use in format "code"+"number"
 QUEUE_DIRECT = [] #queue for direct messages
-USER_VARIABLES = 21 
+QUEUE_TO_SEND = [] #queue of larges messages
+QUEUE_TORRENT = [] #torrent downloads
 QUEUE_DOWNLOAD = [] # queue of downloads
+USER_VARIABLES = 31 
 DOWNLOADING = 0 # if 1 user downloading 
-DATA = [] # all users and variables
+DATA = [] # all users and `variables
 MAX_MESSAGE_LENGTH = 4096 
 WORKERS = os.cpu_count() 
 TOKEN = None  # bot token 
 
 BOT_COMMANDS = [
+    ["BOT","COMMANDS"],
     ["/ls", "send files and dirs in this rute"],
     ["/cat", "get 4096 first bytes of file"],
     ["/geturl", "download url"],

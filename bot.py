@@ -5,14 +5,12 @@ def debug(e):
     _debug.write(str(e) + "\n")
     _debug.close()
 
-Gvar.HAND = ENV.MAIN()
 bot = Client(
     "virusgaming",
     api_id=Gvar.API_ID,
     api_hash=Gvar.API_HASH,
     workers=Gvar.WORKERS
 )
-
 def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     USER = Utils.FindUser(message.chat.id)
     if USER == None:
@@ -23,7 +21,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
             0,  # MKDIR 3
             0,  # SEND 4
             0,  # GETURL 5
-            Gvar.ROOT + "\\" + str(message.from_user.id) + "_" + str(message.from_user.first_name),  # PATH 6
+            Gvar.ROOT + "\\" + str(message.from_user.id) + "-" + str(message.from_user.first_name),  # PATH 6
             0,  # ASKING 7
             0,  # WRITING 8
             0,  # GETING_NOTEPAD_NAME 9
@@ -52,7 +50,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
             debug(e)
             bot.send_message(message.chat.id, "invalid directoy:    " + str(e))
             try:
-                Gvar.DATA[USER][PATH] = Gvar.ROOT + "\\" + str(message.from_user.id)+'_'+str(message.from_user.first_name)
+                Gvar.DATA[USER][PATH] = Gvar.ROOT + "\\" + str(message.from_user.id)+'-'+str(message.from_user.first_name)
                 os.mkdir(Gvar.DATA[USER][PATH])
             except Exception as e:
                 debug(e)
@@ -60,9 +58,25 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
             os.chdir(Gvar.DATA[USER][PATH])
     Gvar.QUEUE_DOWNLOAD.append([message, USER])
     RES = Utils.USER_PROCCESS(USER, message) # aqui hay que verificar que len(RES) no sea mayor que MAX_MESSAGE_LENGHT
-    Gvar.HAND.save()
+
     if not RES:
         return
+    T_TO_SEND = []
+    if(len(RES) > Gvar.MAX_MESSAGE_LENGTH):
+        i = 0
+        aux = ""
+        while(i < len(RES)):
+            for j in range(Gvar.MAX_MESSAGE_LENGTH):
+                if(i + j == len(RES)):
+                    break
+                aux += RES[i+j]
+            i += Gvar.MAX_MESSAGE_LENGTH
+            T_TO_SEND.append(aux)
+            aux = ''
+        Gvar.QUEUE_TO_SEND.append([message,T_TO_SEND])
+        Gvar.HAND.save()
+        return
+    
     Gvar.DATA[USER][BOT_LAST_MESSAGE_ID] = bot.send_message(message.chat.id, RES).id
     Gvar.DATA[USER][LAST_MESSAGE_ID] = message.id
     Gvar.HAND.save()
@@ -188,6 +202,17 @@ def init():
         for i in Gvar.ADMINS:
             bot.send_message(i, str(e))
 
+def TO_SEND_QUEUE_HANDLER(): #TODO
+    try:
+        pass
+    except Exception as e:
+        debug(e)
+def TORRENT_QUEUE_HANDLER(): #TODO
+    try:
+        pass
+    except Exception as e:
+        debug(e)
+
 ADMIN_START_ALERT_AND_BOT_INIT = th.Thread(target=init)
 ADMIN_START_ALERT_AND_BOT_INIT.start()
 CORE = []
@@ -196,8 +221,11 @@ for i in range(2**16-1):
 CORE[0] = th.Thread(target=DIRECT_MESSAGE_QUEUE_HANDLER)
 CORE[1] = th.Thread(target=INLINE_MESSAGE_QUEUE_HANDLER)
 CORE[2] = th.Thread(target=DOWNLOAD_QUEUE_HANDLER)
+CORE[3] = th.Thread(target=TO_SEND_QUEUE_HANDLER)
+CORE[4] = th.Thread(target=TORRENT_QUEUE_HANDLER)
 CORE[0].start()
 CORE[1].start()
 CORE[2].start()
-
+CORE[3].start()
+CORE[4].start()
 bot.run()

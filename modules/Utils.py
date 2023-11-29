@@ -307,17 +307,20 @@ def tree(user,msg):
     dt.tree(Gvar.DATA[user][PATH])
     return dt.trees
 
-def spider(user,msg):
+def spider(user,msg): #TODO
     return "Work in progress"
 
-def getsize(user,msg):
+def getsize(user,msg):  #TODO
     return "Work in progress"
 
-def copy(message:Message):
+def copy(message:Message): #TODO
     pass
+
 def USER_PROCCESS(USER, message: Message):
     MSG = str(message.text)
     if MSG.startswith("/cc"):
+        return copy(message)
+    elif MSG.startswith('/cv'):
         return copy(message)
     elif Gvar.DATA[USER][WRITING] == 1:
         return WRITER(USER, MSG)
@@ -346,5 +349,5 @@ def USER_PROCCESS(USER, message: Message):
     elif MSG.startswith("/cat") or Gvar.DATA[USER][CATING]:
         return cat(USER, MSG)
     else:
-        return None
+        return 0
     pass
