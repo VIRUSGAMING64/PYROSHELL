@@ -3,8 +3,6 @@ from modules.datatypes import *
 import modules.Gvar as Gvar
 from modules.copy_core import *
 from sys import *
-from sysconfig import *
-from syslog import *
 import os
 from math import *
 from modules.tree import *
