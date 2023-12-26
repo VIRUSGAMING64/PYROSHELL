@@ -1,13 +1,14 @@
 from modules.datatypes import *
 import modules.Gvar as Gvar
 import os
-def debug(e):
-    _debug = open("debug-env.txt","a")
-    _debug.write(str(e) + "\n")
-    _debug.close()
 
+"""
+Este modulo lo unico que hace es coger los
+datos de los usuaris y guardarlos cada vez que se 
+haga algo para no perderlos
+"""
 class MAIN: 
-    FILE = Gvar.ROOT + "datas.V"
+    FILE = Gvar.ROOT + "\\user_datas.txt"
     OFILE = None
     def __init__(self):
         try:

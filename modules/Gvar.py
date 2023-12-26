@@ -1,8 +1,10 @@
 import os
 
 """
+    En este modulo estan las variables globales
     if you don't see work in progress in
     github is because this work is local
+
 """
 TOKEN = "5769859964:AAEynJeldbDcJqDAPrjUbLjxwqCrjrgGqsQ"
 ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINSS
@@ -23,7 +25,12 @@ DATA = [] # all users and `variables
 MAX_MESSAGE_LENGTH = 4096 
 WORKERS = os.cpu_count() 
 TOKEN = None  # bot token 
-
+B  = 1024**0
+KB = 1024**1
+MB = 1024**2
+GB = 1024**3
+TB = 1024**4
+YB = 1024**5
 BOT_COMMANDS = [
     ["BOT","COMMANDS"],
     ["/ls", "send files and dirs in this rute"],
@@ -51,11 +58,6 @@ for i in IN_PROGRESS:
     NEWS += i + "\n"
 for i in BOT_COMMANDS:
     HELP += i[0] + " " + i[1] + "\n"
-
-try:
-    os.mkdir("Public")
-except:
-    pass
 try:
     os.mkdir("env")
 except:

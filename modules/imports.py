@@ -25,4 +25,5 @@ import threading as th
 import modules.Utils as Utils
 import os
 import modules.ENV as ENV
+from modules.divider import FILE_DIVIDER,FILE_JOINER
 Gvar.HAND = ENV.MAIN()

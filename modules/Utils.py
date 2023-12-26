@@ -10,8 +10,11 @@ from pyrogram.types import *
 import threading as th
 import time
 
+"""
+En este modulo estan las funciones utiles
+"""
 def debug(e):
-    _debug = open("debug-utils.txt","a")
+    _debug = open(Gvar.ROOT+"\\debug-utils.txt","a")
     _debug.write(str(e) + "\n")
     _debug.close()
 
@@ -303,7 +306,7 @@ def cat(USER, msg:str):
 def tree(user,msg):
     dt = TreeMaker()
     dt.show=False
-    dt.showfiles = True
+    dt.showfiles = False
     dt.tree(Gvar.DATA[user][PATH])
     return dt.trees
 

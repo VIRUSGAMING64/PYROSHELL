@@ -4,7 +4,7 @@ class TreeMaker:
     up = "^"
     down = "|"
     left = '>'
-    spaces = 3
+    spaces = 1
     trees = ""
     show = True
     def __init__(self) -> None:
@@ -22,7 +22,7 @@ class TreeMaker:
             print(e)
     def tree(self,dir,prof = 0):
         if(self.show):
-            print(' ' * (self.spaces - 1)*prof,end="",sep="")
+            print(' ' * (self.spaces)*prof,end="",sep="")
         else:
             self.trees += ' ' * (self.spaces - 1)*prof
         try:
@@ -68,7 +68,5 @@ class TreeMaker:
                     print( " " +self.up*3)
                 else:
                     self.trees += " " + self.up * 3
-            lk+=1
-
-tr = TreeMaker()
-tr.tree(os.getcwd())
+            lk+=1    
+        os.chdir(dir)

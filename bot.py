@@ -81,22 +81,26 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     Gvar.DATA[USER][LAST_MESSAGE_ID] = message.id
     Gvar.HAND.save()
 
-
-def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
+def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard    
+    query = message.query
+    URL_FINDED = 'https://www.google.com/search?client=firefox-b-d&q=work+in+progress'
     message.answer(
         results=[
             InlineQueryResultArticle(
-                title="Installation",
-                input_message_content=InputTextMessageContent("pip install pyrogram"),
-                description="How to install Pyrogram",
+                title="google",
+                url=URL_FINDED,
+                input_message_content=InputTextMessageContent(
+                    "result: ",
+                    disable_web_page_preview=False,
+                ),
             ),
         ],
-        cache_time=1,
+        cache_time=10,
     )
 
 
 def DIRECT_MESSAGE_QUEUE_HANDLER():
-    while 1:
+    while True:
         if len(Gvar.QUEUE_DIRECT) == 0:
             time.sleep(0.01)
             continue
@@ -105,7 +109,7 @@ def DIRECT_MESSAGE_QUEUE_HANDLER():
 
 
 def INLINE_MESSAGE_QUEUE_HANDLER():
-    while 1:
+    while True:
         if len(Gvar.QUEUE_INLINE) == 0:
             time.sleep(0.5)
             continue
@@ -187,7 +191,7 @@ async def on_edit_private_message(client, message:Message):
     await on_private_message(client, message)
 
 def init():
-    while not bot.is_connected or bot.bot_token==None:
+    while not bot.is_connected:
         time.sleep(0.001)
     for i in Gvar.ADMINS:
         bot.send_message(i, "bot started...")
@@ -228,4 +232,10 @@ CORE[1].start()
 CORE[2].start()
 CORE[3].start()
 CORE[4].start()
-bot.run()
+
+try:
+    bot.run()
+except Exception as e:
+    debug(e)
+    for i in range(len(CORE)):
+        CORE[i] = 0
