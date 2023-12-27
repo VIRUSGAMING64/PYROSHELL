@@ -315,7 +315,7 @@ def tree(user,msg):
     dt.tree(Gvar.DATA[user][PATH])
     return dt.trees
 
-def stats():
+def stats(F):
     ns_time = (time.time_ns())
     seconds_uptime = (ns_time - Gvar.START_TIME)/Gvar.SECOND
     minutes_uptime = ((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60
@@ -336,9 +336,9 @@ def stats():
         s+= f"{floor(seconds_uptime)}s"
         pass
     s = "Uptime: " + s + "\n"
-    s +=f"CPU: {st.cpu_percent(interval=1)}%\n"
-    s += F"MEMORY: {100.0-st.virtual_memory().percent}%\n"
-    s +=f"DISK FREE: {100.0-st.disk_usage(os.getcwd()).percent}%\n"
+    s +=f"CPU: {st.cpu_percent(interval=1)}%\n" + f"\nCPU SPEED: {st.cpu_freq()}\nCPU COUNT: {st.cpu_count()}\n" if F else ""
+    s += F"MEMORY: {100.0-st.virtual_memory().percent}%\n" + f" MEMORY: {st.virtual_memory().available/Gvar.GB}GB\n" if F else ""
+    s +=f"DISK FREE: {100.0-st.disk_usage(os.getcwd()).percent}%\n" + f" {st.disk_usage(os.getcwd()).free/Gvar.GB}GB\n" if F else ""
     return s
 
 def spider(user,msg): #TODO
@@ -384,8 +384,10 @@ def USER_PROCCESS(USER, message: Message):
         return geturl(USER, MSG)
     elif MSG.startswith("/cat") or Gvar.DATA[USER][CATING]:
         return cat(USER, MSG)
-    elif MSG.startswith('/stat'):
-        return stats()
+    elif MSG.startswith('/stats+'):
+        return stats(1)
+    elif MSG.startswith('/stats'):
+        return stats(0)
     else:
         return 0
     pass
