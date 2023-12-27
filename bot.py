@@ -194,6 +194,7 @@ def init():
         time.sleep(0.001)
     for i in Gvar.ADMINS:
         bot.send_message(i, "bot started...")
+        return
     commands = []
     for i in Gvar.BOT_COMMANDS:
         AUX_COMMAND = BotCommand(i[0], i[1])
