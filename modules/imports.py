@@ -18,6 +18,7 @@ from pyrogram.raw import *
 from pyrogram.sync import *
 from pyrogram.handlers import *
 from pyrogram.parser import *
+from math import *
 import time
 import modules.Gvar as Gvar
 from modules.datatypes import *
@@ -27,3 +28,4 @@ import os
 import modules.ENV as ENV
 from modules.divider import FILE_DIVIDER,FILE_JOINER
 Gvar.HAND = ENV.MAIN()
+from ctypes import *

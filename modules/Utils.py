@@ -2,12 +2,17 @@ import urllib.request as uq
 from modules.datatypes import *
 import modules.Gvar as Gvar
 from modules.copy_core import *
+from sys import *
+from sysconfig import *
+from syslog import *
 import os
+from math import *
 from modules.tree import *
 import modules.ENV as ENV
 from pyrogram.emoji import *
 from pyrogram.types import *
 import threading as th
+import psutil as st
 import time
 
 """
@@ -310,6 +315,32 @@ def tree(user,msg):
     dt.tree(Gvar.DATA[user][PATH])
     return dt.trees
 
+def stats():
+    ns_time = (time.time_ns())
+    seconds_uptime = (ns_time - Gvar.START_TIME)/Gvar.SECOND
+    minutes_uptime = ((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60
+    hours_uptime = ((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60/60
+    s = ""
+    if(floor(hours_uptime) != 0):
+        minutes_uptime = (hours_uptime - floor(hours_uptime))*60
+        seconds_uptime = (minutes_uptime - floor(minutes_uptime))*60
+        s += f"{hours_uptime}h"
+        pass
+    if(floor(minutes_uptime) != 0):
+        if(s != ""): s+='-'
+        seconds_uptime = (minutes_uptime - floor(minutes_uptime))*60
+        s+= f"{floor(minutes_uptime)}m"
+        pass
+    if(floor(seconds_uptime) != 0):
+        if(s != ""): s+='-'
+        s+= f"{floor(seconds_uptime)}s"
+        pass
+    s = "Uptime: " + s + "\n"
+    s +=f"CPU: {st.cpu_percent(interval=1)}%\n"
+    s += F"MEMORY: {100.0-st.virtual_memory().percent}%\n"
+    s +=f"DISK FREE: {100.0-st.disk_usage(os.getcwd()).percent}%\n"
+    return s
+
 def spider(user,msg): #TODO
     return "Work in progress"
 
@@ -318,6 +349,8 @@ def getsize(user,msg):  #TODO
 
 def copy(message:Message): #TODO
     pass
+
+
 
 def USER_PROCCESS(USER, message: Message):
     MSG = str(message.text)
@@ -351,6 +384,8 @@ def USER_PROCCESS(USER, message: Message):
         return geturl(USER, MSG)
     elif MSG.startswith("/cat") or Gvar.DATA[USER][CATING]:
         return cat(USER, MSG)
+    elif MSG.startswith('/stats'):
+        return stats()
     else:
         return 0
     pass

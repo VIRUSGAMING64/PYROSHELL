@@ -1,4 +1,5 @@
 import os
+import time
 
 """
     En este modulo estan las variables globales
@@ -25,6 +26,8 @@ DATA = [] # all users and `variables
 MAX_MESSAGE_LENGTH = 4096 
 WORKERS = os.cpu_count() 
 TOKEN = None  # bot token 
+START_TIME = time.time_ns()
+SECOND = 10**9
 B  = 1024**0
 KB = 1024**1
 MB = 1024**2

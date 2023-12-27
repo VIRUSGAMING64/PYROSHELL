@@ -1,5 +1,4 @@
 from modules.imports import *
-
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
