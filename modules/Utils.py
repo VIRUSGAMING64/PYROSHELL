@@ -384,7 +384,7 @@ def USER_PROCCESS(USER, message: Message):
         return geturl(USER, MSG)
     elif MSG.startswith("/cat") or Gvar.DATA[USER][CATING]:
         return cat(USER, MSG)
-    elif MSG.startswith('/stats'):
+    elif MSG.startswith('/stat'):
         return stats()
     else:
         return 0
