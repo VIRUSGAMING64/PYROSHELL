@@ -336,9 +336,9 @@ def stats(F):
         s+= f"{floor(seconds_uptime)}s"
         pass
     s = "Uptime: " + s + "\n"
-    s +=f"CPU: {st.cpu_percent(interval=1)}%\n" + f"\nCPU SPEED: {st.cpu_freq()}\nCPU COUNT: {st.cpu_count()}\n" if F else ""
-    s += F"MEMORY: {100.0-st.virtual_memory().percent}%\n" + f" MEMORY: {st.virtual_memory().available/Gvar.GB}GB\n" if F else ""
-    s +=f"DISK FREE: {100.0-st.disk_usage(os.getcwd()).percent}%\n" + f" {st.disk_usage(os.getcwd()).free/Gvar.GB}GB\n" if F else ""
+    s +=f"CPU: {st.cpu_percent(interval=1)}%\n" + f"\nCPU SPEED: {st.cpu_freq()}\nCPU COUNT: {st.cpu_count()}\n"
+    s += f"MEMORY: {100.0-st.virtual_memory().percent}%\n" + f" MEMORY: {st.virtual_memory().available/Gvar.GB}GB\n"
+    s +=f"DISK FREE: {100.0-st.disk_usage(os.getcwd()).percent}%\n" + f" {st.disk_usage(os.getcwd()).free/Gvar.GB}GB\n"
     return s
 
 def spider(user,msg): #TODO
