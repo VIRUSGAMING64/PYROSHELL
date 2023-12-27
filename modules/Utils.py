@@ -101,6 +101,7 @@ def chdir(USER, msg):
         Gvar.DATA[USER][CHDIR] = 0
         try:
             msg = msg.split(" ")
+            msg = msg[0]
             try:
                 msg = msg[1]
             except Exception as e:

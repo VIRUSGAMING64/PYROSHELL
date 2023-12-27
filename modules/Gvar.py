@@ -39,6 +39,7 @@ BOT_COMMANDS = [
     ["/ls", "send files and dirs in this rute"],
     ["/cat", "get 4096 first bytes of file"],
     ["/geturl", "download url"],
+    ["/stats", 'get server stats'],
     ["/mkdir", "make a directory"],
     ["/chdir", "change of directory"],
     ["/note", "make a file to write in her"],
