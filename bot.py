@@ -89,7 +89,7 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
                 title="google",
                 url=URL_FINDED,
                 input_message_content=InputTextMessageContent(
-                    "result: ",
+                    "result: ",URL_FINDED,
                     disable_web_page_preview=False,
                 ),
             ),

@@ -336,7 +336,7 @@ def stats(F):
         s+= f"{floor(seconds_uptime)}s"
         pass
     s = "Uptime: " + s + "\n"
-    s += f"CPU: {st.cpu_percent(interval=1)}%\n" + f"CPU SPEED: {st.cpu_freq().current}\nCPU COUNT: {st.cpu_count()}\n"
+    s += f"CPU: {st.cpu_percent(interval=1)}%\n" + f"CPU SPEED: {st.cpu_freq().current}Mhz\nCPU COUNT: {st.cpu_count()}\n"
     s += f"MEMORY USED: {st.virtual_memory().percent}%\n" + f"MEMORY FREE: {st.virtual_memory().available/Gvar.GB}GB\n"
     s += f"DISK USED: {100.0-st.disk_usage(os.getcwd()).percent}%\n" + f"DISK FREE: {st.disk_usage(os.getcwd()).free/Gvar.GB}GB\n"
     s += f"BOOT TIME: {st.boot_time()/60/60}h"
