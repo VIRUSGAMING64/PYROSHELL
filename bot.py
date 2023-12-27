@@ -89,7 +89,7 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
                 title="google",
                 url=URL_FINDED,
                 input_message_content=InputTextMessageContent(
-                    "result: ",message_text=URL_FINDED,
+                    message_text=URL_FINDED,
                     disable_web_page_preview=False,
                 ),
             ),
@@ -192,6 +192,7 @@ async def on_edit_private_message(client, message:Message):
 def init():
     while not bot.is_connected:
         time.sleep(0.001)
+    
     for i in Gvar.ADMINS:
         bot.send_message(i, "bot started...")
         return
