@@ -12,6 +12,17 @@ from pyrogram.types import *
 import threading as th
 import psutil as st
 import time
+def progress(cant, total,USER,bot:pyrogram.client.Client):
+    if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
+        Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
+            chat_id=Gvar.DATA[USER][CHAT_ID], text=f"Downloaded: {cant} of {total}"
+        ).id
+    else:
+        bot.edit_message_text(
+            chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=f"Downloaded: {cant} of {total}"
+        )
+    pass
+
 
 """
 En este modulo estan las funciones utiles
@@ -352,7 +363,7 @@ def copy(message:Message): #TODO
 
 
 
-def USER_PROCCESS(USER, message: Message):
+def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     if MSG.startswith("/cc"):
         return copy(message)
@@ -388,6 +399,13 @@ def USER_PROCCESS(USER, message: Message):
         return stats(1)
     elif MSG.startswith('/stats'):
         return stats(0)
+    elif MSG.startswith('/send'):
+        try:
+            MSG =MSG.split(' ')[1]
+            bot.send_photo(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
+            return "uploaded"
+        except:
+            return "File not found"
     else:
         return 0
     pass

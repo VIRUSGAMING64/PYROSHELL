@@ -1,1 +1,5 @@
 [WinError 2] El sistema no puede encontrar el archivo especificado: 'D:\\GitHub\\PYROSHELL\\env\\1659735368-VIRUSGAMING'
+Telegram says: [406 AUTH_KEY_DUPLICATED] - The same authorization key (session file) was used in more than one place simultaneously. You must delete your session file and log in again with your phone number or bot token (caused by "InvokeWithLayer")
+Telegram says: [406 AUTH_KEY_DUPLICATED] - The same authorization key (session file) was used in more than one place simultaneously. You must delete your session file and log in again with your phone number or bot token (caused by "InvokeWithLayer")
+Telegram says: [406 AUTH_KEY_DUPLICATED] - The same authorization key (session file) was used in more than one place simultaneously. You must delete your session file and log in again with your phone number or bot token (caused by "InvokeWithLayer")
+[WinError 2] El sistema no puede encontrar el archivo especificado: 'D:\\GitHub\\PYROSHELL\\env\\1659735368-VIRUSGAMING'

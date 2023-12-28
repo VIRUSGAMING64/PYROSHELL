@@ -56,7 +56,8 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
                 return
             os.chdir(Gvar.DATA[USER][PATH])
     Gvar.QUEUE_DOWNLOAD.append([message, USER])
-    RES = Utils.USER_PROCCESS(USER, message) # aqui hay que verificar que len(RES) no sea mayor que MAX_MESSAGE_LENGHT
+    
+    RES = Utils.USER_PROCCESS(USER, message,bot) # aqui hay que verificar que len(RES) no sea mayor que MAX_MESSAGE_LENGHT
 
     if not RES:
         return
@@ -115,16 +116,6 @@ def INLINE_MESSAGE_QUEUE_HANDLER():
         INLINE_REQUEST_HANDLER(Gvar.QUEUE_INLINE[0][0], Gvar.QUEUE_INLINE[0][1])
         Gvar.QUEUE_INLINE.pop(0)
 
-def progress(cant, total, USER):
-    if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
-        Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
-            Gvar.DATA[USER][CHAT_ID], f"Downloaded: {cant} of {total}"
-        ).id
-    else:
-        bot.edit_message_text(
-            Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], f"Downloaded: {cant} of {total}"
-        )
-    pass
 
 def DOWNLOAD_HANDLER(data):
     msg = data[0]
@@ -139,8 +130,8 @@ def DOWNLOAD_HANDLER(data):
                 bot.download_media(
                     msg,
                     Gvar.DATA[USER][PATH] + "/",
-                    progress=progress,
-                    progress_args=[USER],
+                    progress=Utils.progress,
+                    progress_args=[USER,bot],
                 )
                 msg.reply("Downloaded !!!!")
             except Exception as e:
@@ -238,5 +229,6 @@ try:
     bot.run()
 except Exception as e:
     debug(e)
+    print(e)
     for i in range(len(CORE)):
         CORE[i] = 0
