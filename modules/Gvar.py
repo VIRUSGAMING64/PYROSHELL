@@ -40,7 +40,7 @@ BOT_COMMANDS = [
     ["/cat", "get 4096 first bytes of file"],
     ["/geturl", "download url"],
     ["/stats", 'get server stats'],
-    ["/tree, make directorys tree"],
+    ["/tree", "make directorys tree"],
     ["/mkdir", "make a directory"],
     ["/chdir", "change of directory"],
     ["/note", "make a file to write in her"],
