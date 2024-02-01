@@ -1,9 +1,6 @@
 from modules.imports import *
 def mainapi():
-    while (Gvar.BOT_ON == 0):
-        print("timing...")
-        time.sleep(1)
-    
+   
     app = FastAPI()
     @app.get("/")
     async def main():
