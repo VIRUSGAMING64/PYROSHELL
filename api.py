@@ -11,7 +11,7 @@ def mainapi():
     
     
     print("runing api")
-    if 0:
+    if 1:
         host = "0.0.0.0"
     else:
         host = "127.0.0.1"
