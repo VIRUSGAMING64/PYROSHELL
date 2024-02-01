@@ -15,4 +15,4 @@ def mainapi():
         host = "0.0.0.0"
     else:
         host = "127.0.0.1"
-    uvicorn.run(app,host=host)
+    uvicorn.run(app,host=host,port=80,reload=0)
