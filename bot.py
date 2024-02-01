@@ -1,9 +1,10 @@
 from modules.imports import *
+from api import *
+
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
     _debug.close()
-
 bot = Client(
     "virusgaming",
     api_id=Gvar.API_ID,
@@ -20,7 +21,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
             0,  # MKDIR 3
             0,  # SEND 4
             0,  # GETURL 5
-            Gvar.ROOT + "\\" + str(message.from_user.id) + "-" + str(message.from_user.first_name),  # PATH 6
+            Gvar.ROOT+ "/" + str(message.from_user.id) + "-" + str(message.from_user.first_name),  # PATH 6
             0,  # ASKING 7
             0,  # WRITING 8
             0,  # GETING_NOTEPAD_NAME 9
@@ -42,6 +43,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
         os.chdir(Gvar.DATA[USER][PATH])
     except Exception as e:
         debug(e)
+        print('\ndirect message')
         try:
             os.mkdir(Gvar.DATA[USER][PATH])
             os.chdir(Gvar.DATA[USER][PATH])
@@ -49,7 +51,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
             debug(e)
             bot.send_message(message.chat.id, "invalid directoy:    " + str(e))
             try:
-                Gvar.DATA[USER][PATH] = Gvar.ROOT + "\\" + str(message.from_user.id)+'-'+str(message.from_user.first_name)
+                Gvar.DATA[USER][PATH] = Gvar.ROOT+ "/" + str(message.from_user.id)+'-'+str(message.from_user.first_name)
                 os.mkdir(Gvar.DATA[USER][PATH])
             except Exception as e:
                 debug(e)
@@ -136,6 +138,7 @@ def DOWNLOAD_HANDLER(data):
                 msg.reply("Downloaded !!!!")
             except Exception as e:
                 debug(e)
+                print("in downloads first try")
                 msg.reply("Error downloading media")
             finally:
                 Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
@@ -183,9 +186,10 @@ async def on_edit_private_message(client, message:Message):
 def init():
     while not bot.is_connected:
         time.sleep(0.001)
-    
+    Gvar.BOT_ON = 1
     for i in Gvar.ADMINS:
         bot.send_message(i, "bot started...")
+        Gvar.BOT_ON = 1
         return
     commands = []
     for i in Gvar.BOT_COMMANDS:
@@ -208,25 +212,30 @@ def TORRENT_QUEUE_HANDLER(): #TODO
         pass
     except Exception as e:
         debug(e)
+    
 
 ADMIN_START_ALERT_AND_BOT_INIT = th.Thread(target=init)
 ADMIN_START_ALERT_AND_BOT_INIT.start()
 CORE = []
-for i in range(2**16-1):
+for i in range(2**8-1):
     CORE.append(0)
 CORE[0] = th.Thread(target=DIRECT_MESSAGE_QUEUE_HANDLER)
 CORE[1] = th.Thread(target=INLINE_MESSAGE_QUEUE_HANDLER)
 CORE[2] = th.Thread(target=DOWNLOAD_QUEUE_HANDLER)
 CORE[3] = th.Thread(target=TO_SEND_QUEUE_HANDLER)
 CORE[4] = th.Thread(target=TORRENT_QUEUE_HANDLER)
+CORE[5] = th.Thread(target=mainapi)
+
 CORE[0].start()
 CORE[1].start()
 CORE[2].start()
 CORE[3].start()
 CORE[4].start()
+CORE[5].start()
 
 try:
     bot.run()
+
 except Exception as e:
     debug(e)
     print(e)

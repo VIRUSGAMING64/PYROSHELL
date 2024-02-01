@@ -29,3 +29,5 @@ import modules.ENV as ENV
 from modules.divider import FILE_DIVIDER,FILE_JOINER
 Gvar.HAND = ENV.MAIN()
 from ctypes import *
+from fastapi import *
+import uvicorn

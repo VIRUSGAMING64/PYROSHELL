@@ -28,7 +28,7 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
 En este modulo estan las funciones utiles
 """
 def debug(e):
-    _debug = open(Gvar.ROOT+"\\debug-utils.txt","a")
+    _debug = open(Gvar.ROOT+"/debug-utils.txt","a")
     _debug.write(str(e) + "\n")
     _debug.close()
 
@@ -129,7 +129,7 @@ def chdir(USER, msg):
         else:
             try:
                 while len(msg) >= 1:
-                    if msg[len(msg) - 1] == "\\" or msg[len(msg) - 1] == "/":
+                    if msg[len(msg) - 1] == "/" or msg[len(msg) - 1] == "/":
                         msg.pop(len(msg) - 1)
                     else:
                         break
@@ -149,7 +149,7 @@ def chdir(USER, msg):
                     DIR += msg[i]
                 try:
                     os.chdir(DIR)
-                    Gvar.DATA[USER][PATH] = Gvar.DATA[USER][PATH] + "\\" + DIR
+                    Gvar.DATA[USER][PATH] = Gvar.DATA[USER][PATH] + "/" + DIR
                     return "Changed to: " + os.getcwd()
                 except Exception as e:
                     debug(e)
@@ -192,7 +192,7 @@ def chdir(USER, msg):
                 DIR += msg[i]
             try:
                 os.chdir(DIR)
-                Gvar.DATA[USER][PATH] = Gvar.DATA[USER][PATH] + "\\" + DIR
+                Gvar.DATA[USER][PATH] = Gvar.DATA[USER][PATH] + "/" + DIR
                 return "Changed to: " + os.getcwd()
             except Exception as e:
                 debug(e)

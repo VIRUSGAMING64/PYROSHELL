@@ -8,7 +8,7 @@ datos de los usuaris y guardarlos cada vez que se
 haga algo para no perderlos
 """
 class MAIN: 
-    FILE = Gvar.ROOT + "\\user_datas.txt"
+    FILE = Gvar.ROOT + "/user_datas.txt"
     OFILE = None
     def __init__(self):
         try:
