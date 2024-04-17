@@ -1,15 +1,15 @@
 from modules.imports import *
-from api import *
 
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
     _debug.close()
+
 bot = Client(
     "virusgaming",
     api_id=Gvar.API_ID,
     api_hash=Gvar.API_HASH,
-    workers=Gvar.WORKERS
+    workers=Gvar.WORKERS 
 )
 def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     USER = Utils.FindUser(message.chat.id)
@@ -224,18 +224,16 @@ CORE[1] = th.Thread(target=INLINE_MESSAGE_QUEUE_HANDLER)
 CORE[2] = th.Thread(target=DOWNLOAD_QUEUE_HANDLER)
 CORE[3] = th.Thread(target=TO_SEND_QUEUE_HANDLER)
 CORE[4] = th.Thread(target=TORRENT_QUEUE_HANDLER)
-CORE[5] = th.Thread(target=mainapi)
+#CORE[5] = th.Thread(target=mainapi)
 
 CORE[0].start()
 CORE[1].start()
 CORE[2].start()
 CORE[3].start()
 CORE[4].start()
-CORE[5].start()
-
+#CORE[5].start()
 try:
     bot.run()
-
 except Exception as e:
     debug(e)
     print(e)

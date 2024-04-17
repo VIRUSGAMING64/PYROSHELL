@@ -8,9 +8,9 @@ import time
 
 """
 TOKEN = "5769859964:AAEynJeldbDcJqDAPrjUbLjxwqCrjrgGqsQ"
-ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINSS
 API_ID = 29695292
 API_HASH = "8b05ce00146edeeae7aafc4bea30e713"  # bot api
+ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINSS
 HAND = None
 BOT_ON = 0
 FILEROOT = os.getcwd()
