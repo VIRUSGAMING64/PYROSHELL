@@ -2,8 +2,8 @@ from modules.imports import *
 from flask import Flask,request
 
 def WEB():
-    web = Flask("vshell",methods = ['POST', 'GET'])
-    @web.route("/")
+    web = Flask("vshell")
+    @web.route("/",methods = ['POST', 'GET'])
     def main():
         if request.method == "POST":
             Gvar.QUERYS+=1
