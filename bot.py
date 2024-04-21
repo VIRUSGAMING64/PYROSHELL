@@ -10,7 +10,8 @@ bot = Client(
     "virusgaming",
     api_id=Gvar.API_ID,
     api_hash=Gvar.API_HASH,
-    workers=Gvar.WORKERS
+    workers=Gvar.WORKERS,
+    bot_token=Gvar.TOKEN
 )
 
 def WEB():
