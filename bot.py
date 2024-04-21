@@ -1,6 +1,23 @@
 from modules.imports import *
-from flask import Flask,request
-
+############################################################
+def WEB():
+    web = Flask("vshell",root_path="web/")
+    @web.route("/",methods = ['POST', 'GET'])    
+    def main():
+        if request.method == "POST":
+            Gvar.POST_QUERYS+=1
+        else:
+            Gvar.GET_QUERYS+=1
+            if __name__ != "__main__":        
+                while bot.is_connected == None:
+                    time.sleep(1)
+                bot.send_message("Vdebug",f"GET: {Gvar.GET_QUERYS} POST: {Gvar.POST_QUERYS}")
+                pass
+        return open("web/index.html","rb").read(2**31)        
+    web.run("0.0.0.0",80)
+#############################################################
+## FLASK ##
+###########
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
@@ -14,17 +31,6 @@ bot = Client(
     bot_token=Gvar.TOKEN
 )
 
-def WEB():
-    web = Flask("vshell")
-    @web.route("/",methods = ['POST', 'GET'])
-    def main():
-        if request.method == "POST":
-            Gvar.POST_QUERYS+=1
-        else:
-            Gvar.GET_QUERYS+=1
-            bot.send_message("Vdebug",f"alive: {Gvar.GET_QUERYS}")
-        return f"POST: {Gvar.POST_QUERYS}\nGET: {Gvar.GET_QUERYS}"
-    web.run("0.0.0.0",80)
 
 
 def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
@@ -212,6 +218,6 @@ pool = v_pool(
         TORRENT_QUEUE_HANDLER
     ]
 )
-pool.start_all()
+pool.start_all(1)
 print("THREADS STARTEDS")
 bot.run()

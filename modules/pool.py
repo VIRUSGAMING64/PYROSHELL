@@ -11,7 +11,12 @@ class v_pool:
                 funcs[i] = Thread(target=funcs[i])
         self.sequence = sequence
         self.funcs = funcs
-    def start_all(self):
+    def start_all(self,deamon = 0,indices = []):
+        if indices != []:
+            for i in indices:
+                self.Setdeamon(i,deamon)
+        elif deamon != 0:
+            self.Setdeamon()
         for i in range(len(self.funcs)):
             if self.funcs[i].is_alive() == 0:
                 if self.sequence == 0:
@@ -36,9 +41,9 @@ class v_pool:
         if(self.funcs[index].is_alive() == 0):
             return 1
         return self.funcs[index].kill()
-    def Setdeamon(self,index:int=None,deamon = 1):
+    def Setdeamon(self,index=None,deamon = 1):
         if index is None:
-            for i in range(self.funcs):
+            for i in range(len(self.funcs)):
                 self.funcs[i].daemon=deamon
         else:
             self.funcs[index].daemon=deamon

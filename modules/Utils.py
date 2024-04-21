@@ -340,14 +340,14 @@ def tree(user,msg):
 
 def stats(F):
     ns_time = (time.time_ns())
-    seconds_uptime = (ns_time - Gvar.START_TIME)/Gvar.SECOND
-    minutes_uptime = ((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60
-    hours_uptime = ((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60/60
+    seconds_uptime = round((ns_time - Gvar.START_TIME)/Gvar.SECOND)
+    minutes_uptime = round(((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60)
+    hours_uptime = round(((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60/60)
     s = ""
     if(floor(hours_uptime) != 0):
         minutes_uptime = (hours_uptime - floor(hours_uptime))*60
         seconds_uptime = (minutes_uptime - floor(minutes_uptime))*60
-        s += f"{hours_uptime}h"
+        s += f"{floor(hours_uptime)}h"
         pass
     if(floor(minutes_uptime) != 0):
         if(s != ""): s+='-'
