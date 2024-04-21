@@ -7,9 +7,11 @@ import time
     github is because this work is local
 
 """
-TOKEN = "5769859964:AAEynJeldbDcJqDAPrjUbLjxwqCrjrgGqsQ"
-API_ID = 29695292
-API_HASH = "8b05ce00146edeeae7aafc4bea30e713"  # bot api
+d=os.environ
+print(d)
+TOKEN = os.getenv("BOT_TOKEN")
+API_ID = os.getenv("API_ID")
+API_HASH = os.getenv("API_HASH")  # bot api
 ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINSS
 HAND = None
 BOT_ON = 0
@@ -25,8 +27,7 @@ USER_VARIABLES = 31
 DOWNLOADING = 0 # if 1 user downloading 
 DATA = [] # all users and `variables
 MAX_MESSAGE_LENGTH = 4096 
-WORKERS = os.cpu_count() 
-TOKEN = None  # bot token 
+WORKERS = os.cpu_count()  
 START_TIME = time.time_ns()
 SECOND = 10**9
 B  = 1024**0
@@ -38,7 +39,7 @@ YB = 1024**5
 BOT_COMMANDS = [
     ["BOT","COMMANDS"],
     ["/ls", "send files and dirs in this rute"],
-    ["/send",'send a file']
+    ["/send",'send a file'],
     ["/cat", "get 4096 first bytes of file"],
     ["/geturl", "download url"],
     ["/stats", 'get server stats'],
@@ -69,3 +70,5 @@ try:
     os.mkdir("env")
 except:
     pass
+
+print(TOKEN)
