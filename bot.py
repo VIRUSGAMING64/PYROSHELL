@@ -14,29 +14,7 @@ bot = Client(
 def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     USER = Utils.FindUser(message.chat.id)
     if USER == None:
-        TEMP_USER = [
-            message.from_user.id,  # USER_ID  0
-            message.id,  # LAST_MESSAGE_ID 1
-            0,  # CHDIR 2
-            0,  # MKDIR 3
-            0,  # SEND 4
-            0,  # GETURL 5
-            Gvar.ROOT+ "/" + str(message.from_user.id) + "-" + str(message.from_user.first_name),  # PATH 6
-            0,  # ASKING 7
-            0,  # WRITING 8
-            0,  # GETING_NOTEPAD_NAME 9
-            0,  # WRITING_FILEPATH 10
-            0,  # BOT_LAST_MESSAGE_ID 11
-            0,  # CATING 12
-            0,  # LAST_MESSAGE_DOWNLOAD_ID 13
-            message.chat.id,  # chat_id 14
-            0,  # other vars 15
-            0,  # other vars 16
-            0,  # other vars 17
-            0,  # other vars 18
-            0,  # other vars 19
-            0,  # other vars 20
-        ]
+        TEMP_USER = CreateNewUser()
         USER = len(Gvar.DATA)
         Gvar.DATA.append(TEMP_USER)
     try:
@@ -59,8 +37,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
             os.chdir(Gvar.DATA[USER][PATH])
     Gvar.QUEUE_DOWNLOAD.append([message, USER])
     
-    RES = Utils.USER_PROCCESS(USER, message,bot) # aqui hay que verificar que len(RES) no sea mayor que MAX_MESSAGE_LENGHT
-
+    RES = Utils.USER_PROCCESS(USER, message,bot)    
     if not RES:
         return
     T_TO_SEND = []
@@ -78,7 +55,6 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
         Gvar.QUEUE_TO_SEND.append([message,T_TO_SEND])
         Gvar.HAND.save()
         return
-    
     Gvar.DATA[USER][BOT_LAST_MESSAGE_ID] = bot.send_message(message.chat.id, RES).id
     Gvar.DATA[USER][LAST_MESSAGE_ID] = message.id
     Gvar.HAND.save()
@@ -100,7 +76,6 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
         cache_time=10,
     )
 
-
 def DIRECT_MESSAGE_QUEUE_HANDLER():
     while True:
         if len(Gvar.QUEUE_DIRECT) == 0:
@@ -109,7 +84,6 @@ def DIRECT_MESSAGE_QUEUE_HANDLER():
         DIRECT_REQUEST_HANDLER(Gvar.QUEUE_DIRECT[0][0], Gvar.QUEUE_DIRECT[0][1])
         Gvar.QUEUE_DIRECT.pop(0)
 
-
 def INLINE_MESSAGE_QUEUE_HANDLER():
     while True:
         if len(Gvar.QUEUE_INLINE) == 0:
@@ -117,7 +91,6 @@ def INLINE_MESSAGE_QUEUE_HANDLER():
             continue
         INLINE_REQUEST_HANDLER(Gvar.QUEUE_INLINE[0][0], Gvar.QUEUE_INLINE[0][1])
         Gvar.QUEUE_INLINE.pop(0)
-
 
 def DOWNLOAD_HANDLER(data):
     msg = data[0]
@@ -148,8 +121,7 @@ def DOWNLOAD_HANDLER(data):
             return 1
     else:
         return 0
-
-
+    
 def DOWNLOAD_QUEUE_HANDLER():
     while 1:
         if len(Gvar.QUEUE_DOWNLOAD) < 1:
@@ -165,7 +137,6 @@ def DOWNLOAD_QUEUE_HANDLER():
 async def on_inline_query(client: Client, message: Message):
     Gvar.QUEUE_INLINE.append([client, message])
     pass
-
 
 @bot.on_message(filters.private)
 async def on_private_message(client: Client, message: Message):
@@ -183,25 +154,6 @@ async def on_group_message(client: Client, message: Message):
 async def on_edit_private_message(client, message:Message):
     await on_private_message(client, message)
 
-def init():
-    while not bot.is_connected:
-        time.sleep(0.001)
-    Gvar.BOT_ON = 1
-    for i in Gvar.ADMINS:
-        bot.send_message(i, "bot started...")
-        Gvar.BOT_ON = 1
-        return
-    commands = []
-    for i in Gvar.BOT_COMMANDS:
-        AUX_COMMAND = BotCommand(i[0], i[1])
-        commands.append(AUX_COMMAND)
-    try:
-        pass  #repair this --> bot.set_bot_commands(commands)
-    except Exception as e:
-        debug(e)
-        for i in Gvar.ADMINS:
-            bot.send_message(i, str(e))
-
 def TO_SEND_QUEUE_HANDLER(): #TODO
     try:
         pass
@@ -212,30 +164,20 @@ def TORRENT_QUEUE_HANDLER(): #TODO
         pass
     except Exception as e:
         debug(e)
-    
 
-ADMIN_START_ALERT_AND_BOT_INIT = th.Thread(target=init)
-ADMIN_START_ALERT_AND_BOT_INIT.start()
-CORE = []
-for i in range(2**8-1):
-    CORE.append(0)
-CORE[0] = th.Thread(target=DIRECT_MESSAGE_QUEUE_HANDLER)
-CORE[1] = th.Thread(target=INLINE_MESSAGE_QUEUE_HANDLER)
-CORE[2] = th.Thread(target=DOWNLOAD_QUEUE_HANDLER)
-CORE[3] = th.Thread(target=TO_SEND_QUEUE_HANDLER)
-CORE[4] = th.Thread(target=TORRENT_QUEUE_HANDLER)
-#CORE[5] = th.Thread(target=mainapi)
+def INIT():
+    pass
 
-CORE[0].start()
-CORE[1].start()
-CORE[2].start()
-CORE[3].start()
-CORE[4].start()
-#CORE[5].start()
-try:
-    bot.run()
-except Exception as e:
-    debug(e)
-    print(e)
-    for i in range(len(CORE)):
-        CORE[i] = 0
+pool = v_pool(
+    [
+        INIT,
+        DIRECT_MESSAGE_QUEUE_HANDLER,
+        INLINE_MESSAGE_QUEUE_HANDLER,
+        DOWNLOAD_QUEUE_HANDLER,
+        TO_SEND_QUEUE_HANDLER,
+        TORRENT_QUEUE_HANDLER
+    ]
+)
+pool.start_all()
+print("THREADS STARTEDS")
+bot.run()

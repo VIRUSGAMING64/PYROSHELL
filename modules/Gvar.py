@@ -38,6 +38,7 @@ YB = 1024**5
 BOT_COMMANDS = [
     ["BOT","COMMANDS"],
     ["/ls", "send files and dirs in this rute"],
+    ["/send",'send a file']
     ["/cat", "get 4096 first bytes of file"],
     ["/geturl", "download url"],
     ["/stats", 'get server stats'],
@@ -51,7 +52,7 @@ BOT_COMMANDS = [
 ]
 
 IN_PROGRESS = [
-    "download youtube videos", # libreria de jlsearch bot o buscar en github??
+    "download youtube videos", # libreria de ytd_lib
     "work with videos [combert x264 to x265]", # ????
     "download torrent", # ????
     "work with compresed files [ZIP]", #esto creo que hay documentacion en los .7z

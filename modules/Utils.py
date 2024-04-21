@@ -1,17 +1,17 @@
 import urllib.request as uq
-from modules.datatypes import *
-import modules.Gvar as Gvar
-from modules.copy_core import *
 from sys import *
 import os
 from math import *
-from modules.tree import *
-import modules.ENV as ENV
 from pyrogram.emoji import *
 from pyrogram.types import *
 import threading as th
 import psutil as st
 import time
+from modules.datatypes import *
+import modules.Gvar as Gvar
+from modules.copy_core import *
+from modules.v_tree import *
+
 def progress(cant, total,USER,bot:pyrogram.client.Client):
     if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
@@ -31,8 +31,21 @@ def debug(e):
     _debug = open(Gvar.ROOT+"/debug-utils.txt","a")
     _debug.write(str(e) + "\n")
     _debug.close()
-
-
+def round(fl:float,prec:int=2):
+    if prec > 1e3:
+        raise prec > 1e3
+    r=str(fl)
+    if "." in r:
+        r=r.split('.')
+        r[0] += "."
+        for i in range(prec):
+            if i >= len(r[1]):
+                r[0] += '0'
+            else:
+                r[0]+=r[1][i]
+    else:
+        r = [r]
+    return float(r[0])
 def FindUser(user):
     i = 0
     for users in Gvar.DATA:
@@ -346,9 +359,17 @@ def stats(F):
         s+= f"{floor(seconds_uptime)}s"
         pass
     s = "Uptime: " + s + "\n"
-    s += f"CPU: {st.cpu_percent(interval=1)}%\n" + f"CPU SPEED: {st.cpu_freq().current}Mhz\nCPU COUNT: {st.cpu_count()}\n"
-    s += f"MEMORY USED: {st.virtual_memory().percent}%\n" + f"MEMORY FREE: {st.virtual_memory().available/Gvar.GB}GB\n"
-    s += f"DISK USED: {100.0-st.disk_usage(os.getcwd()).percent}%\n" + f"DISK FREE: {st.disk_usage(os.getcwd()).free/Gvar.GB}GB\n"
+    CPU_P=round(st.cpu_percent(interval=1))
+    CPU_F=round(st.cpu_freq().current)
+    CPU_C=round(st.cpu_count())
+    MEM_P = round(st.virtual_memory().percent)
+    MEM_FREE= round(st.virtual_memory().available/Gvar.GB)
+    DISK_USED=round(100.0-st.disk_usage(os.getcwd()).percent)
+    DISK_FREE=round(st.disk_usage(os.getcwd()).free/Gvar.GB)
+
+    s += f"CPU: {CPU_P}%\n" + f"CPU SPEED: {CPU_F}Mhz\nCPU COUNT: {CPU_C}\n"
+    s += f"MEMORY USED: {MEM_P}%\n" + f"MEMORY FREE: {MEM_FREE}GB\n"
+    s += f"DISK USED: {DISK_USED}%\n" + f"DISK FREE: {DISK_FREE}GB\n"
     return s
 
 def spider(user,msg): #TODO
@@ -401,10 +422,12 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith('/send'):
         try:
             MSG =MSG.split(' ')[1]
-            bot.send_photo(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
+            bot.send_document(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
+            Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID]=0
             return "uploaded"
         except:
             return "File not found"
     else:
         return 0
     pass
+
