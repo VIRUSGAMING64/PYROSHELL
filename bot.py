@@ -18,7 +18,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
         print(e)
         return
     if USER == None:
-        TEMP_USER = CreateNewUser()
+        TEMP_USER = CreateNewUser(message)
         USER = len(Gvar.DATA)
         Gvar.DATA.append(TEMP_USER)
     try:
