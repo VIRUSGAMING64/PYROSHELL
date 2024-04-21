@@ -1,4 +1,13 @@
 from modules.imports import *
+from flask import Flask
+
+def WEB():
+    web = Flask("vshell")
+    @web.route("/")
+    def main():
+        return "Hola Mundo"
+    web.run("0.0.0.0",80)
+
 
 def debug(e):
     _debug = open("debug-bot.txt","a")
@@ -179,6 +188,7 @@ def INIT():
         print(e)
 pool = v_pool(
     [
+        WEB,
         INIT,
         DIRECT_MESSAGE_QUEUE_HANDLER,
         INLINE_MESSAGE_QUEUE_HANDLER,
