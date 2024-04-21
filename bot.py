@@ -12,7 +12,11 @@ bot = Client(
     workers=Gvar.WORKERS 
 )
 def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
-    USER = Utils.FindUser(message.chat.id)
+    try:
+        USER = Utils.FindUser(message.chat.id)
+    except Exception as e:
+        print(e)
+        return
     if USER == None:
         TEMP_USER = CreateNewUser()
         USER = len(Gvar.DATA)
