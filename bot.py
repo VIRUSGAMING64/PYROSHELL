@@ -196,7 +196,7 @@ def INIT():
 def ACTIVATOR():
     while 1:
         try:
-            time.sleep(10)
+            time.sleep(60)
             req.get("https://vshell2.onrender.com")
         except Exception as e:
             print(str(e))
