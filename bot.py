@@ -166,8 +166,13 @@ def TORRENT_QUEUE_HANDLER(): #TODO
         debug(e)
 
 def INIT():
-    pass
-
+    try:
+        while bot.is_connected == None:
+            time.sleep(1)
+        for i in Gvar.ADMINS:
+            bot.send_message(i,"bot online")
+    except Exception as e:
+        print(e)
 pool = v_pool(
     [
         INIT,
