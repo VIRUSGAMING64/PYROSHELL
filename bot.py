@@ -5,7 +5,8 @@ def WEB():
     web = Flask("vshell")
     @web.route("/")
     def main():
-        return "Hola Mundo"
+        Gvar.QUERYS+=1
+        return f"Hola query: {Gvar.QUERYS}"
     web.run("0.0.0.0",80)
 
 
