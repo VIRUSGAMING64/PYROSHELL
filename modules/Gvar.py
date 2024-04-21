@@ -24,6 +24,7 @@ QUEUE_TO_SEND = [] #queue of larges messages
 QUEUE_TORRENT = [] #torrent downloads
 QUEUE_DOWNLOAD = [] # queue of downloads
 USER_VARIABLES = 31 
+DEBUG_MODE = True
 DOWNLOADING = 0 # if 1 user downloading 
 DATA = [] # all users and `variables
 MAX_MESSAGE_LENGTH = 4096 
