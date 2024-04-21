@@ -23,6 +23,7 @@ import time
 import modules.Gvar as Gvar
 from modules.datatypes import *
 import threading as th
+import requests as req
 import modules.Utils as Utils
 from modules.pool import *
 from modules.users import *

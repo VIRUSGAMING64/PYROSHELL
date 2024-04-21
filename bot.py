@@ -6,8 +6,10 @@ def WEB():
     @web.route("/",methods = ['POST', 'GET'])
     def main():
         if request.method == "POST":
-            Gvar.QUERYS+=1
-        return f"Hola query: {Gvar.QUERYS}"
+            Gvar.POST_QUERYS+=1
+        else:
+            Gvar.GET_QUERYS+=1
+        return f"POST: {Gvar.POST_QUERYS}\nGET: {Gvar.GET_QUERYS}"
     web.run("0.0.0.0",80)
 
 
@@ -188,8 +190,13 @@ def INIT():
             bot.send_message(i,"bot online")
     except Exception as e:
         print(e)
+def ACTIVATOR():
+    while 1:
+        time.sleep(1)
+        req.get("https://mapi-a2dm.onrender.com/")
 pool = v_pool(
     [
+        ACTIVATOR,
         WEB,
         INIT,
         DIRECT_MESSAGE_QUEUE_HANDLER,

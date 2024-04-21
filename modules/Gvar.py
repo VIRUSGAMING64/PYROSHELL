@@ -7,7 +7,8 @@ import time
     github is because this work is local
 
 """
-QUERYS = 0
+GET_QUERYS = 0
+POST_QUERYS = 0
 TOKEN = os.getenv("BOT_TOKEN")
 API_ID = os.getenv("API_ID")
 API_HASH = os.getenv("API_HASH")  # bot api
