@@ -25,7 +25,7 @@ from modules.datatypes import *
 import threading as th
 import modules.Utils as Utils
 from modules.pool import *
-from users import *
+from modules.users import *
 import os
 import modules.ENV as ENV
 from modules.divider import FILE_DIVIDER,FILE_JOINER

@@ -7,8 +7,6 @@ import time
     github is because this work is local
 
 """
-d=os.environ
-print(d)
 TOKEN = os.getenv("BOT_TOKEN")
 API_ID = os.getenv("API_ID")
 API_HASH = os.getenv("API_HASH")  # bot api
@@ -70,5 +68,3 @@ try:
     os.mkdir("env")
 except:
     pass
-
-print(TOKEN)

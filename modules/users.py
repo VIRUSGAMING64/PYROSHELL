@@ -1,6 +1,6 @@
 
 import pyrogram
-import Gvar
+import modules.Gvar as Gvar
 
 def CreateNewUser(message:pyrogram.types.Message):
     TEMP_USER = [
