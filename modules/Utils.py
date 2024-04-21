@@ -376,12 +376,11 @@ def spider(user,msg): #TODO
     return "Work in progress"
 
 def getsize(user,msg):  #TODO
-    return "Work in progress"
-
-def copy(message:Message): #TODO
     pass
 
-
+def copy(message:Message): #TODO
+    return "Work in progress" 
+    pass
 
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)

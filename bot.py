@@ -1,18 +1,6 @@
 from modules.imports import *
 from flask import Flask,request
 
-def WEB():
-    web = Flask("vshell")
-    @web.route("/",methods = ['POST', 'GET'])
-    def main():
-        if request.method == "POST":
-            Gvar.POST_QUERYS+=1
-        else:
-            Gvar.GET_QUERYS+=1
-        return f"POST: {Gvar.POST_QUERYS}\nGET: {Gvar.GET_QUERYS}"
-    web.run("0.0.0.0",80)
-
-
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
@@ -22,8 +10,22 @@ bot = Client(
     "virusgaming",
     api_id=Gvar.API_ID,
     api_hash=Gvar.API_HASH,
-    workers=Gvar.WORKERS 
+    workers=Gvar.WORKERS
 )
+
+def WEB():
+    web = Flask("vshell")
+    @web.route("/",methods = ['POST', 'GET'])
+    def main():
+        if request.method == "POST":
+            Gvar.POST_QUERYS+=1
+        else:
+            Gvar.GET_QUERYS+=1
+            bot.send_message("Vdebug",f"alive: {Gvar.GET_QUERYS}")
+        return f"POST: {Gvar.POST_QUERYS}\nGET: {Gvar.GET_QUERYS}"
+    web.run("0.0.0.0",80)
+
+
 def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     try:
         USER = Utils.FindUser(message.chat.id)
@@ -192,8 +194,11 @@ def INIT():
         print(e)
 def ACTIVATOR():
     while 1:
-        time.sleep(1)
-        req.get("https://mapi-a2dm.onrender.com/bot")
+        try:
+            time.sleep(10)
+            req.get("https://vshell2.onrender.com")
+        except Exception as e:
+            print(str(e))
 pool = v_pool(
     [
         ACTIVATOR,
