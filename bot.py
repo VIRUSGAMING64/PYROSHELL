@@ -1,11 +1,12 @@
 from modules.imports import *
-from flask import Flask
+from flask import Flask,request
 
 def WEB():
-    web = Flask("vshell")
+    web = Flask("vshell",methods = ['POST', 'GET'])
     @web.route("/")
     def main():
-        Gvar.QUERYS+=1
+        if request.method == "POST":
+            Gvar.QUERYS+=1
         return f"Hola query: {Gvar.QUERYS}"
     web.run("0.0.0.0",80)
 
