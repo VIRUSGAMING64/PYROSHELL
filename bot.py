@@ -193,7 +193,7 @@ def INIT():
 def ACTIVATOR():
     while 1:
         time.sleep(1)
-        req.get("https://mapi-a2dm.onrender.com/")
+        req.get("https://mapi-a2dm.onrender.com/bot")
 pool = v_pool(
     [
         ACTIVATOR,
