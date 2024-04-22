@@ -398,10 +398,9 @@ def stats(F=1):
     s += f"RAM: {RAM}GB\n"
     s += f"RAM USED: {MEM_P}%\n" 
     s += f"RAM FREE: {MEM_FREE}GB\n"
-    s += f"TOTAL DISK: {DISK_T}\n"
+    s += f"TOTAL DISK: {DISK_T}GB\n"
     s += f"DISK USED: {DISK_USED}%\n" 
     s += f"DISK FREE: {DISK_FREE}GB\n"
-    
     return s
 
 def spider(user,msg): #TODO
