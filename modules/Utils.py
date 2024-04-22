@@ -391,14 +391,14 @@ def stats(F=1):
     if sys.platform != "win32":
             try:
                 temp = st.sensors_temperatures()["coretemp"][0]
-                s+=f"CPU_TEMP: {temp.current}C"
-                s+=f"MAX_CPU_TEMP: {temp.critical}C"
+                s+=f"CPU_TEMP: {temp.current}C\n"
+                s+=f"MAX_CPU_TEMP: {temp.critical}C\n"
             except Exception as e:
                 print(e)
-    s += f"RAM: {RAM}"
+    s += f"RAM: {RAM}GB\n"
     s += f"RAM USED: {MEM_P}%\n" 
     s += f"RAM FREE: {MEM_FREE}GB\n"
-    s += f"TOTAL DISK: {DISK_T}"
+    s += f"TOTAL DISK: {DISK_T}\n"
     s += f"DISK USED: {DISK_USED}%\n" 
     s += f"DISK FREE: {DISK_FREE}GB\n"
     

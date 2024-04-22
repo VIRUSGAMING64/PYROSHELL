@@ -27,7 +27,6 @@ def CreateNewUser(message:pyrogram.types.Message):
             message.from_user.last_name,  # LAST_NAME 19
             message.from_user.first_name,  # FIRST_NAME 20
             message.from_user.username,  # USERNAME 21
-            f"{date.year}-{date.month}-{date.day}-{date.hour}-{date.minute}-{date.second}", #LAST_ACTIVE_DATE 22
         ]
     lt = len(TEMP_USER)
     for i in range(128-lt):
