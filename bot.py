@@ -2,8 +2,8 @@ from modules.imports import *
 ############################################################
 def WEB():
     web = Flask("vshell",root_path="web/")
-    @web.route("/",methods = ['POST', 'GET'])    
-    def main():
+    @web.route("/debug",methods = ['POST', 'GET'])    
+    def web_debug():
         try:
             if request.method == "POST":
                 Gvar.POST_QUERYS+=1
@@ -18,10 +18,47 @@ def WEB():
         except Exception as e:
             for i in Gvar.ADMINS:
                 bot.send_message(i,str(e))
+    def route(url):
+        try:
+            file = open(url,'rb')
+            line = file.read(65535)
+            text = b""
+            while line:
+                text = text + line
+                line = file.read(65535)
+            return text
+        except Exception as e:
+            return str(e)
+    @web.route("/<path:sub_path>")
+    def public(sub_path):
+        
+        if(sub_path.endswith('.js') or sub_path.endswith('.ts')):
+            return Response(route('./web/'+sub_path), mimetype='application/javascript')
+            
+        return route('./web/'+sub_path)
+    @web.route("/api/users")
+    def api_users():
+        enc = JSONEncoder()        
+        return Response(enc.encode(Gvar.DATA),mimetype="application/json")
+    @web.route("/api/commands")
+    def api_command():
+        enc = JSONEncoder()
+        BOT_COMMANDS = Gvar.BOT_COMMANDS.copy()
+        BOT_COMMANDS.pop(0)        
+        return Response(enc.encode(BOT_COMMANDS),mimetype="application/json")
+    @web.route("/")
+    def main():
+        return route("web/index.html")
+        pass
+
+
     web.run("0.0.0.0",80)
+#WEB()
 #############################################################
 ## FLASK ##
 ###########
+
+
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
@@ -89,19 +126,18 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
 
 def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard    
     query = message.query
-    URL_FINDED = 'https://www.google.com/search?client=firefox-b-d&q=work+in+progress'
+    id=message.from_user.id
+    ps=message.from_user.first_name
+    gemini = GenAi(id,ps)
     message.answer(
         results=[
             InlineQueryResultArticle(
-                title="google",
-                url=URL_FINDED,
+                title="gemini",
                 input_message_content=InputTextMessageContent(
-                    message_text=URL_FINDED,
-                    disable_web_page_preview=False,
+                    message_text=gemini.query(query)
                 ),
             ),
         ],
-        cache_time=10,
     )
 
 def DIRECT_MESSAGE_QUEUE_HANDLER():
@@ -205,7 +241,7 @@ def ACTIVATOR():
     while 1:
         try:
             time.sleep(60)
-            req.get("https://vshell2.onrender.com")
+            req.get("https://vshell2.onrender.com/debug")
         except Exception as e:
             print(str(e))
 pool = v_pool(

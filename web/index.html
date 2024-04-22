@@ -1,15 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>vshell web</title>
+    <script src="./src/tailwind/tailwind.js"></script>
+    <script src="./src/react/react.production.min.js"></script>
+    <script src="./src/react/react-dom.production.min.js"></script>
+    <script src="./src/react/babel.min.js"></script>
+    <style>
+        *::-webkit-scrollbar{
+            display: none;
+        }
+    </style>
 </head>
-<body>
-    
 
+<body class="bg-slate-900 text-white">
+
+    <script type="text/babel">
+
+
+
+        function Command(data) {
+            return <div className='p-4 bg-slate-900 rounded-md  m-4'>
+                <b>{data.name}</b>: <span>{data.desc}</span>
+            </div>
+        }
+
+        function Button(data) {
+            function handleClick() {
+                data.setActive(data.title)
+            }
+            return <div className='p-2 pl-4 pr-4 bg-slate-800 rounded-md m-2 cursor-pointer hover:bg-slate-700 transition-all active:bg-slate-800' onClick={handleClick}>
+                {data.title}
+            </div>
+        }
+
+        function Panel(data) {
+            let buttons = [];
+
+            for (const key in data) {
+                if (Object.hasOwnProperty.call(data, key)) {
+                    if (key != 'setActive') { // setActive es un metodo 
+                        buttons.push(key);
+                    }
+                }
+            }
+
+
+            return <div className='w-96 h-full'>
+                {buttons.map(button => <Button title={button} setActive={data.setActive} />)}
+            </div>
+        }
+
+        function Data(props) {
+
+            const usr_temp = {
+                USER_ID: 0,
+                LAST_MESSAGE_ID: 1,
+                LAST_MESSAGE_DOWNLOAD_ID: 13,
+                CHAT_ID: 14,
+                DC_ID: 15,
+                VERIFIED: 16,
+                PREMIUM: 17,
+                LANG_CODE: 18,
+                LAST_NAME: 19,
+                FIRST_NAME: 20,
+                USERNAME: 21
+            };
+
+            
+
+            switch (props.active) {
+                case 'commands':
+                    return <div className='w-full bg-slate-950 pl-14 pr-7 pt-8 overflow-scroll overflow-scroll'>
+                        <div className='text-5xl pb-8'>{props.active}</div>
+                        <div>
+                            {props.data.commands.map(command => <Command name={command[0]} desc={command[1]} />)}
+                        </div>
+                    </div>
+                case 'users':
+                    return <div className='w-full bg-slate-950 pl-14 pr-7 pt-8 overflow-scroll overflow-scroll'>
+                        <div className='text-5xl pb-8'>{props.active}</div>
+                        <div>
+                            <table>
+                                <th >
+                                    {Object.keys(usr_temp).map(tmp => <td className='border p-2'>{tmp}</td>)}
+
+                                </th>
+                            </table>
+                        </div>
+                    </div>
+                default:
+                    break;
+            }
+        }
+
+        function App(props) {
+
+
+            let [active, setActive] = React.useState('commands')
+
+
+            let data = {
+                commands: props.commands,
+                users: props.users
+            }
+
+            return <div className='h-screen flex'>
+                <Panel {...data} setActive={setActive} />
+                <Data data={data} active={active} />
+            </div>
+        }
+
+
+
+
+
+
+
+        async function init() {
+
+            let command_api = await fetch('/api/commands');
+            let commands = await command_api.json();
+            console.log(commands)
+
+            let users_api = await fetch('/api/users');
+            let users = await users_api.json();
+            console.log(users)
+
+            const root = ReactDOM.createRoot(document.body);
+
+            root.render(<App commands={commands} />);
+        }
+
+        window.onload = init;
+
+
+    </script>
 </body>
-<script>
-  
-</script>
+
 </html>

@@ -19,9 +19,11 @@ from pyrogram.raw import *
 from pyrogram.sync import *
 from pyrogram.handlers import *
 from pyrogram.parser import *
+from modules.Timer import Timer
 from math import *
 import time
 from modules.datatypes import *
+from modules.gemini import *
 import threading as th
 import requests as req
 import modules.Utils as Utils
@@ -33,3 +35,5 @@ from modules.divider import FILE_DIVIDER,FILE_JOINER
 Gvar.HAND = ENV.MAIN()
 from ctypes import *
 from flask import *
+from json.encoder import JSONEncoder
+from json.decoder import JSONDecoder

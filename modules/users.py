@@ -2,6 +2,7 @@
 import pyrogram
 import modules.Gvar as Gvar
 from modules.datatypes import *
+from modules.gemini import GenAi
 def CreateNewUser(message:pyrogram.types.Message):
     date = message.from_user.last_online_date
     TEMP_USER = [

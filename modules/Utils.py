@@ -15,7 +15,7 @@ from modules.v_tree import *
 def prog(cant,total):
     por = (cant/total)*100
     por2= round(por,prec=2)
-    por = int(por/10)
+    por = int(por2/10)
     res = 10-por
     s = f"{por2}%\n"
     s += "*"*por+"."*res
@@ -72,12 +72,14 @@ def mkdir(USER, msg: str):
             msg = msg.split(" ")
             os.mkdir(msg[0])
         except Exception as e:
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             debug(e)
             print(e)
             try:
                 os.mkdir(msg)
                 return "Directory created"
             except Exception as e:
+                Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
                 debug(e)
                 print(e)
                 return "Error on create directory"
@@ -89,13 +91,14 @@ def mkdir(USER, msg: str):
         return "Directory created"
     except Exception as e:
         print(e)
+        Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         debug(e)
         Gvar.DATA[USER][3] = 1
         return "Send directory name"
         pass
 
 
-def __geturl(url,filename):
+def __geturl(url,filename,USER):
     ret = "Downloaded..."
     try:
         Dn = uq.urlopen(url)
@@ -106,18 +109,32 @@ def __geturl(url,filename):
             D = Dn.read(1024 * 1024)
     except Exception as e:
         debug(e)
+        Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         ret = "Error: " + str(e) 
     finally:
         file.close()
         return ret
-
+def GetParent(url):
+    url = list(url)
+    parent = ""
+    if "/" in url:
+        while url[len(url)-1] != "/":
+            parent = url[len(url)-1]+parent
+            url.pop()
+        return parent 
+    else:
+        return ""
+    
 def geturl(USER, msg: str):
     if msg.startswith("/geturl"):
         try:
             msg = msg.split(' ')
-            return __geturl(msg[1],msg[2])
+            if len(msg) == 2:
+                msg.append(GetParent(msg[1]))
+            return __geturl(msg[1],msg[2],USER)
         except Exception as e:
             debug(e)
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             return "command sintaxis: /geturl URL FILENAME"
     else:
         try:
@@ -125,9 +142,8 @@ def geturl(USER, msg: str):
             return __geturl(msg[0],msg[1])
         except Exception as e:
             debug(e)
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             return "incorrect link and filename format"   
-            
-
 def chdir(USER, msg):
     if Gvar.DATA[USER][CHDIR] == 1:
         Gvar.DATA[USER][CHDIR] = 0
@@ -137,10 +153,12 @@ def chdir(USER, msg):
             try:
                 msg = msg[1]
             except Exception as e:
+                Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
                 debug(e)
                 print(e, " one message")
         except Exception as e:
             print(e)
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             debug(e)
             pass
         if msg == "..":
@@ -175,10 +193,11 @@ def chdir(USER, msg):
                     Gvar.DATA[USER][PATH] = Gvar.DATA[USER][PATH] + "/" + DIR
                     return "Changed to: " + os.getcwd()
                 except Exception as e:
+                    Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
                     debug(e)
                     return e
-
             except Exception as e:
+                Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
                 debug(e)
                 print(e)
                 return "Impossible change directory."
@@ -219,36 +238,42 @@ def chdir(USER, msg):
                 return "Changed to: " + os.getcwd()
             except Exception as e:
                 debug(e)
+                Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
                 return "Error on chdir: " + str(e)
         except Exception as e:
             debug(e)
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             print(e)
             return "Impossible change directory"
             pass
     except Exception as e:
         debug(e)
         print(e)
+        Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         Gvar.DATA[USER][CHDIR] = 1
         return "send directory name"
 
 
-def ls():
+def ls(USER):
     try:
         sstr = "in " + os.getcwd() + ": \n"
         ls = os.listdir()
         ls.sort()
+        j = 1
         for i in ls:
             if os.path.isdir(i):
-                sstr += "   [dir] " + i + "\n"
+                sstr += f"({j}){pyrogram.emoji.FILE_FOLDER} " + i + "\n"
             elif os.path.isfile(i):
-                sstr += "   [file] " + i + "\n"
+                sstr += f"({j})[file] " + i + "\n"
             elif os.path.islink(i):
-                sstr += "   [link] " + i + "\n"
+                sstr += f"({j}){pyrogram.emoji.LINK} " + i + "\n"
             else:
-                sstr += "   [other] " + i + "\n"
+                sstr += f"({j})[other] " + i + "\n"
+            j+=1
         return sstr
     except Exception as e:
         debug(e)
+        Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         print("Error: " + str(e))
         return "Error: " + str(e)
 
@@ -266,6 +291,7 @@ def NOTEPAD(USER, msg):
             return "file created"
         except Exception as e:
             print(e)
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             debug(e)
             return "Error: " + str(e)
     try:
@@ -280,14 +306,17 @@ def NOTEPAD(USER, msg):
                 Gvar.DATA[USER][WRITING_FILEPATH] = msg
             except Exception as e:
                 debug(e)
+                Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
                 return "Error: " + str(e)
         except Exception as e:
             debug(e)
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             Gvar.DATA[USER][GETING_NOTEPAD_NAME] = 1
             return "send filename: "
     except Exception as e:
         print(e)
         debug(e)
+        Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         return "Error: " + str(e)
 
 
@@ -304,10 +333,12 @@ def WRITER(USER, msg):
                 return f"Writed {total} bytes"
             except Exception as e:
                 debug(e)
+                Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
                 return "Error writing file "+str(e)
         except Exception as e:
             debug(e)
             print(e)
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             return "Error: " + str(e)
 
 
@@ -318,6 +349,7 @@ def cat(USER, msg:str):
             msg = msg.split(" ")
             msg = msg[0]
         except Exception as e:
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             print(e)
             debug(e)
             return "Error: " + str(e)
@@ -328,6 +360,7 @@ def cat(USER, msg:str):
 
         except Exception as e:    
             debug(e)
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             print(e)
             Gvar.DATA[USER][CATING] = 1
             return "Send file name"
@@ -338,6 +371,7 @@ def cat(USER, msg:str):
         return file.read(Gvar.MAX_MESSAGE_LENGTH)
     except Exception as e:
         debug(e)
+        Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         print("Error on cat:", e)
         return "Error on cat: " + str(e)
 
@@ -445,7 +479,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/cd"):
         return os.getcwd()
     elif MSG.startswith("/ls"):
-        return ls()
+        return ls(USER)
     elif MSG.startswith("/note") or Gvar.DATA[USER][GETING_NOTEPAD_NAME]:
         return NOTEPAD(USER, MSG)
     elif MSG.startswith("/chdir") or Gvar.DATA[USER][CHDIR]:
@@ -465,11 +499,17 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith('/send'):
         try:
             MSG =MSG.split(' ')[1]
+            if MSG.isnumeric():
+                MSG = int(MSG)
+                dirs = os.listdir()
+                dirs.sort()
+                MSG = dirs[MSG-1]
             bot.send_document(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
             Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID]=0
             return "uploaded"
-        except:
-            return "File not found"
+        except Exception as e:
+            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
+            return f"File not found E:{str(e)}"
     else:
         return 0
     pass

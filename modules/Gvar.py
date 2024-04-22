@@ -29,6 +29,7 @@ DOWNLOADING = 0 # if 1 user downloading
 DATA = [] # all users and `variables
 MAX_MESSAGE_LENGTH = 4096 
 WORKERS = os.cpu_count()  
+LOG = []
 START_TIME = time.time_ns()
 SECOND = 10**9
 B  = 1024**0
@@ -63,6 +64,7 @@ IN_PROGRESS = [
     "work with compresed files [ZIP]", #esto creo que hay documentacion en los .7z
     "/spider command [get all urls in a web page with deep X [default X = 0]]" # esto debe hacerse con HTTPHandler de urllib.request
 ]
+
 
 HELP = ""
 NEWS = ""
