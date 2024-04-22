@@ -1,3 +1,4 @@
+import modules.Gvar as Gvar
 from pyrogram.client import *
 from pyrogram.connection import *
 from pyrogram.crypto import *
@@ -20,7 +21,6 @@ from pyrogram.handlers import *
 from pyrogram.parser import *
 from math import *
 import time
-import modules.Gvar as Gvar
 from modules.datatypes import *
 import threading as th
 import requests as req

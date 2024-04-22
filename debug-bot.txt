@@ -1,1 +1,0 @@
-[WinError 2] El sistema no puede encontrar el archivo especificado: 'D:\\GitHub\\vshell/env/1659735368-VIRUSGAMING'

@@ -13,7 +13,7 @@ def WEB():
                     time.sleep(1)
                 bot.send_message("Vdebug",f"GET: {Gvar.GET_QUERYS} POST: {Gvar.POST_QUERYS}")
                 pass
-        return open("web/index.html","rb").read(2**31)        
+        return open(Gvar.FILEROOT+"/web/index.html","rb").read(2**31)        
     web.run("0.0.0.0",80)
 #############################################################
 ## FLASK ##
@@ -30,8 +30,6 @@ bot = Client(
     workers=Gvar.WORKERS,
     bot_token=Gvar.TOKEN
 )
-
-
 
 def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     try:

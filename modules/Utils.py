@@ -1,5 +1,5 @@
 import urllib.request as uq
-from sys import *
+import sys
 import os
 from math import *
 from pyrogram.emoji import *
@@ -12,14 +12,23 @@ import modules.Gvar as Gvar
 from modules.copy_core import *
 from modules.v_tree import *
 
+def prog(cant,total):
+    por = (cant/total)*100
+    por2= round(por,prec=2)
+    por = int(por/10)
+    res = 10-por
+    s = f"{por2}%\n"
+    s += "*"*por+"."*res
+    return s
+
 def progress(cant, total,USER,bot:pyrogram.client.Client):
     if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
-            chat_id=Gvar.DATA[USER][CHAT_ID], text=f"Downloaded: {cant} of {total}"
+            chat_id=Gvar.DATA[USER][CHAT_ID], text=prog(cant,total)
         ).id
     else:
         bot.edit_message_text(
-            chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=f"Downloaded: {cant} of {total}"
+            chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=prog(cant,total)
         )
     pass
 
@@ -46,6 +55,7 @@ def round(fl:float,prec:int=2):
     else:
         r = [r]
     return float(r[0])
+
 def FindUser(user):
     i = 0
     for users in Gvar.DATA:
@@ -338,13 +348,20 @@ def tree(user,msg):
     dt.tree(Gvar.DATA[user][PATH])
     return dt.trees
 
-def stats(F):
+def stats(F=1):
     ns_time = (time.time_ns())
     seconds_uptime = round((ns_time - Gvar.START_TIME)/Gvar.SECOND)
     minutes_uptime = round(((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60)
     hours_uptime = round(((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60/60)
+    days_uptime = round(((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60/60/24)
     s = ""
+    if(floor(days_uptime) != 0):
+        hours_uptime = (days_uptime - floor(days_uptime))*24
+        minutes_uptime = (hours_uptime - floor(hours_uptime))*60
+        seconds_uptime = (minutes_uptime - floor(minutes_uptime))*60
+        s += f"{floor(days_uptime)}d"
     if(floor(hours_uptime) != 0):
+        if(s != ""): s+='-'
         minutes_uptime = (hours_uptime - floor(hours_uptime))*60
         seconds_uptime = (minutes_uptime - floor(minutes_uptime))*60
         s += f"{floor(hours_uptime)}h"
@@ -364,12 +381,27 @@ def stats(F):
     CPU_C=round(st.cpu_count())
     MEM_P = round(st.virtual_memory().percent)
     MEM_FREE= round(st.virtual_memory().available/Gvar.GB)
+    RAM = round(st.virtual_memory().total/Gvar.GB)
     DISK_USED=round(100.0-st.disk_usage(os.getcwd()).percent)
     DISK_FREE=round(st.disk_usage(os.getcwd()).free/Gvar.GB)
-
-    s += f"CPU: {CPU_P}%\n" + f"CPU SPEED: {CPU_F}Mhz\nCPU COUNT: {CPU_C}\n"
-    s += f"MEMORY USED: {MEM_P}%\n" + f"MEMORY FREE: {MEM_FREE}GB\n"
-    s += f"DISK USED: {DISK_USED}%\n" + f"DISK FREE: {DISK_FREE}GB\n"
+    DISK_T = round(st.disk_usage(os.getcwd()).total/Gvar.GB)
+    s += f"CPU: {CPU_P}%\n"
+    s += f"CPU SPEED: {CPU_F}Mhz\n" 
+    s += f"CPU COUNT: {CPU_C}\n"
+    if sys.platform != "win32":
+            try:
+                temp = st.sensors_temperatures()["coretemp"][0]
+                s+=f"CPU_TEMP: {temp.current}C"
+                s+=f"MAX_CPU_TEMP: {temp.critical}C"
+            except Exception as e:
+                print(e)
+    s += f"RAM: {RAM}"
+    s += f"RAM USED: {MEM_P}%\n" 
+    s += f"RAM FREE: {MEM_FREE}GB\n"
+    s += f"TOTAL DISK: {DISK_T}"
+    s += f"DISK USED: {DISK_USED}%\n" 
+    s += f"DISK FREE: {DISK_FREE}GB\n"
+    
     return s
 
 def spider(user,msg): #TODO
@@ -381,6 +413,17 @@ def getsize(user,msg):  #TODO
 def copy(message:Message): #TODO
     return "Work in progress" 
     pass
+
+def getusers(message:Message):
+    s = ""
+    if message.from_user.id in Gvar.ADMINS:
+        for USER in Gvar.DATA:
+            s+=USER[USERNAME]+"\n"
+        return s
+    else:
+        return "access denied"
+    pass
+
 
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
@@ -418,6 +461,8 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return stats(1)
     elif MSG.startswith('/stats'):
         return stats(0)
+    elif MSG.startswith("/getU"):
+        return getusers(message)
     elif MSG.startswith('/send'):
         try:
             MSG =MSG.split(' ')[1]

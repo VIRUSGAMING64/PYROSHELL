@@ -11,6 +11,7 @@ class v_pool:
                 funcs[i] = Thread(target=funcs[i])
         self.sequence = sequence
         self.funcs = funcs
+
     def start_all(self,deamon = 0,indices = []):
         if indices != []:
             for i in indices:
@@ -47,3 +48,8 @@ class v_pool:
                 self.funcs[i].daemon=deamon
         else:
             self.funcs[index].daemon=deamon
+    def add_thread(self,func:callable,start = 1,deamon=0):
+        func=Thread(target=func,deamon=deamon)
+        self.funcs.append(func)
+        if(start):
+            self.funcs[len(self.funcs)].start()
