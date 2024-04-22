@@ -16,7 +16,7 @@ def WEB():
                     pass
             return open(Gvar.FILEROOT+"/web/index.html","rb").read(2**31)        
         except Exception as e:
-            for i in Gvar.admins:
+            for i in Gvar.ADMINS:
                 bot.send_message(i,str(e))
     web.run("0.0.0.0",80)
 #############################################################
