@@ -4,16 +4,20 @@ def WEB():
     web = Flask("vshell",root_path="web/")
     @web.route("/",methods = ['POST', 'GET'])    
     def main():
-        if request.method == "POST":
-            Gvar.POST_QUERYS+=1
-        else:
-            Gvar.GET_QUERYS+=1
-            if __name__ != "__main__":        
-                while bot.is_connected == None:
-                    time.sleep(1)
-                bot.send_message("-1001809067914",f"GET: {Gvar.GET_QUERYS} POST: {Gvar.POST_QUERYS}")
-                pass
-        return open(Gvar.FILEROOT+"/web/index.html","rb").read(2**31)        
+        try:
+            if request.method == "POST":
+                Gvar.POST_QUERYS+=1
+            else:
+                Gvar.GET_QUERYS+=1
+                if __name__ != "__main__":        
+                    while bot.is_connected == None:
+                        time.sleep(1)
+                    bot.send_message(-1001809067914,f"GET: {Gvar.GET_QUERYS} POST: {Gvar.POST_QUERYS}")
+                    pass
+            return open(Gvar.FILEROOT+"/web/index.html","rb").read(2**31)        
+        except Exception as e:
+            for i in Gvar.admins:
+                bot.send_message(i,str(e))
     web.run("0.0.0.0",80)
 #############################################################
 ## FLASK ##
