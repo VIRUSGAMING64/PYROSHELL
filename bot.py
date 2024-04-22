@@ -1,7 +1,7 @@
 from modules.imports import *
 ############################################################
 def WEB():
-    web = Flask("vshell",root_path="web/")
+    web = Flask("vshell")
     @web.route("/debug",methods = ['POST', 'GET'])    
     def web_debug():
         try:
