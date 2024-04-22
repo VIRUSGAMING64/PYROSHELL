@@ -33,9 +33,8 @@ def WEB():
     def public(sub_path):
         
         if(sub_path.endswith('.js') or sub_path.endswith('.ts')):
-            return Response(route('./web/'+sub_path), mimetype='application/javascript')
-            
-        return route('./web/'+sub_path)
+            return Response(route(Gvar.FILEROOT+'/web/'+sub_path), mimetype='application/javascript')
+        return route(Gvar.FILEROOT+'/web/'+sub_path)
     @web.route("/api/users")
     def api_users():
         enc = JSONEncoder()        
@@ -48,7 +47,7 @@ def WEB():
         return Response(enc.encode(BOT_COMMANDS),mimetype="application/json")
     @web.route("/")
     def main():
-        return route("web/index.html")
+        return route(Gvar.FILEROOT+"/web/index.html")
         pass
 
 
