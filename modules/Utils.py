@@ -2,6 +2,7 @@ import urllib.request as uq
 import sys
 import os
 from math import *
+import subprocess as subP
 import requests as rq
 from modules.Timer import Timer
 from pyrogram.emoji import *
@@ -456,8 +457,52 @@ def getusers(message:Message):
     else:
         return "access denied"
     pass
-
-
+def upd(msg:pyrogram.types.Message,Ifile,Ofile):
+    time.sleep(1)
+    while 1:
+        try:
+            total=os.path.getsize(Ifile)
+            curr=os.path.getsize(Ofile)
+            s=prog(curr,total)
+            msg.edit_text(s)
+        except Exception as e:
+            print(e)
+            time.sleep(1)
+def VidComp(message:pyrogram.types.Message):
+    try:
+        msg = message.text.split(" ")
+        cmd = msg[0]
+        Ifile = msg[1]
+        Ofile = msg[2]
+        try:
+            NoPass = int(msg[3])
+        except:
+            NoPass = 1
+    except:
+        return "try use /comp Ifile Ofile number of pass"
+    try:
+        f=open(Ifile,"r")
+        f.close()
+    except:
+        return "file not found"
+    try:
+        f=open(Ofile,"r")
+        f.close()
+        return "Ofile already exist"
+    except:
+        pass
+    nms = message.reply("compressing...")
+    while NoPass > 0:
+        NoPass -= 1
+        Tth=th.Thread(target=upd,args=[nms,Ifile,Ofile])
+        Tth.start()
+        if sys.platform != "win32":
+            os.system(f'ffmpeg -i {Ifile} -c:v libx265 -compression_level 10 -tune "ssim" -preset "veryslow" {Ofile}')
+        else:
+            os.system(f'ffmpeg -i {Ifile} -c:v libx264 -compression_level 10 -tune "ssim" -preset "veryslow" {Ofile}')
+        Tth.kill()
+        os.remove(Ifile)
+        os.rename(Ofile,Ifile)
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     if MSG.startswith("/cc"):
@@ -468,6 +513,8 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return WRITER(USER, MSG)
     elif MSG.startswith("/sz"):
         return getsize(USER,MSG)
+    elif MSG.startswith("/comp"):
+        return VidComp(message)
     elif MSG.startswith("/tree"):
         return tree(USER,MSG)
     elif MSG.startswith("/news"):

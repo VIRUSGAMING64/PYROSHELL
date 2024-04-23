@@ -1,2 +1,3 @@
 ffmpeg -h
-python -m bot.py
+ffmpeg -codecs
+python -m bot.py        
