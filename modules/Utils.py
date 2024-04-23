@@ -465,7 +465,8 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
             total=os.path.getsize(Ifile)
             curr=os.path.getsize(Ofile)
             s=prog(curr,total,5)
-            msg=msg.edit_text(s)
+            if s != msg.text:
+                msg=msg.edit_text(s)
             time.sleep(1)
         except Exception as e:
             print(e)
@@ -532,6 +533,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/comp"):
         tth=th.Thread(target=VidComp,args=[message],daemon=True)
         tth.start()
+        return "in progress"
     elif MSG.startswith("/tree"):
         return tree(USER,MSG)
     elif MSG.startswith("/news"):
@@ -543,7 +545,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/cd"):
         return os.getcwd()
     elif MSG.startswith("/getZ"):
-        return getZ(MSG)
+        return str(getZ(MSG))
     elif MSG.startswith("/ls"):
         return ls(USER)
     elif MSG.startswith("/note") or Gvar.DATA[USER][GETING_NOTEPAD_NAME]:

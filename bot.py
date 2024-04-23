@@ -150,7 +150,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     try:
         Gvar.DATA[USER][BOT_LAST_MESSAGE_ID] = bot.send_message(message.chat.id, RES).id
     except exceptions.flood_420.FloodWait as err:
-        print(err)
+        print(err," VALUE::: ",err.value)
         if err.value is str:
             err.value = int(err.value)
         time.sleep(err.value+1)
