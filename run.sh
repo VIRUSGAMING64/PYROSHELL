@@ -1,4 +1,2 @@
-apt update
-apt upgrade
-apt install ffmpeg
+ffmpeg -h
 python -m bot.py
