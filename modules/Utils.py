@@ -464,7 +464,7 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
             total=os.path.getsize(Ifile)
             curr=os.path.getsize(Ofile)
             s=prog(curr,total,5)
-            msg.edit_text(s)
+            msg=msg.edit_text(s)
         except Exception as e:
             print(e)
             time.sleep(1)
@@ -503,6 +503,20 @@ def VidComp(message:pyrogram.types.Message):
         Tth.kill()
         os.remove(Ifile)
         os.rename(Ofile,Ifile)
+
+
+def getZ(msg):
+    msg = msg.split(" ")
+    msg.append(None)
+    if msg[1] is None:
+        return "/getZ filename <--"
+    try:
+        f=open(msg[1])
+        f.close()
+    except:
+        return "file not found"
+    return os.path.getsize(msg[1])
+
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     if MSG.startswith("/cc"):
@@ -527,6 +541,8 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return spider(USER,MSG)
     elif MSG.startswith("/cd"):
         return os.getcwd()
+    elif MSG.startswith("/getZ"):
+        return getZ(MSG)
     elif MSG.startswith("/ls"):
         return ls(USER)
     elif MSG.startswith("/note") or Gvar.DATA[USER][GETING_NOTEPAD_NAME]:
