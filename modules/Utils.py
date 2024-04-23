@@ -460,6 +460,7 @@ def getusers(message:Message):
 def upd(msg:pyrogram.types.Message,Ifile,Ofile):
     time.sleep(1)
     while 1:
+        time.sleep(1)
         try:
             total=os.path.getsize(Ifile)
             curr=os.path.getsize(Ofile)
@@ -467,8 +468,6 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
             msg=msg.edit_text(s)
         except Exception as e:
             print(e)
-        finally:
-            time.sleep(1)
 def VidComp(message:pyrogram.types.Message):
     try:
         msg = message.text.split(" ")
@@ -495,10 +494,10 @@ def VidComp(message:pyrogram.types.Message):
     nms = message.reply("compressing...")
     while NoPass > 0:
         NoPass -= 1
-        Tth=th.Thread(target=upd,args=[nms,Ifile,Ofile])
+        Tth=th.Thread(target=upd,args=[nms,Ifile,Ofile],deamon=1)
         Tth.start()
         if sys.platform != "win32":
-            os.system(f'ffmpeg -i {Ifile} -c:v libx265 -compression_level 10 -tune "ssim" -preset "veryslow" {Ofile}')
+            os.system(f'ffmpeg -i {Ifile} -cpu-used 5 -c:v libx265 -compression_level 10 -tune "ssim" -preset "veryslow" {Ofile}')
         else:
             os.system(f'ffmpeg -i {Ifile} -c:v libx264 -compression_level 10 -tune "ssim" -preset "veryslow" {Ofile}')
         Tth.kill()
@@ -529,7 +528,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/sz"):
         return getsize(USER,MSG)
     elif MSG.startswith("/comp"):
-        tth=th.Thread(target=VidComp,args=[message])
+        tth=th.Thread(target=VidComp,args=[message],deamon=True)
         tth.start()
         return "compressing..."
     elif MSG.startswith("/tree"):
