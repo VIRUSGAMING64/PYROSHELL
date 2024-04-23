@@ -532,7 +532,6 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/comp"):
         tth=th.Thread(target=VidComp,args=[message],deamon=True)
         tth.start()
-        return "compressing..."
     elif MSG.startswith("/tree"):
         return tree(USER,MSG)
     elif MSG.startswith("/news"):
@@ -579,7 +578,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
             return f"File not found E:{str(e)}"
     else:
         return 0
-    pass
+    return 0
 
 def API_INIT():
     try:

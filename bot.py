@@ -146,7 +146,13 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
         Gvar.QUEUE_TO_SEND.append([message,T_TO_SEND])
         Gvar.HAND.save()
         return
-    Gvar.DATA[USER][BOT_LAST_MESSAGE_ID] = bot.send_message(message.chat.id, RES).id
+    try:
+        Gvar.DATA[USER][BOT_LAST_MESSAGE_ID] = bot.send_message(message.chat.id, RES).id
+    except exceptions.flood_420.FloodWait as err:
+        if err.value is str:
+            err.value = int(err.value)
+        time.sleep(err.value+1)
+        pass
     Gvar.DATA[USER][LAST_MESSAGE_ID] = message.id
     Gvar.HAND.save()
 
