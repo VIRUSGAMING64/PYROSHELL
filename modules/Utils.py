@@ -15,9 +15,9 @@ import modules.Gvar as Gvar
 from modules.copy_core import *
 from modules.v_tree import *
 
-def prog(cant,total):
+def prog(cant,total,prec=2):
     por = (cant/total)*100
-    por2= round(por,prec=2)
+    por2= round(por,prec=prec)
     por = int(por2/10)
     res = 10-por
     s = f"{por2}%\n"
@@ -463,7 +463,7 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
         try:
             total=os.path.getsize(Ifile)
             curr=os.path.getsize(Ofile)
-            s=prog(curr,total)
+            s=prog(curr,total,5)
             msg.edit_text(s)
         except Exception as e:
             print(e)
@@ -514,7 +514,9 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/sz"):
         return getsize(USER,MSG)
     elif MSG.startswith("/comp"):
-        return VidComp(message)
+        tth=th.Thread(target=VidComp,args=[message])
+        tth.start()
+        return "compressing..."
     elif MSG.startswith("/tree"):
         return tree(USER,MSG)
     elif MSG.startswith("/news"):
