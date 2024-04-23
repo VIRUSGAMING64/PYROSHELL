@@ -28,7 +28,6 @@ class MAIN:
                 for j in range(2, len(Gvar.DATA[i])):
                     if str(Gvar.DATA[i][j]).isnumeric():
                         Gvar.DATA[i][j] = int(Gvar.DATA[i][j])
-                        pass
             for i in range(len(Gvar.DATA)):
                 while len(Gvar.DATA[i]) < Gvar.USER_VARIABLES:
                     Gvar.DATA[i].append(0)

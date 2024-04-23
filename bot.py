@@ -154,13 +154,15 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
     query = message.query
     id=message.from_user.id
     ps=message.from_user.first_name
-    gemini = GenAi(id,ps)
+    gemini = GenAi(ps,id)
+    text = gemini.query(query)
     message.answer(
         results=[
             InlineQueryResultArticle(
-                title="gemini",
+                title="gemini-AI",
+                description=text[0:15]+"...",
                 input_message_content=InputTextMessageContent(
-                    message_text=gemini.query(query)
+                    message_text=text
                 ),
             ),
         ],

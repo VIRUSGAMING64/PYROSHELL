@@ -5,14 +5,16 @@ class GenAi:
         try:
             self.user = usermame
             self.password = password
-            rquest = rq.get(f"https://mapi-a2dm.onrender.com/register/?username={usermame}&password={password}&repassword={password}",timeout=50000)
+            rquest = rq.get(f'https://mapi-a2dm.onrender.com/register/?username="{usermame}"&password="{password}"&repassword="{password}"')
         except Exception as e:
             Gvar.LOG.append(str(e))
     def query(self,query):
+        if query == "":
+            return "No answer"
         try:
             username=self.user
             password=self.password
-            res = rq.get(f'https://mapi-a2dm.onrender.com/query/?quest="{query}"&username={username}&password={password}')
+            res = rq.get(f'https://mapi-a2dm.onrender.com/query/?quest="{query}"&username="{username}"&password="{password}"')
         except Exception as e:
             Gvar.LOG.append(str(e))
         if res.text == "":
