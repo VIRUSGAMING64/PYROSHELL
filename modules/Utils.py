@@ -496,7 +496,7 @@ def VidComp(message:pyrogram.types.Message):
     nms = message.reply("compressing...")
     while NoPass > 0:
         NoPass -= 1
-        Tth=th.Thread(target=upd,args=[nms,Ifile,Ofile],deamon=1)
+        Tth=th.Thread(target=upd,args=[nms,Ifile,Ofile],daemon=1)
         Tth.start()
         if sys.platform != "win32":
             os.system(f'ffmpeg -i {Ifile} -cpu-used 5 -c:v libx265 -compression_level 10 -tune "ssim" -preset "veryslow" {Ofile}')
@@ -530,7 +530,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/sz"):
         return getsize(USER,MSG)
     elif MSG.startswith("/comp"):
-        tth=th.Thread(target=VidComp,args=[message],deamon=True)
+        tth=th.Thread(target=VidComp,args=[message],daemon=True)
         tth.start()
     elif MSG.startswith("/tree"):
         return tree(USER,MSG)
