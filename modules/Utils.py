@@ -466,8 +466,10 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
             curr=os.path.getsize(Ofile)
             s=prog(curr,total,5)
             msg=msg.edit_text(s)
+            time.sleep(1)
         except Exception as e:
             print(e)
+            time.sleep(1)
 def VidComp(message:pyrogram.types.Message):
     try:
         msg = message.text.split(" ")
