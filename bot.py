@@ -26,7 +26,8 @@ def WEB():
         except Exception as e:
             for i in Gvar.ADMINS:
                 bot.send_message(i,str(e))
-    
+        return "nothing"
+
     def route(url):
         try:
             file = open(url,'rb')
