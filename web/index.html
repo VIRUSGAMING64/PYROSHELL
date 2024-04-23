@@ -90,7 +90,7 @@
 
                     try {
                         res = await fetch(
-                            `https://mapi.onrender.com/query/?query="${pregunta}"&username=${username}&password=${password}`
+                            `https://mapi-a2dm.onrender.com/query/?quest="${pregunta}"&username=${username}&password=${password}`
                         );
                         type = 'MESSAGE';
 
@@ -118,12 +118,13 @@
 
         function GeminiChat() {
             const chat = { name: 'Gemini chat' };
-
+            
 
             return <div className='flex flex-col h-full'>
                 <Chat />
             </div>;
         }
+
 
 
         function Command(data) {
