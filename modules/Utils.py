@@ -464,7 +464,7 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
         try:
             total=os.path.getsize(Ifile)
             curr=os.path.getsize(Ofile)
-            s=prog(curr,total,5)
+            s=prog(curr,total,10)
             if s != msg.text:
                 msg=msg.edit_text(s)
             time.sleep(1)
