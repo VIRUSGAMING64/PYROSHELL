@@ -15,6 +15,7 @@ API_HASH = os.getenv("API_HASH")  # bot api
 ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINS
 HAND = None
 BOT_ON = 0
+uptime=0
 FILEROOT = os.getcwd()
 ROOT = os.getcwd() + "/env"  # for envs
 QUEUE_INLINE = []

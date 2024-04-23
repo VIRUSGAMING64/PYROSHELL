@@ -2,6 +2,8 @@ import urllib.request as uq
 import sys
 import os
 from math import *
+import requests as rq
+from modules.Timer import Timer
 from pyrogram.emoji import *
 from pyrogram.types import *
 import threading as th
@@ -381,28 +383,26 @@ def tree(user,msg):
     dt.showfiles = False
     dt.tree(Gvar.DATA[user][PATH])
     return dt.trees
-
+def cp(a):
+    return a
 def stats(F=1):
-    ns_time = (time.time_ns())
-    seconds_uptime = round((ns_time - Gvar.START_TIME)/Gvar.SECOND)
-    minutes_uptime = round(((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60)
-    hours_uptime = round(((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60/60)
-    days_uptime = round(((ns_time - Gvar.START_TIME)/Gvar.SECOND)/60/60/24)
+    print(Gvar.uptime)
+    seconds_uptime = round(cp(Gvar.uptime)) 
+    minutes_uptime = round(seconds_uptime // 60)
+    hours_uptime = round(minutes_uptime // 60)
+    days_uptime = round(hours_uptime // 24)
+    seconds_uptime%=60
+    minutes_uptime%=60
+    hours_uptime%=60
     s = ""
     if(floor(days_uptime) != 0):
-        hours_uptime = (days_uptime - floor(days_uptime))*24
-        minutes_uptime = (hours_uptime - floor(hours_uptime))*60
-        seconds_uptime = (minutes_uptime - floor(minutes_uptime))*60
         s += f"{floor(days_uptime)}d"
     if(floor(hours_uptime) != 0):
         if(s != ""): s+='-'
-        minutes_uptime = (hours_uptime - floor(hours_uptime))*60
-        seconds_uptime = (minutes_uptime - floor(minutes_uptime))*60
         s += f"{floor(hours_uptime)}h"
         pass
     if(floor(minutes_uptime) != 0):
         if(s != ""): s+='-'
-        seconds_uptime = (minutes_uptime - floor(minutes_uptime))*60
         s+= f"{floor(minutes_uptime)}m"
         pass
     if(floor(seconds_uptime) != 0):
@@ -514,3 +514,15 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return 0
     pass
 
+def API_INIT():
+    try:
+        rq.get("https://mapi-a2dm.onrender.com/ram/",timeout=10000)
+    except Exception as e:
+        Gvar.LOG.append(str(e))
+def UPD_HOUR():
+    Gvar.uptime+=1
+timer = Timer(
+    [API_INIT,UPD_HOUR],
+    [60,1]
+)
+timer.start()

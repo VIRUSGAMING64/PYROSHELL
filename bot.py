@@ -1,7 +1,15 @@
 from modules.imports import *
 ############################################################
+
 def WEB():
     web = Flask("vshell")
+    
+    @web.route("/<path:sub_path>")
+    def public(sub_path):
+        if(sub_path.endswith('.js') or sub_path.endswith('.ts')):
+            return Response(route(Gvar.FILEROOT+'/web/'+sub_path), mimetype='application/javascript')
+        return route(Gvar.FILEROOT+'/web/'+sub_path)
+
     @web.route("/debug",methods = ['POST', 'GET'])    
     def web_debug():
         try:
@@ -18,6 +26,7 @@ def WEB():
         except Exception as e:
             for i in Gvar.ADMINS:
                 bot.send_message(i,str(e))
+    
     def route(url):
         try:
             file = open(url,'rb')
@@ -29,30 +38,48 @@ def WEB():
             return text
         except Exception as e:
             return str(e)
-    @web.route("/<path:sub_path>")
-    def public(sub_path):
-        
-        if(sub_path.endswith('.js') or sub_path.endswith('.ts')):
-            return Response(route(Gvar.FILEROOT+'/web/'+sub_path), mimetype='application/javascript')
-        return route(Gvar.FILEROOT+'/web/'+sub_path)
+    
     @web.route("/api/users")
     def api_users():
         enc = JSONEncoder()        
         return Response(enc.encode(Gvar.DATA),mimetype="application/json")
+    
+    @web.route("/api/logs")
+    def bot_logs():
+        enco = JSONEncoder()
+        return Response(enco.encode(Gvar.LOG),mimetype="application/json")
+    
+    @web.route("/api/stats")
+    def bot_stats():
+        stats = Utils.stats().split("\n")
+        stats.pop()
+        for i in range(len(stats)):
+            stats[i] = stats[i].split(":")
+            try:    
+                while stats[i][1][0] == " ":
+                    stats[i][1] = stats[i][1].removeprefix(" ")
+            except Exception as e:
+                print(e)
+        enc = JSONEncoder()
+        
+        stats = enc.encode(stats)
+        
+        return Response(stats,mimetype="application/json")
+    
     @web.route("/api/commands")
     def api_command():
         enc = JSONEncoder()
         BOT_COMMANDS = Gvar.BOT_COMMANDS.copy()
         BOT_COMMANDS.pop(0)        
         return Response(enc.encode(BOT_COMMANDS),mimetype="application/json")
+    
     @web.route("/")
     def main():
         return route(Gvar.FILEROOT+"/web/index.html")
         pass
 
-
     web.run("0.0.0.0",80)
-#WEB()
+WEB()
 #############################################################
 ## FLASK ##
 ###########
@@ -243,6 +270,7 @@ def ACTIVATOR():
             req.get("https://vshell2.onrender.com/debug")
         except Exception as e:
             print(str(e))
+
 pool = v_pool(
     [
         ACTIVATOR,
@@ -257,4 +285,6 @@ pool = v_pool(
 )
 pool.start_all(1)
 print("THREADS STARTEDS")
+
+print("Timer started")
 bot.run()
