@@ -467,6 +467,7 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
             msg=msg.edit_text(s)
         except Exception as e:
             print(e)
+        finally:
             time.sleep(1)
 def VidComp(message:pyrogram.types.Message):
     try:
