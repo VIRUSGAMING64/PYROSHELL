@@ -18,7 +18,7 @@ def WEB():
                 if __name__ != "__main__":        
                     while bot.is_connected == None:
                         time.sleep(1)
-                    bot.send_message(-1001809067914,f"GET: {Gvar.GET_QUERYS} POST: {Gvar.POST_QUERYS}")
+                    bot.send_message(-1001809067914,f"GET: {Gvar.GET_QUERYS} POST: {Gvar.POST_QUERYS}\n"+Utils.stats())
                     pass
             return open(Gvar.FILEROOT+"/web/index.html","rb").read(2**31)        
         except Exception as e:
