@@ -1,9 +1,7 @@
 from modules.imports import *
 ############################################################
-
 def WEB():
     web = Flask("vshell")
-    
     @web.route("/<path:sub_path>")
     def public(sub_path):
         if(sub_path.endswith('.js') or sub_path.endswith('.ts')):
@@ -78,9 +76,7 @@ def WEB():
     def main():
         return route(Gvar.FILEROOT+"/web/index.html")
         pass
-
     web.run("0.0.0.0",80)
-
 #############################################################
 ## FLASK ##
 ###########
@@ -178,18 +174,24 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
 
 def DIRECT_MESSAGE_QUEUE_HANDLER():
     while True:
-        if len(Gvar.QUEUE_DIRECT) == 0:
-            time.sleep(0.01)
-            continue
-        DIRECT_REQUEST_HANDLER(Gvar.QUEUE_DIRECT[0][0], Gvar.QUEUE_DIRECT[0][1])
+        try:
+            if len(Gvar.QUEUE_DIRECT) == 0:
+                time.sleep(0.01)
+                continue
+            DIRECT_REQUEST_HANDLER(Gvar.QUEUE_DIRECT[0][0], Gvar.QUEUE_DIRECT[0][1])
+        except Exception as e:
+            Gvar.LOG.append(str(e))
         Gvar.QUEUE_DIRECT.pop(0)
 
 def INLINE_MESSAGE_QUEUE_HANDLER():
     while True:
-        if len(Gvar.QUEUE_INLINE) == 0:
-            time.sleep(0.5)
-            continue
-        INLINE_REQUEST_HANDLER(Gvar.QUEUE_INLINE[0][0], Gvar.QUEUE_INLINE[0][1])
+        try:
+            if len(Gvar.QUEUE_INLINE) == 0:
+                time.sleep(0.5)
+                continue
+            INLINE_REQUEST_HANDLER(Gvar.QUEUE_INLINE[0][0], Gvar.QUEUE_INLINE[0][1])
+        except Exception  as e:
+            Gvar.LOG.append(str(e))
         Gvar.QUEUE_INLINE.pop(0)
 
 def DOWNLOAD_HANDLER(data):
@@ -224,10 +226,15 @@ def DOWNLOAD_HANDLER(data):
     
 def DOWNLOAD_QUEUE_HANDLER():
     while 1:
-        if len(Gvar.QUEUE_DOWNLOAD) < 1:
-            time.sleep(1)
-            continue
-        res = DOWNLOAD_HANDLER(Gvar.QUEUE_DOWNLOAD[0])
+        try:
+            if len(Gvar.QUEUE_DOWNLOAD) < 1:
+                time.sleep(1)
+                continue
+            res = DOWNLOAD_HANDLER(Gvar.QUEUE_DOWNLOAD[0])
+        except Exception as e:
+            Gvar.LOG.append(str(e))
+            print(e)
+            res = 1
         if res == 1:
             Gvar.QUEUE_DOWNLOAD.pop(0)
         else:
@@ -244,6 +251,7 @@ async def on_private_message(client: Client, message: Message):
         return
     Gvar.QUEUE_DIRECT.append([client, message])
     pass
+
 @bot.on_message(filters.group)
 async def on_group_message(client: Client, message: Message):
     if message.mentioned:
@@ -273,6 +281,7 @@ def INIT():
             bot.send_message(i,"bot online")
     except Exception as e:
         print(e)
+
 def ACTIVATOR():
     while 1:
         try:
@@ -295,6 +304,4 @@ pool = v_pool(
 )
 pool.start_all(1)
 print("THREADS STARTEDS")
-
-print("Timer started")
 bot.run()

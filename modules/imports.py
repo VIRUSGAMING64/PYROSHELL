@@ -33,7 +33,6 @@ from modules.pool import *
 from modules.users import *
 import os
 from modules.divider import FILE_DIVIDER,FILE_JOINER
-
 from ctypes import *
 from flask import *
 from json.encoder import JSONEncoder

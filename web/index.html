@@ -23,6 +23,8 @@
         const username = String(Math.random()).split('.')[1];
         const password = String(Math.random()).split('.')[1];
 
+        
+
         const reg = new RegExp('```(.*?)```', 'gi');
         const formated = ''.replace(reg, '<code>$1</code>');
         console.log(formated);
@@ -272,9 +274,6 @@
                 <Data data={data} active={active} />
             </div>
         }
-
-
-
 
 
 

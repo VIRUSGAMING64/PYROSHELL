@@ -34,8 +34,6 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
             chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=prog(cant,total)
         )
     pass
-
-
 """
 En este modulo estan las funciones utiles
 """
@@ -43,6 +41,7 @@ def debug(e):
     _debug = open(Gvar.ROOT+"/debug-utils.txt","a")
     _debug.write(str(e) + "\n")
     _debug.close()
+
 def round(fl:float,prec:int=2):
     if prec > 1e3:
         raise prec > 1e3
@@ -66,7 +65,6 @@ def FindUser(user):
             return i
         i += 1
     return None
-
 
 def mkdir(USER, msg: str):
     if Gvar.DATA[USER][MKDIR] == 1:
@@ -117,6 +115,7 @@ def __geturl(url,filename,USER):
     finally:
         file.close()
         return ret
+
 def GetParent(url):
     url = list(url)
     parent = ""
@@ -147,6 +146,7 @@ def geturl(USER, msg: str):
             debug(e)
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             return "incorrect link and filename format"   
+
 def chdir(USER, msg):
     if Gvar.DATA[USER][CHDIR] == 1:
         Gvar.DATA[USER][CHDIR] = 0
@@ -394,7 +394,7 @@ def stats(F=1):
     days_uptime = round(hours_uptime // 24)
     seconds_uptime%=60
     minutes_uptime%=60
-    hours_uptime%=60
+    hours_uptime%=24
     s = ""
     if(floor(days_uptime) != 0):
         s += f"{floor(days_uptime)}d"
@@ -441,9 +441,6 @@ def stats(F=1):
 def spider(user,msg): #TODO
     return "Work in progress"
 
-def getsize(user,msg):  #TODO
-    pass
-
 def copy(message:Message): #TODO
     return "Work in progress" 
     pass
@@ -457,6 +454,7 @@ def getusers(message:Message):
     else:
         return "access denied"
     pass
+
 def upd(msg:pyrogram.types.Message,Ifile,Ofile):
     time.sleep(1)
     while 1:
@@ -471,6 +469,7 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
         except Exception as e:
             print(e)
             time.sleep(1)
+
 def VidComp(message:pyrogram.types.Message):
     try:
         msg = message.text.split(" ")
@@ -507,7 +506,6 @@ def VidComp(message:pyrogram.types.Message):
         os.remove(Ifile)
         os.rename(Ofile,Ifile)
 
-
 def getZ(msg):
     msg = msg.split(" ")
     msg.append(None)
@@ -528,8 +526,6 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return copy(message)
     elif Gvar.DATA[USER][WRITING] == 1:
         return WRITER(USER, MSG)
-    elif MSG.startswith("/sz"):
-        return getsize(USER,MSG)
     elif MSG.startswith("/comp"):
         tth=th.Thread(target=VidComp,args=[message],daemon=True)
         tth.start()
@@ -558,6 +554,11 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return geturl(USER, MSG)
     elif MSG.startswith("/cat") or Gvar.DATA[USER][CATING]:
         return cat(USER, MSG)
+    elif MSG.startswith("/logs"):
+        ms = ""
+        for i in range(len(Gvar.LOG)):
+            ms += Gvar.LOG[i] + "\n"
+        return ms
     elif MSG.startswith('/stats+'):
         return stats(1)
     elif MSG.startswith('/stats'):
