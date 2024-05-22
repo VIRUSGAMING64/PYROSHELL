@@ -39,7 +39,11 @@ class CSV:
     data = []
     locate = ""
     def __init__(self,file:str=Gvar.ROOT+"/user_datas.csv"):   
-        self.load(file)
+        try:
+            self.load(file)
+        except:
+            open(file,"w").close()
+            self.load(file)
     def load(self,file:str = Gvar.ROOT+"/user_datas.csv"):
         self.locate = file
         file = open(file,"r")
