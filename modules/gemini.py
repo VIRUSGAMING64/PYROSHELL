@@ -14,6 +14,7 @@ chats = {
 
 def NewChat(id):
     chats[id] = GenAI()
+    return chats[id]
 
 def GetAI(id):
     try:
