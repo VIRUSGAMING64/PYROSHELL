@@ -1,6 +1,4 @@
 import modules.Gvar as Gvar
-import modules.ENV as ENV
-Gvar.HAND = ENV.MAIN()
 from pyrogram.client import *
 from pyrogram.connection import *
 from pyrogram.crypto import *
@@ -32,8 +30,11 @@ import modules.Utils as Utils
 from modules.pool import *
 from modules.users import *
 import os
-from modules.divider import FILE_DIVIDER,FILE_JOINER
 from ctypes import *
 from flask import *
 from json.encoder import JSONEncoder
 from json.decoder import JSONDecoder
+
+
+
+Gvar.HAND = CSV()

@@ -2,11 +2,7 @@ requests
 pyrogram    
 TgCrypto
 asyncio
-httpx
-natsort
-opencv-python
 psutil
 flask 
-pytz
-uvloop
 yt_dlp
+google-generativeai

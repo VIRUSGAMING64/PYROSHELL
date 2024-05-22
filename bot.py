@@ -81,7 +81,6 @@ def WEB():
 ## FLASK ##
 ###########
 
-
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
@@ -157,8 +156,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
 def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard    
     query = message.query
     id=message.from_user.id
-    ps=message.from_user.first_name
-    gemini = GenAi(ps,id)
+    gemini = GetAI(id)
     text = gemini.query(query)
     message.answer(
         results=[
@@ -168,8 +166,10 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
                 input_message_content=InputTextMessageContent(
                     message_text=text
                 ),
+                
             ),
         ],
+        cache_time=1000
     )
 
 def DIRECT_MESSAGE_QUEUE_HANDLER():
@@ -304,4 +304,7 @@ pool = v_pool(
 )
 pool.start_all(1)
 print("THREADS STARTEDS")
-bot.run()
+try:
+    bot.run()
+except Exception as e:
+    print(str(e))

@@ -61,7 +61,7 @@ class CSV:
         file.close()
     def find(self,id:int | str): # O(n) -> with tree change to -> O(log(n)) #TODO
         for i in range(len(self.data)):
-            if(self.data[i][USER_ID] == id):
+            if(str(self.data[i][USER_ID]) == str(id)):
                 return i
         return -1
     def find(self,usr:list): # O(n) -> with tree change to -> O(log(n)) #TODO
@@ -69,7 +69,7 @@ class CSV:
             if(self.data[i] == usr):
                 return i
         return -1
-    def append(self,usr:[]):
+    def append(self,usr:list):
         return self.data.append(usr)
     def erase(self,pos):
         return self.data.pop(pos)

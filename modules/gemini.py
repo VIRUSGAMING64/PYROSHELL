@@ -1,22 +1,25 @@
 import requests as rq
 import modules.Gvar as Gvar
-class GenAi:
-    def __init__(self,usermame,password):
-        try:
-            self.user = usermame
-            self.password = password
-            rquest = rq.get(f'https://mapi-a2dm.onrender.com/register/?username="{usermame}"&password="{password}"&repassword="{password}"')
-        except Exception as e:
-            Gvar.LOG.append(str(e))
-    def query(self,query):
-        if query == "":
-            return "No answer"
-        try:
-            username=self.user
-            password=self.password
-            res = rq.get(f'https://mapi-a2dm.onrender.com/query/?quest="{query}"&username="{username}"&password="{password}"')
-        except Exception as e:
-            Gvar.LOG.append(str(e))
-        if res.text == "":
-            return "No answer"
-        return res.text
+import google.generativeai as googleIA
+import os
+googleIA.configure(api_key=os.getenv("GOOGLE"))
+class GenAI:
+    model = googleIA.GenerativeModel().start_chat()
+    def query(self,qe:str):
+        return self.model.send_message(qe).text
+
+chats = {
+    "id":GenAI
+}
+
+def NewChat(id):
+    chats[id] = GenAI()
+
+def GetAI(id):
+    try:
+        chat = chats[id]
+        return chat 
+    except Exception as e:
+        print(str(e))
+        return NewChat(id)
+

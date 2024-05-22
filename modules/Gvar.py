@@ -7,15 +7,17 @@ import time
     github is because this work is local
 
 """
+nulls_parents = 0
 GET_QUERYS = 0
 POST_QUERYS = 0
+GOOGLE_API = os.getenv("GOOGLE")
 TOKEN = os.getenv("BOT_TOKEN")
 API_ID = os.getenv("API_ID")
 API_HASH = os.getenv("API_HASH")  # bot api
 ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINS
 HAND = None
 BOT_ON = 0
-uptime=0
+UPTIME=0
 FILEROOT = os.getcwd()
 ROOT = os.getcwd() + "/env"  # for envs
 QUEUE_INLINE = []
@@ -49,7 +51,6 @@ BOT_COMMANDS = [
     ["/cat", "get 4096 first bytes of file"],
     ["/geturl", "download url"],
     ["/stats", 'get server stats'],
-    ["/tree", "make directorys tree"],
     ["/mkdir", "make a directory"],
     ["/chdir", "change of directory"],
     ["/note", "make a file to write in her"],

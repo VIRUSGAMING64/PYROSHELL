@@ -12,13 +12,10 @@ import psutil as st
 import time
 from modules.datatypes import *
 import modules.Gvar as Gvar
-from modules.copy_core import *
-from modules.v_tree import *
 
 def prog(cant,total,prec=2):
-    por = (cant/total)*100
-    por2= round(por,prec=prec)
-    por = int(por2/10)
+    por = int((cant/total)*10)
+    por2 = round((cant/total)*100)
     res = 10-por
     s = f"{por2}%\n"
     s += "*"*por+"."*res
@@ -33,10 +30,8 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
         bot.edit_message_text(
             chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=prog(cant,total)
         )
+        time.sleep(0.5)
     pass
-"""
-En este modulo estan las funciones utiles
-"""
 def debug(e):
     _debug = open(Gvar.ROOT+"/debug-utils.txt","a")
     _debug.write(str(e) + "\n")
@@ -125,10 +120,16 @@ def GetParent(url):
             url.pop()
         return parent 
     else:
-        return ""
+        Gvar.nulls_parents += 1
+        return f"null{Gvar.nulls_parents}"
     
 def geturl(USER, msg: str):
-    if msg.startswith("/geturl"):
+    if(os.path.islink(msg)):
+        try:
+            return __geturl(msg,GetParent(msg),USER)
+        except Exception as e:
+            return str(e)
+    elif msg.startswith("/geturl"):
         try:
             msg = msg.split(' ')
             if len(msg) == 2:
@@ -377,18 +378,10 @@ def cat(USER, msg:str):
         Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         print("Error on cat:", e)
         return "Error on cat: " + str(e)
-
-def tree(user,msg):
-    dt = TreeMaker()
-    dt.show=False
-    dt.showfiles = False
-    dt.tree(Gvar.DATA[user][PATH])
-    return dt.trees
 def cp(a):
     return a
 def stats(F=1):
-    print(Gvar.uptime)
-    seconds_uptime = round(cp(Gvar.uptime)) 
+    seconds_uptime = round(cp(Gvar.UPTIME)) 
     minutes_uptime = round(seconds_uptime // 60)
     hours_uptime = round(minutes_uptime // 60)
     days_uptime = round(hours_uptime // 24)
@@ -469,6 +462,11 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
         except Exception as e:
             print(e)
             time.sleep(1)
+def ffmpegW(Ifile,Ofile):
+    os.system(f'ffmpeg -i {Ifile} -cpu-used 5 -c:v libx265 -compression_level 10 -tune "ssim" -preset "plasebo" {Ofile}')
+
+def ffmpegL(Ifile,Ofile):
+    os.system(f'ffmpeg -i {Ifile} -c:v libx264 -compression_level 10 -tune "ssim" -preset "plasebo" {Ofile}')
 
 def VidComp(message:pyrogram.types.Message):
     try:
@@ -499,9 +497,9 @@ def VidComp(message:pyrogram.types.Message):
         Tth=th.Thread(target=upd,args=[nms,Ifile,Ofile],daemon=1)
         Tth.start()
         if sys.platform != "win32":
-            os.system(f'ffmpeg -i {Ifile} -cpu-used 5 -c:v libx265 -compression_level 10 -tune "ssim" -preset "veryslow" {Ofile}')
+            ffmpegW(Ifile,Ofile) 
         else:
-            os.system(f'ffmpeg -i {Ifile} -c:v libx264 -compression_level 10 -tune "ssim" -preset "veryslow" {Ofile}')
+            ffmpegL(Ifile,Ofile)
         Tth.kill()
         os.remove(Ifile)
         os.rename(Ofile,Ifile)
@@ -530,8 +528,6 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         tth=th.Thread(target=VidComp,args=[message],daemon=True)
         tth.start()
         return "in progress"
-    elif MSG.startswith("/tree"):
-        return tree(USER,MSG)
     elif MSG.startswith("/news"):
         return Gvar.NEWS #change in time
     elif MSG.startswith("/help"):
@@ -550,7 +546,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return chdir(USER, MSG)
     elif MSG.startswith("/mkdir") or Gvar.DATA[USER][MKDIR]:
         return mkdir(USER, MSG)
-    elif MSG.startswith("/geturl") or Gvar.DATA[USER][GETURL]:
+    elif MSG.startswith("/geturl") or Gvar.DATA[USER][GETURL] or os.path.islink(MSG):
         return geturl(USER, MSG)
     elif MSG.startswith("/cat") or Gvar.DATA[USER][CATING]:
         return cat(USER, MSG)
@@ -583,15 +579,10 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return 0
     return 0
 
-def API_INIT():
-    try:
-        rq.get("https://mapi-a2dm.onrender.com/ram/",timeout=10000)
-    except Exception as e:
-        Gvar.LOG.append(str(e))
 def UPD_HOUR():
-    Gvar.uptime+=1
+    Gvar.UPTIME+=1
 timer = Timer(
-    [API_INIT,UPD_HOUR],
-    [60,1]
+    [UPD_HOUR],
+    [1]
 )
 timer.start()
