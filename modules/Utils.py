@@ -636,6 +636,20 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         except Exception as e:
             Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
             return f"File not found E:{str(e)}"
+    elif MSG.startswith("/rm"):
+        try:
+            dirs = os.listdir()
+            dirs.sort()
+            if MSG.isnumeric():
+                MSG = int(MSG)
+                dirs = os.listdir()
+                dirs.sort()
+                MSG = dirs[MSG-1]
+            if(os.path.isdir(MSG)):
+                os.removedirs(MSG)
+            os.remove(dirs[MSG-1])
+        except Exception as e:
+            return str(e) 
     else:
         return 0
     return 0
