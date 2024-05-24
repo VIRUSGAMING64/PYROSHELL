@@ -2,9 +2,7 @@ import urllib.request as uq
 import sys
 import os
 from math import *
-import subprocess as subP
 import yt_dlp
-import requests as rq
 from modules.Timer import Timer
 from pyrogram.emoji import *
 from pyrogram.types import *
@@ -21,12 +19,13 @@ def prog(cant,total,prec=2):
     res = 10-por
     s = f"{por2}%\n"
     s += f"{round(cant/(1024**2))}MB of {round(total/(1024**2))}MB\n"
-    s += "*"*por+"."*res
+    s += f"{pyrogram.emoji.BLACK_SMALL_SQUARE}"*por
+    s += f"{pyrogram.emoji.WHITE_SMALL_SQUARE}"*res
     s += "\n"+str(round(Gvar.UPTIME/60))
     return s
 
 def progress(cant, total,USER,bot:pyrogram.client.Client):
-    if(Gvar.UPTIME % 5 != 0):
+    if(Gvar.UPTIME % 8 != 0):
         return
     time.sleep(0.1)
     if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
@@ -561,14 +560,15 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
     try:
         do = MyDownloader(bot,usr)
         do.download_video(msg.text)
-        bot.delete_messages(msg.chat.id,msg.id)
+        bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
         try:
             if do.file.endswith(".mp4") or do.file.endswith(".mkv") or do.file.endswith(".mpg"):
                 bot.send_video(msg.chat.id,do.file,progress=progress,progress_args=[FindUser(msg.chat.id),bot])    
         except:
             bot.send_document(msg.chat.id,do.file,progress=progress,progress_args=[FindUser(msg.chat.id),bot])
-    
+        bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
+        Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
     except Exception as e:
         msg.reply(str(e))
         Gvar.LOG.append(str(e))
@@ -634,6 +634,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
                 tar.close()
                 MSG = MSG + ".7z"
             bot.send_document(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
+            bot.delete_messages(Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
             Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
             return "uploaded"
         except Exception as e:
