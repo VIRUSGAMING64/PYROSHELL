@@ -35,7 +35,7 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
             )
         except Exception as e:
             Gvar.LOG.append(str(e))
-    time.sleep(0.5)
+    time.sleep(1)
     pass
 
 class MyDownloader:
