@@ -24,6 +24,7 @@ def prog(cant,total,prec=2):
     return s
 
 def progress(cant, total,USER,bot:pyrogram.client.Client):
+    time.sleep(0.75)
     if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
             chat_id=Gvar.DATA[USER][CHAT_ID], text=prog(cant,total)
@@ -35,7 +36,6 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
             )
         except Exception as e:
             Gvar.LOG.append(str(e))
-    time.sleep(1)
     pass
 
 class MyDownloader:
@@ -43,7 +43,11 @@ class MyDownloader:
         self.bot = bot
         self.USER = user
     def my_hook(self, down):
-        curr = down["downloaded_bytes"]
+        curr = 0
+        try:
+            down["downloaded_bytes"]
+        except:
+            pass
         total = curr * 2
         try:
             total = down["total_bytes"]
@@ -53,6 +57,7 @@ class MyDownloader:
             except:
                 pass
             e=str(e)
+        Gvar.FUNC_QUEUE.append([progress,[curr,total,self.USER,self.bot]])
         progress(curr,total,self.USER,self.bot)
     def download_video(self, url):
         ydl_opts = {
@@ -623,8 +628,13 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
 
 def UPD_HOUR():
     Gvar.UPTIME+=1
+def FUNC_QUEUE_HANDLER():
+    if len(Gvar.FUNC_QUEUE) > 0:
+        func,args = Gvar.FUNC_QUEUE[0]
+        Gvar.FUNC_QUEUE.pop(0)
+        func(*args)
 timer = Timer(
-    [UPD_HOUR],
-    [1]
+    [UPD_HOUR,FUNC_QUEUE_HANDLER],
+    [1,1]
 )
 timer.start()

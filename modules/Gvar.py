@@ -23,6 +23,7 @@ ROOT = os.getcwd() + "/env"  # for envs
 QUEUE_INLINE = []
 MUTED_USERS = [] #Use in format "code"+"number"
 QUEUE_DIRECT = [] #queue for direct messages
+FUNC_QUEUE = []
 QUEUE_TO_SEND = [] #queue of larges messages
 QUEUE_TORRENT = [] #torrent downloads
 QUEUE_DOWNLOAD = [] # queue of downloads
