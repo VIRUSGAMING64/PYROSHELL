@@ -58,7 +58,6 @@ class MyDownloader:
                 pass
             e=str(e)
         Gvar.FUNC_QUEUE.append([progress,[curr,total,self.USER,self.bot]])
-        progress(curr,total,self.USER,self.bot)
     def download_video(self, url):
         ydl_opts = {
             'format': 'best',
