@@ -3,6 +3,7 @@ import sys
 import os
 from math import *
 import subprocess as subP
+import yt_dlp
 import requests as rq
 from modules.Timer import Timer
 from pyrogram.emoji import *
@@ -32,6 +33,23 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
         )
         time.sleep(0.5)
     pass
+
+class MyDownloader:
+    def __init__(self, bot,user):
+        self.bot = bot
+        self.USER = user
+    def my_hook(self, down):
+        total = down["total_bytes"]
+        curr = down["downloaded_bytes"]
+        progress(curr,total,self.USER,self.bot)
+    def download_video(self, url):
+        ydl_opts = {
+            'format': 'best',
+            'progress_hooks': [self.my_hook],
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+
 def debug(e):
     _debug = open(Gvar.ROOT+"/debug-utils.txt","a")
     _debug.write(str(e) + "\n")
@@ -516,8 +534,16 @@ def getZ(msg):
         return "file not found"
     return os.path.getsize(msg[1])
 
+
+
+
+def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
+    MyDownloader(bot).download_video(msg.text,usr)
+    
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
+    if MSG.startswith("http") or MSG.startswith("https"):
+        vid_down(USER,message,bot)
     if MSG.startswith("/cc"):
         return copy(message)
     elif MSG.startswith('/cv'):

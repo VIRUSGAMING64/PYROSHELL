@@ -4,7 +4,8 @@ import google.generativeai as googleIA
 import os
 googleIA.configure(api_key=os.getenv("GOOGLE"))
 class GenAI:
-    model = googleIA.GenerativeModel().start_chat()
+    def __init__(self):
+        model = googleIA.GenerativeModel().start_chat()
     def query(self,qe:str):
         return self.model.send_message(qe).text
 
@@ -24,3 +25,4 @@ def GetAI(id):
         print(str(e))
         return NewChat(id)
 
+NewChat(1).query("hola")
