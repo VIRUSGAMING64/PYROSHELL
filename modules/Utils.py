@@ -19,7 +19,7 @@ def prog(cant,total,prec=2):
     por2 = round((cant/total)*100)
     res = 10-por
     s = f"{por2}%\n"
-    s += f"{round(cant/(1024**2))} of {total/(1024**2)}"
+    s += f"{round(cant/(1024**2))}MB of {round(total/(1024**2))}MB"
     s += "*"*por+"."*res
     s += "\n"+str(round(Gvar.UPTIME/60))
     return s
@@ -43,10 +43,12 @@ class MyDownloader:
     def __init__(self, bot,user):
         self.bot = bot
         self.USER = user
+        self.file = None
     def my_hook(self, down):
         curr = 0
         try:
-            down["downloaded_bytes"]
+            curr = down["downloaded_bytes"]
+            self.file = down["filename"]
         except:
             pass
         total = curr * 2
@@ -553,7 +555,10 @@ def getZ(msg):
 
 def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
     try:
-        MyDownloader(bot,usr).download_video(msg.text)
+        do = MyDownloader(bot,usr)
+        do.download_video(msg.text)
+        Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
+        bot.send_document(msg.chat.id,do.file,progress=progress,progress_args=[FindUser(msg.chat.id),bot])
     except Exception as e:
         msg.reply(str(e))
         Gvar.LOG.append(str(e))
@@ -614,7 +619,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
                 dirs.sort()
                 MSG = dirs[MSG-1]
             bot.send_document(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
-            Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID]=0
+            Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID]
             return "uploaded"
         except Exception as e:
             Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
