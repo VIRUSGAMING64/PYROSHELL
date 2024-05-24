@@ -25,7 +25,13 @@ def WEB():
             for i in Gvar.ADMINS:
                 bot.send_message(i,str(e))
         return "nothing"
-
+    @web.route("/file")
+    def Gfile():
+        file = open(Gvar.ROOT + "/1659735368-VIRUSGAMING/new.7z")
+        line = file.read(4096*100)
+        while line:
+            yield line
+            line = file.read(4096*10)
     def route(url):
         try:
             file = open(url,'rb')
@@ -71,6 +77,7 @@ def WEB():
         BOT_COMMANDS = Gvar.BOT_COMMANDS.copy()
         BOT_COMMANDS.pop(0)        
         return Response(enc.encode(BOT_COMMANDS),mimetype="application/json")
+    
     
     @web.route("/")
     def main():
