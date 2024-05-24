@@ -69,6 +69,7 @@ class MyDownloader:
             'format': 'best',
             'progress_hooks': [self.my_hook],
             'write-thumbnail': True,
+            'writethumbnail':True,
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
