@@ -68,6 +68,7 @@ class MyDownloader:
         ydl_opts = {
             'format': 'best',
             'progress_hooks': [self.my_hook],
+            'write-thumbnail': True,
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
@@ -558,6 +559,7 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
     try:
         do = MyDownloader(bot,usr)
         do.download_video(msg.text)
+        bot.delete_messages(msg.chat.id,msg.id)
         Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
         try:
             if do.file.endswith(".mp4") or do.file.endswith(".mkv") or do.file.endswith(".mpg"):
