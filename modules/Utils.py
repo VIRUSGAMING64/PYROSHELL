@@ -629,7 +629,9 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
             if(os.path.isdir(MSG)):
                 tar = tarfile.TarFile(MSG + ".7z","w")
                 tar.add(MSG)
+                tar.close()
                 MSG = MSG + ".7z"
+
             bot.send_document(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
             Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID]
             return "uploaded"
