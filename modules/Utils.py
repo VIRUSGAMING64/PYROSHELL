@@ -20,13 +20,15 @@ def prog(cant,total,prec=2):
     por2 = round((cant/total)*100)
     res = 10-por
     s = f"{por2}%\n"
-    s += f"{round(cant/(1024**2))}MB of {round(total/(1024**2))}MB"
+    s += f"{round(cant/(1024**2))}MB of {round(total/(1024**2))}MB\n"
     s += "*"*por+"."*res
     s += "\n"+str(round(Gvar.UPTIME/60))
     return s
 
 def progress(cant, total,USER,bot:pyrogram.client.Client):
-    time.sleep(0.75)
+    if(Gvar.UPTIME % 5 != 0):
+        return
+    time.sleep(0.1)
     if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
             chat_id=Gvar.DATA[USER][CHAT_ID], text=prog(cant,total)
@@ -499,10 +501,10 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
             print(e)
             time.sleep(1)
 def ffmpegW(Ifile,Ofile):
-    os.system(f'ffmpeg -i {Ifile} -cpu-used 5 -c:v libx265 -compression_level 10 -tune "ssim" -preset "plasebo" {Ofile}')
+    os.system(f'ffmpeg -i {Ifile} -cpu-used 5 -c:v libx265 -compression_level 10 -tune "ssim" -preset "fast" {Ofile}')
 
 def ffmpegL(Ifile,Ofile):
-    os.system(f'ffmpeg -i {Ifile} -c:v libx264 -compression_level 10 -tune "ssim" -preset "plasebo" {Ofile}')
+    os.system(f'ffmpeg -i {Ifile} -c:v libx264 -compression_level 10 -tune "ssim" -preset "fast" {Ofile}')
 
 def VidComp(message:pyrogram.types.Message):
     try:
@@ -632,7 +634,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
                 tar.close()
                 MSG = MSG + ".7z"
             bot.send_document(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
-            Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID]
+            Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
             return "uploaded"
         except Exception as e:
             Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
@@ -644,12 +646,10 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
             dirs.sort()
             if MSG.isnumeric():
                 MSG = int(MSG)
-                MSG = dirs[MSG-1]
                 os.remove(dirs[MSG-1])
             else:
                 os.remove(MSG)
             return "removed"
-            
         except Exception as e:
             return str(e) 
     else:
