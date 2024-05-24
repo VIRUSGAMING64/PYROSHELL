@@ -20,6 +20,7 @@ def prog(cant,total,prec=2):
     res = 10-por
     s = f"{por2}%\n"
     s += "*"*por+"."*res
+    s += "\n"+str(round(Gvar.UPTIME/60))
     return s
 
 def progress(cant, total,USER,bot:pyrogram.client.Client):
@@ -34,7 +35,7 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
             )
         except Exception as e:
             Gvar.LOG.append(str(e))
-    time.sleep(0.3)
+    time.sleep(0.5)
     pass
 
 class MyDownloader:
