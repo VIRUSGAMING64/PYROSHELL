@@ -638,6 +638,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
             return f"File not found E:{str(e)}"
     elif MSG.startswith("/rm"):
         try:
+            MSG = MSG.split(" ")[1]
             dirs = os.listdir()
             dirs.sort()
             if MSG.isnumeric():
