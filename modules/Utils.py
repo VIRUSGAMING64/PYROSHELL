@@ -645,7 +645,11 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
             if MSG.isnumeric():
                 MSG = int(MSG)
                 MSG = dirs[MSG-1]
-            os.remove(dirs[MSG-1])
+                os.remove(dirs[MSG-1])
+            else:
+                os.remove(MSG)
+            return "removed"
+            
         except Exception as e:
             return str(e) 
     else:
