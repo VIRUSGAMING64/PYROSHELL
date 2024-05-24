@@ -610,7 +610,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return getusers(message)
     elif MSG.startswith('/send'):
         try:
-            MSG =MSG.split(' ')[1]
+            MSG = MSG.split(' ')[1]
             if MSG.isnumeric():
                 MSG = int(MSG)
                 dirs = os.listdir()
@@ -620,7 +620,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
             Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID]=0
             return "uploaded"
         except Exception as e:
-            Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
+            Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
             return f"File not found E:{str(e)}"
     else:
         return 0
