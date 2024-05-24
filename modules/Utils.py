@@ -538,7 +538,7 @@ def getZ(msg):
 
 
 def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
-    MyDownloader(bot).download_video(msg.text,usr)
+    MyDownloader(bot,ust).download_video(msg.text)
     
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
