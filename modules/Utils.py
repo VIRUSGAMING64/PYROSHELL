@@ -58,7 +58,9 @@ class MyDownloader:
             except:
                 pass
             e=str(e)
-        Gvar.FUNC_QUEUE.append([progress,[curr,total,self.USER,self.bot]])
+        #Gvar.FUNC_QUEUE.append([progress,[curr,total,self.USER,self.bot]])
+        if Gvar.UPTIME % 7 == 0:
+            progress(curr,total,self.USER,self.bot)
     def download_video(self, url):
         ydl_opts = {
             'format': 'best',
@@ -66,11 +68,6 @@ class MyDownloader:
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
-
-def debug(e):
-    _debug = open(Gvar.ROOT+"/debug-utils.txt","a")
-    _debug.write(str(e) + "\n")
-    _debug.close()
 
 def round(fl:float,prec:int=2):
     if prec > 1e3:
@@ -104,14 +101,14 @@ def mkdir(USER, msg: str):
             os.mkdir(msg[0])
         except Exception as e:
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
-            debug(e)
+            
             print(e)
             try:
                 os.mkdir(msg)
                 return "Directory created"
             except Exception as e:
                 Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
-                debug(e)
+                
                 print(e)
                 return "Error on create directory"
             pass
@@ -123,7 +120,7 @@ def mkdir(USER, msg: str):
     except Exception as e:
         print(e)
         Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
-        debug(e)
+        
         Gvar.DATA[USER][3] = 1
         return "Send directory name"
         pass
@@ -139,7 +136,7 @@ def __geturl(url,filename,USER):
             file.write(D)
             D = Dn.read(1024 * 1024)
     except Exception as e:
-        debug(e)
+        
         Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         ret = "Error: " + str(e) 
     finally:
@@ -171,7 +168,7 @@ def geturl(USER, msg: str):
                 msg.append(GetParent(msg[1]))
             return __geturl(msg[1],msg[2],USER)
         except Exception as e:
-            debug(e)
+            
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             return "command sintaxis: /geturl URL FILENAME"
     else:
@@ -179,7 +176,7 @@ def geturl(USER, msg: str):
             msg = msg.split(' ')
             return __geturl(msg[0],msg[1])
         except Exception as e:
-            debug(e)
+            
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             return "incorrect link and filename format"   
 
@@ -193,12 +190,12 @@ def chdir(USER, msg):
                 msg = msg[1]
             except Exception as e:
                 Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
-                debug(e)
+                
                 print(e, " one message")
         except Exception as e:
             print(e)
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
-            debug(e)
+            
             pass
         if msg == "..":
             if os.path.dirname(os.getcwd()) == Gvar.ROOT:
@@ -233,11 +230,11 @@ def chdir(USER, msg):
                     return "Changed to: " + os.getcwd()
                 except Exception as e:
                     Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
-                    debug(e)
+                    
                     return e
             except Exception as e:
                 Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
-                debug(e)
+                
                 print(e)
                 return "Impossible change directory."
                 pass
@@ -276,17 +273,17 @@ def chdir(USER, msg):
                 Gvar.DATA[USER][PATH] = Gvar.DATA[USER][PATH] + "/" + DIR
                 return "Changed to: " + os.getcwd()
             except Exception as e:
-                debug(e)
+                
                 Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
                 return "Error on chdir: " + str(e)
         except Exception as e:
-            debug(e)
+            
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             print(e)
             return "Impossible change directory"
             pass
     except Exception as e:
-        debug(e)
+        
         print(e)
         Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         Gvar.DATA[USER][CHDIR] = 1
@@ -311,7 +308,7 @@ def ls(USER):
             j+=1
         return sstr
     except Exception as e:
-        debug(e)
+        
         Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         print("Error: " + str(e))
         return "Error: " + str(e)
@@ -331,7 +328,7 @@ def NOTEPAD(USER, msg):
         except Exception as e:
             print(e)
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
-            debug(e)
+            
             return "Error: " + str(e)
     try:
         if msg.startswith("/note"):
@@ -344,17 +341,17 @@ def NOTEPAD(USER, msg):
                 Gvar.DATA[USER][WRITING] = 1
                 Gvar.DATA[USER][WRITING_FILEPATH] = msg
             except Exception as e:
-                debug(e)
+                
                 Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
                 return "Error: " + str(e)
         except Exception as e:
-            debug(e)
+            
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             Gvar.DATA[USER][GETING_NOTEPAD_NAME] = 1
             return "send filename: "
     except Exception as e:
         print(e)
-        debug(e)
+        
         Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         return "Error: " + str(e)
 
@@ -371,11 +368,11 @@ def WRITER(USER, msg):
                 total = file.write(msg)
                 return f"Writed {total} bytes"
             except Exception as e:
-                debug(e)
+                
                 Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
                 return "Error writing file "+str(e)
         except Exception as e:
-            debug(e)
+            
             print(e)
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             return "Error: " + str(e)
@@ -390,7 +387,7 @@ def cat(USER, msg:str):
         except Exception as e:
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             print(e)
-            debug(e)
+            
             return "Error: " + str(e)
     elif msg.startswith("/cat"):
         try:
@@ -398,7 +395,7 @@ def cat(USER, msg:str):
             msg = msg[1]
 
         except Exception as e:    
-            debug(e)
+            
             Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
             print(e)
             Gvar.DATA[USER][CATING] = 1
@@ -409,7 +406,7 @@ def cat(USER, msg:str):
         file = open(msg, "r")
         return file.read(Gvar.MAX_MESSAGE_LENGTH)
     except Exception as e:
-        debug(e)
+        
         Gvar.LOG.append(str(e) +" "+ Gvar.DATA[USER][USER_ID])
         print("Error on cat:", e)
         return "Error on cat: " + str(e)
