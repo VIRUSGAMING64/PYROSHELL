@@ -39,8 +39,14 @@ class MyDownloader:
         self.bot = bot
         self.USER = user
     def my_hook(self, down):
-        total = down["total_bytes"]
+        
+        
         curr = down["downloaded_bytes"]
+        total = curr * 2
+        try:
+            total = down["total_bytes"]
+        except Exception as e:
+            e=str(e)
         progress(curr,total,self.USER,self.bot)
     def download_video(self, url):
         ydl_opts = {
