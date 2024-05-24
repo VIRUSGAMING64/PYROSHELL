@@ -574,7 +574,7 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     if MSG.startswith("http") or MSG.startswith("https"):
-        vid_down(USER,message,bot)
+        Gvar.FUNC_QUEUE.append([vid_down,[USER,message,bot]])
     if MSG.startswith("/cc"):
         return copy(message)
     elif MSG.startswith('/cv'):
