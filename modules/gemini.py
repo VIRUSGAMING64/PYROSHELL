@@ -5,7 +5,7 @@ import os
 googleIA.configure(api_key=os.getenv("GOOGLE"))
 class GenAI:
     def __init__(self):
-        model = googleIA.GenerativeModel().start_chat()
+        self.model = googleIA.GenerativeModel().start_chat()
     def query(self,qe:str):
         return self.model.send_message(qe).text
 
