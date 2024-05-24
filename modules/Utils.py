@@ -28,10 +28,14 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
             chat_id=Gvar.DATA[USER][CHAT_ID], text=prog(cant,total)
         ).id
     else:
-        bot.edit_message_text(
-            chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=prog(cant,total)
-        )
-        time.sleep(0.5)
+        try:
+            bot.edit_message_text(
+                chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=prog(cant,total)
+            )
+            time.sleep(0.5)
+        except Exception as e:
+            Gvar.LOG.append(str(e))
+            return
     pass
 
 class MyDownloader:
@@ -39,8 +43,6 @@ class MyDownloader:
         self.bot = bot
         self.USER = user
     def my_hook(self, down):
-        
-        
         curr = down["downloaded_bytes"]
         total = curr * 2
         try:
