@@ -48,6 +48,10 @@ class MyDownloader:
         try:
             total = down["total_bytes"]
         except Exception as e:
+            try:
+                total = int(down["total_bytes_estimate"])
+            except:
+                pass
             e=str(e)
         progress(curr,total,self.USER,self.bot)
     def download_video(self, url):
