@@ -19,7 +19,7 @@ def prog(cant,total,prec=2):
     por2 = round((cant/total)*100)
     res = 10-por
     s = f"{por2}%\n"
-    f += f"{round(cant/(1024**2))} of {total/(1024**2)}"
+    s += f"{round(cant/(1024**2))} of {total/(1024**2)}"
     s += "*"*por+"."*res
     s += "\n"+str(round(Gvar.UPTIME/60))
     return s
