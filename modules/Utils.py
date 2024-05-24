@@ -40,6 +40,7 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
     pass
 
 class MyDownloader:
+    file = ""
     def __init__(self, bot,user):
         self.bot = bot
         self.USER = user
@@ -558,7 +559,12 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
         do = MyDownloader(bot,usr)
         do.download_video(msg.text)
         Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
-        bot.send_document(msg.chat.id,do.file,progress=progress,progress_args=[FindUser(msg.chat.id),bot])
+        try:
+            if do.file.endswith(".mp4") or do.file.endswith(".mkv") or do.file.endswith(".mpg"):
+                bot.send_video(msg.chat.id,do.file,progress=progress,progress_args=[FindUser(msg.chat.id),bot])    
+        except:
+            bot.send_document(msg.chat.id,do.file,progress=progress,progress_args=[FindUser(msg.chat.id),bot])
+    
     except Exception as e:
         msg.reply(str(e))
         Gvar.LOG.append(str(e))
