@@ -541,6 +541,7 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
     try:
         MyDownloader(bot,usr).download_video(msg.text)
     except Exception as e:
+        msg.reply(str(e))
         Gvar.LOG.append(str(e))
         print(e)
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
