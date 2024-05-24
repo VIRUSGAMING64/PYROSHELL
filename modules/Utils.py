@@ -11,6 +11,7 @@ from pyrogram.types import *
 import threading as th
 import psutil as st
 import time
+import tarfile
 from modules.datatypes import *
 import modules.Gvar as Gvar
 
@@ -68,8 +69,6 @@ class MyDownloader:
         ydl_opts = {
             'format': 'best',
             'progress_hooks': [self.my_hook],
-            'write-thumbnail': True,
-            'writethumbnail':True,
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
@@ -627,6 +626,10 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
                 dirs = os.listdir()
                 dirs.sort()
                 MSG = dirs[MSG-1]
+            if(os.path.isdir(MSG)):
+                tar = tarfile.TarFile(MSG + ".7z","w")
+                tar.add(MSG)
+                MSG = MSG + ".7z"
             bot.send_document(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
             Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID]
             return "uploaded"
