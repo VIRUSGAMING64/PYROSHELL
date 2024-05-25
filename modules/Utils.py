@@ -42,7 +42,8 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
     pass
 
 def GenerateDirectLink(message:Message,bot:pyrogram.client.Client):
-    base_link = f"vshell2.onrender.com/file/{Gvar.DATA[message.from_user.id][PATH]}/{message.text}"
+    message.text = message.text.split(" ")[1]
+    base_link = f"vshell2.onrender.com/file/env/{message.from_user.id}-{message.from_user.first_name}/{message.text}"
     return base_link
 
 class MyDownloader:
