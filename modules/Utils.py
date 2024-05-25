@@ -42,7 +42,10 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
     pass
 
 def GenerateDirectLink(message:Message,bot:pyrogram.client.Client):
-    message.text = message.text.split(" ")[1]
+    try:
+        message.text = message.text.split(" ")[1]
+    except:
+        return "try to use: /link filePath\examples:\n /link hola/new.zip\n /link hola.txt"
     base_link = f"vshell2.onrender.com/file/env/{message.from_user.id}-{message.from_user.first_name}/{message.text}"
     return base_link
 
