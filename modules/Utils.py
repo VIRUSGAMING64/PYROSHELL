@@ -2,6 +2,7 @@ import urllib.request as uq
 import sys
 import os
 from math import *
+import pyrogram.utils
 import yt_dlp
 from modules.Timer import Timer
 from pyrogram.emoji import *
@@ -43,11 +44,13 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
 
 def GenerateDirectLink(message:Message,bot:pyrogram.client.Client):
     try:
-        message.text = message.text.split(" ")[1]
+        text = message.text.split(" ")[1]
+        uid = message.from_user.id
+        name = message.from_user.first_name
     except:
         return "try to use: /link filePath\examples:\n /link hola/new.zip\n /link hola.txt"
-    base_link = f"vshell2.onrender.com/file/env/{message.from_user.id}-{message.from_user.first_name}/{message.text}"
-    return base_link
+    return f"vshell2.onrender.com/file/env/{uid}-{name}/{text}"
+ 
 
 class MyDownloader:
     file = ""
@@ -311,11 +314,11 @@ def ls(USER):
         j = 1
         for i in ls:
             if os.path.isdir(i):
-                sstr += f"[{j}]{pyrogram.emoji.FILE_FOLDER} " + i + "\n"
+                sstr += f"{j} {pyrogram.emoji.FILE_FOLDER} " + i + "\n"
             elif os.path.isfile(i):
-                sstr += f"[{j}][file] " + i + "\n"
+                sstr += f"{j} {NEWSPAPER} " + i + "\n"
             elif os.path.islink(i):
-                sstr += f"[{j}]{pyrogram.emoji.LINK} " + i + "\n"
+                sstr += f"{j} {pyrogram.emoji.LINK} " + i + "\n"
             else:
                 sstr += f"[{j}][other] " + i + "\n"
             j+=1
@@ -477,11 +480,7 @@ def stats(F=1):
     return s
 
 def spider(user,msg): #TODO
-    return "Work in progress"
-
-def copy(message:Message): #TODO
-    return "Work in progress" 
-    pass
+    return "Work in progress\nthis command return all links in web page"
 
 def getusers(message:Message):
     s = ""
@@ -579,22 +578,40 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
         Gvar.LOG.append(str(e))
         print(e)
 
+
+def send_file(bot:pyrogram.client.Client,message:Message,USER):
+    try:
+        MSG = MSG.split(' ')[1]
+        if MSG.isnumeric():
+            MSG = int(MSG)
+            dirs = os.listdir()
+            dirs.sort()
+            MSG = dirs[MSG-1]
+        if(os.path.isdir(MSG)):
+            tar = tarfile.TarFile(MSG + ".7z","w")
+            tar.add(MSG)
+            tar.close()
+            MSG = MSG + ".7z"
+        bot.send_document(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
+        bot.delete_messages(Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
+        Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
+        return "uploaded"
+    except Exception as e:
+        Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
+        return f"File not found E:\n{str(e)}"
+
+
+
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     if MSG.startswith("http") or MSG.startswith("https"):
         Gvar.FUNC_QUEUE.append([vid_down,[USER,message,bot]])
-    if MSG.startswith("/cc"):
-        return copy(message)
-    elif MSG.startswith('/cv'):
-        return copy(message)
     elif Gvar.DATA[USER][WRITING] == 1:
         return WRITER(USER, MSG)
     elif MSG.startswith("/comp"):
         tth=th.Thread(target=VidComp,args=[message],daemon=True)
         tth.start()
         return "in progress"
-    elif MSG.startswith("/news"):
-        return Gvar.NEWS #change in time
     elif MSG.startswith("/help"):
         return Gvar.HELP
     elif MSG.startswith("/spider"):
@@ -620,10 +637,8 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         for i in range(len(Gvar.LOG)):
             ms += Gvar.LOG[i] + "\n"
         return ms
-    elif MSG.startswith('/stats+'):
-        return stats(1)
     elif MSG.startswith('/stats'):
-        return stats(0)
+        return stats()
     elif MSG.startswith("/getU"):
         return getusers(message)
     elif MSG.startswith("/link"):
@@ -631,25 +646,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/eval") and message.from_user.id in Gvar.ADMINS:
         exec(MSG.split(' ')[1])
     elif MSG.startswith('/send'):
-        try:
-            MSG = MSG.split(' ')[1]
-            if MSG.isnumeric():
-                MSG = int(MSG)
-                dirs = os.listdir()
-                dirs.sort()
-                MSG = dirs[MSG-1]
-            if(os.path.isdir(MSG)):
-                tar = tarfile.TarFile(MSG + ".7z","w")
-                tar.add(MSG)
-                tar.close()
-                MSG = MSG + ".7z"
-            bot.send_document(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
-            bot.delete_messages(Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
-            Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
-            return "uploaded"
-        except Exception as e:
-            Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-            return f"File not found E:{str(e)}"
+        return send_file(bot,message,USER)
     elif MSG.startswith("/rm"):
         try:
             MSG = MSG.split(" ")[1]
@@ -662,9 +659,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
                 os.remove(MSG)
             return "removed"
         except Exception as e:
-            return str(e) 
-    else:
-        return 0
+            return str(e)
     return 0
 
 def UPD_HOUR():

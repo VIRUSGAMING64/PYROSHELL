@@ -12,6 +12,7 @@ from pyrogram.errors import *
 from pyrogram.storage import *
 from pyrogram.methods import *
 from pyrogram.enums import *
+from pyrogram.utils import *
 from pyrogram.sync import *
 from pyrogram import *
 from pyrogram.utils import *
