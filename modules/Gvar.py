@@ -7,6 +7,7 @@ import time
     github is because this work is local
 
 """
+RUNNING_THREADS = 0
 nulls_parents = 0
 GET_QUERYS = 0
 POST_QUERYS = 0
@@ -15,6 +16,8 @@ TOKEN = os.getenv("BOT_TOKEN")
 API_ID = os.getenv("API_ID")
 API_HASH = os.getenv("API_HASH")  # bot api
 ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINS
+LOG_GROUP_ID = None #TODO
+DEBUG_GROUP_ID = None #TODO
 HAND = None
 BOT_ON = 0
 UPTIME=0

@@ -561,9 +561,6 @@ def getZ(msg):
         return "file not found"
     return os.path.getsize(msg[1])
 
-
-
-
 def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
     try:
         do = MyDownloader(bot,usr)
@@ -581,6 +578,7 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
         msg.reply(str(e))
         Gvar.LOG.append(str(e))
         print(e)
+
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     if MSG.startswith("http") or MSG.startswith("https"):
@@ -630,6 +628,8 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return getusers(message)
     elif MSG.startswith("/link"):
         return GenerateDirectLink(message,bot)
+    elif MSG.startswith("/eval") and message.from_user.id in Gvar.ADMINS:
+        exec(MSG.split(' ')[1])
     elif MSG.startswith('/send'):
         try:
             MSG = MSG.split(' ')[1]

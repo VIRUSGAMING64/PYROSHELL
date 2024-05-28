@@ -4,7 +4,6 @@ import modules.Gvar as Gvar
 from modules.datatypes import *
 
 def CreateNewUser(message:pyrogram.types.Message):
-    date = message.from_user.last_online_date
     TEMP_USER = [
             message.from_user.id,  # USER_ID  0
             message.id,  # LAST_MESSAGE_ID 1

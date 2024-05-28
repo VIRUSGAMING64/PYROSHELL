@@ -229,37 +229,39 @@ def DOWNLOAD_HANDLER(data):
     
 def DOWNLOAD_QUEUE_HANDLER():
     while 1:
-        try:
-            if len(Gvar.QUEUE_DOWNLOAD) < 1:
+        def HANDLER():
+            try:
+                if len(Gvar.QUEUE_DOWNLOAD) < 1:
+                    time.sleep(1)
+                    continue
+                res = DOWNLOAD_HANDLER(Gvar.QUEUE_DOWNLOAD[0])
+            except Exception as e:
+                Gvar.LOG.append(str(e))
+                print(e)
+                res = 1
+            if res == 1:
+                Gvar.QUEUE_DOWNLOAD.pop(0)
+            else:
                 time.sleep(1)
-                continue
-            res = DOWNLOAD_HANDLER(Gvar.QUEUE_DOWNLOAD[0])
-        except Exception as e:
-            Gvar.LOG.append(str(e))
-            print(e)
-            res = 1
-        if res == 1:
-            Gvar.QUEUE_DOWNLOAD.pop(0)
+        if Gvar.RUNNING_THREADS < 4 and len(Gvar.QUEUE_DOWNLOAD) >= 1:
+            Thread(target=HANDLER).start()
         else:
             time.sleep(1)
 
 @bot.on_inline_query()
 async def on_inline_query(client: Client, message: Message):
     Gvar.QUEUE_INLINE.append([client, message])
-    pass
 
 @bot.on_message(filters.private)
 async def on_private_message(client: Client, message: Message):
     if message.from_user.phone_number in Gvar.MUTED_USERS:
         return
     Gvar.QUEUE_DIRECT.append([client, message])
-    pass
 
 @bot.on_message(filters.group)
 async def on_group_message(client: Client, message: Message):
     if message.mentioned:
-        Gvar.QUEUE_DIRECT.append([client, message])
-    pass
+        await on_private_message(client,message)
 
 @bot.on_edited_message(filters.private)
 async def on_edit_private_message(client, message:Message):
@@ -270,6 +272,7 @@ def TO_SEND_QUEUE_HANDLER(): #TODO
         pass
     except Exception as e:
         debug(e)
+
 def TORRENT_QUEUE_HANDLER(): #TODO
     try:
         pass
@@ -283,7 +286,7 @@ def INIT():
         for i in Gvar.ADMINS:
             bot.send_message(i,"bot online")
     except Exception as e:
-        print(e)
+        Gvar.LOG.append(str(e))
 
 def ACTIVATOR():
     while 1:
@@ -291,7 +294,10 @@ def ACTIVATOR():
             time.sleep(60)
             req.get("https://vshell2.onrender.com/debug")
         except Exception as e:
+            Gvar.LOG.append(str(e))
             print(str(e))
+
+
 
 pool = v_pool(
     [
@@ -305,9 +311,13 @@ pool = v_pool(
         TORRENT_QUEUE_HANDLER
     ]
 )
+
 pool.start_all(1)
 print("THREADS STARTEDS")
+
 try:
     bot.run()
 except Exception as e:
     print(str(e))
+
+time.sleep(1200)

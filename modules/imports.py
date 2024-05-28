@@ -20,6 +20,8 @@ from pyrogram.sync import *
 from pyrogram.handlers import *
 from pyrogram.parser import *
 from modules.Timer import Timer
+from modules.tempfile import *
+from modules.vec import *
 from math import *
 import time
 from modules.datatypes import *
@@ -34,7 +36,5 @@ from ctypes import *
 from flask import *
 from json.encoder import JSONEncoder
 from json.decoder import JSONDecoder
-
-
 
 Gvar.HAND = CSV()

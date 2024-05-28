@@ -1,17 +1,14 @@
-import requests as rq
 import modules.Gvar as Gvar
 import google.generativeai as googleIA
 import os
-googleIA.configure(api_key=os.getenv("GOOGLE"))
+googleIA.configure(api_key=Gvar.GOOGLE_API)
 class GenAI:
     def __init__(self):
         self.model = googleIA.GenerativeModel().start_chat()
     def query(self,qe:str):
         return self.model.send_message(qe).text
 
-chats = {
-    "id":GenAI
-}
+chats = {}
 
 def NewChat(id):
     chats[id] = GenAI()
