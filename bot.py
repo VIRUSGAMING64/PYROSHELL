@@ -298,23 +298,6 @@ def ACTIVATOR():
             Gvar.LOG.append(str(e))
             print(str(e))
 
-def UPD_HOUR():
-    Gvar.UPTIME+=1
-
-def FUNC_QUEUE_HANDLER():
-    if len(Gvar.FUNC_QUEUE) > 0:
-        func,args = Gvar.FUNC_QUEUE[0]
-        Gvar.FUNC_QUEUE.pop(0)
-        func(*args)
-
-timer = Timer(
-    [
-        UPD_HOUR,
-        FUNC_QUEUE_HANDLER
-    ],
-    [1,1]
-)
-
 pool = v_pool(
     [
         ACTIVATOR,
@@ -327,7 +310,6 @@ pool = v_pool(
         TORRENT_QUEUE_HANDLER
     ]
 )
-timer.start()
 pool.start_all(1)
 print("THREADS STARTEDS")
 

@@ -580,7 +580,7 @@ def send_file(bot:pyrogram.client.Client,message:Message,USER):
 
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
-    if MSG.startswith("http") or MSG.startswith("https"):
+    if MSG.startswith("http"):
         Gvar.FUNC_QUEUE.append([vid_down,[USER,message,bot]])
     elif Gvar.DATA[USER][WRITING] == 1:
         return WRITER(USER, MSG)
@@ -637,3 +637,22 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         except Exception as e:
             return str(e)
     return 0
+
+def UPD_HOUR():
+    Gvar.UPTIME+=1
+
+def FUNC_QUEUE_HANDLER():
+    if len(Gvar.FUNC_QUEUE) > 0:
+        func,args = Gvar.FUNC_QUEUE[0]
+        Gvar.FUNC_QUEUE.pop(0)
+        func(*args)
+
+timer = Timer(
+    [
+        UPD_HOUR,
+        FUNC_QUEUE_HANDLER
+    ],
+    [1,1]
+)
+
+timer.start()
