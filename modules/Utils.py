@@ -723,10 +723,8 @@ def FUNC_QUEUE_HANDLER():
         func(*args)
 
 timer = Timer(
-    [
-        UPD_HOUR,
-        FUNC_QUEUE_HANDLER
-    ],
+    [   UPD_HOUR,
+        FUNC_QUEUE_HANDLER],
     [1,1]
 )
 
