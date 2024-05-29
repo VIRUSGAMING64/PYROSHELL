@@ -28,7 +28,7 @@ def prog(cant,total,prec=2):
     return s
 
 def progress(cant, total,USER,bot:pyrogram.client.Client):
-    if(Gvar.UPTIME % 8 != 0):
+    if(Gvar.UPTIME % 5 != 0):
         return
     time.sleep(0.1)
     if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
@@ -312,7 +312,7 @@ def ls(USER):
             if os.path.isdir(i):
                 sstr += f"{j} {FILE_FOLDER} " + i + "\n"
             elif os.path.isfile(i):
-                sstr += f"{j} {NEWSPAPER} " + i + "\n"
+                sstr += f"{j} {PAGE_FACING_UP} " + i + "\n"
             elif os.path.islink(i):
                 sstr += f"{j} {LINK} " + i + "\n"
             else:
@@ -637,7 +637,7 @@ def SendFile(chatID,filename,bot:Client,progress:Callable = None,args = None,thu
 
 def send_file(bot:pyrogram.client.Client,message:Message,USER):
     try:
-        MSG = MSG.split(' ')[1]
+        MSG = message.text.split(' ')[1]
         if MSG.isnumeric():
             MSG = int(MSG)
             dirs = os.listdir()
