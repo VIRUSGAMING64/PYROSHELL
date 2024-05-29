@@ -79,7 +79,7 @@ class MyDownloader:
             progress(curr,total,self.USER,self.bot)
     def download_video(self, url):
         ydl_opts = {
-            'format': 'best',
+            'format': 'best',"writethumbnail":True,
             'progress_hooks': [self.my_hook],
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -551,7 +551,8 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
         do.download_video(msg.text)
         bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
-        SendFile(msg.chat.id,do.file,bot,progress,[FindUser(msg.chat.id),bot]) 
+        thumb = None
+        SendFile(msg.chat.id,do.file,bot,progress,[FindUser(msg.chat.id),bot],thumb) 
         bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
     except Exception as e:

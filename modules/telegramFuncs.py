@@ -40,7 +40,7 @@ def Compress(filename,MAX_Z = 2000*Gvar.MB):
     os.remove(filename)
     return files
 
-def SendFile(chatID,filename,bot:Client,progress:Callable = None,args = None):
+def SendFile(chatID,filename,bot:Client,progress:Callable = None,args = None,thumb = None):
     try:
         if os.path.isdir(filename):
             filename = DirToTar(filename)
@@ -51,10 +51,10 @@ def SendFile(chatID,filename,bot:Client,progress:Callable = None,args = None):
         file:str =""
         for file in files:
             if file.endswith(".mp4") or file.endswith(".mpg") or file.endswith('.mkv'):
-                bot.send_video(chatID,file,progress=progress,progress_args=args)
+                bot.send_video(chatID,file,progress=progress,progress_args=args,thumb=thumb)
             elif file.endswith(".jpg") or file.endswith(".png"):
-                bot.send_photo(chatID,file,progress=progress,progress_args=args)
+                bot.send_photo(chatID,file,progress=progress,progress_args=args,thumb=thumb)
             else:
-                bot.send_document(chatID,file,progress=progress,progress_args=args)
+                bot.send_document(chatID,file,progress=progress,progress_args=args,thumb=thumb)
     except Exception as e:
         return str(e)
