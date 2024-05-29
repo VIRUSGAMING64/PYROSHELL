@@ -51,6 +51,7 @@ BOT_COMMANDS = [
     ["/send",'send a file'],
     ["/cc","copy element"],
     ["/cv","paste file"],
+    ["/getZ","get file size"],
     ["/sz","get file size"],
     ["/cat", "get 4096 first bytes of file"],
     ["/geturl", "download url"],
@@ -59,15 +60,14 @@ BOT_COMMANDS = [
     ["/chdir", "change of directory"],
     ["/note", "make a file to write in her"],
     ["/cd", "show actual directory"],
+    ["/comp", "compress a video"],
     ["/news", "show work in progress"],
     ["/help", "send help"],
 ]
 
 IN_PROGRESS = [
-    "download youtube videos", # libreria de ytd_lib
-    "work with videos [combert x264 to x265]", # ????
     "download torrent", # ????
-    "work with compresed files [ZIP]", #esto creo que hay documentacion en los .7z
+    "work with compresed files [ZIP]", #esto falta hacer para que los divida en trozos si son mas grandes de 2000MB
     "/spider command [get all urls in a web page with deep X [default X = 0]]" # esto debe hacerse con HTTPHandler de urllib.request
 ]
 

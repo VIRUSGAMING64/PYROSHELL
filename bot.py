@@ -1,3 +1,4 @@
+
 from modules.imports import *
 ############################################################
 def WEB():
@@ -233,7 +234,7 @@ def DOWNLOAD_QUEUE_HANDLER():
             try:
                 if len(Gvar.QUEUE_DOWNLOAD) < 1:
                     time.sleep(1)
-                    continue
+                    return
                 res = DOWNLOAD_HANDLER(Gvar.QUEUE_DOWNLOAD[0])
             except Exception as e:
                 Gvar.LOG.append(str(e))
@@ -297,7 +298,22 @@ def ACTIVATOR():
             Gvar.LOG.append(str(e))
             print(str(e))
 
+def UPD_HOUR():
+    Gvar.UPTIME+=1
 
+def FUNC_QUEUE_HANDLER():
+    if len(Gvar.FUNC_QUEUE) > 0:
+        func,args = Gvar.FUNC_QUEUE[0]
+        Gvar.FUNC_QUEUE.pop(0)
+        func(*args)
+
+timer = Timer(
+    [
+        UPD_HOUR,
+        FUNC_QUEUE_HANDLER
+    ],
+    [1,1]
+)
 
 pool = v_pool(
     [
@@ -311,7 +327,7 @@ pool = v_pool(
         TORRENT_QUEUE_HANDLER
     ]
 )
-
+timer.start()
 pool.start_all(1)
 print("THREADS STARTEDS")
 

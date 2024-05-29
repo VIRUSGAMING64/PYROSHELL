@@ -13,6 +13,7 @@ import time
 import tarfile
 from modules.datatypes import *
 import modules.Gvar as Gvar
+from modules.telegramFuncs import *
 
 def prog(cant,total,prec=2):
     por = int((cant/total)*10)
@@ -42,7 +43,7 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
             Gvar.LOG.append(str(e))
     pass
 
-def GenerateDirectLink(message:Message,bot:pyrogram.client.Client):
+def GenerateDirectLink(message:Message):
     try:
         text = message.text.split(" ")[1]
         uid = message.from_user.id
@@ -50,7 +51,6 @@ def GenerateDirectLink(message:Message,bot:pyrogram.client.Client):
     except:
         return "try to use: /link filePath\examples:\n /link hola/new.zip\n /link hola.txt"
     return f"vshell2.onrender.com/file/env/{uid}-{name}/{text}"
- 
 
 class MyDownloader:
     file = ""
@@ -206,7 +206,6 @@ def chdir(USER, msg):
                 msg = msg[1]
             except Exception as e:
                 Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-                
                 print(e, " one message")
         except Exception as e:
             print(e)
@@ -237,24 +236,22 @@ def chdir(USER, msg):
                         POS = i
                         break
                     i = i - 1
-                DIR = ""
-                for i in range(POS + 1, len(msg)):
-                    DIR += msg[i]
                 try:
+                    DIR = ""
+                    for i in range(POS + 1, len(msg)):
+                        DIR += msg[i]
                     os.chdir(DIR)
                     Gvar.DATA[USER][PATH] = Gvar.DATA[USER][PATH] + "/" + DIR
                     return "Changed to: " + os.getcwd()
                 except Exception as e:
-                    Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-                    
+                    Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))                    
                     return e
             except Exception as e:
                 Gvar.LOG.append(str(e) +" "+str(Gvar.DATA[USER][USER_ID]))
                 
                 print(e)
                 return "Impossible change directory."
-                pass
-        return
+
     try:
         msg = msg.split(" ")
         msg = msg[1]
@@ -299,12 +296,10 @@ def chdir(USER, msg):
             return "Impossible change directory"
             pass
     except Exception as e:
-        
         print(e)
         Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
         Gvar.DATA[USER][CHDIR] = 1
         return "send directory name"
-
 
 def ls(USER):
     try:
@@ -314,17 +309,16 @@ def ls(USER):
         j = 1
         for i in ls:
             if os.path.isdir(i):
-                sstr += f"{j} {pyrogram.emoji.FILE_FOLDER} " + i + "\n"
+                sstr += f"{j} {FILE_FOLDER} " + i + "\n"
             elif os.path.isfile(i):
                 sstr += f"{j} {NEWSPAPER} " + i + "\n"
             elif os.path.islink(i):
-                sstr += f"{j} {pyrogram.emoji.LINK} " + i + "\n"
+                sstr += f"{j} {LINK} " + i + "\n"
             else:
                 sstr += f"[{j}][other] " + i + "\n"
             j+=1
         return sstr
-    except Exception as e:
-        
+    except Exception as e:  
         Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
         print("Error: " + str(e))
         return "Error: " + str(e)
@@ -343,8 +337,7 @@ def NOTEPAD(USER, msg):
             return "file created"
         except Exception as e:
             print(e)
-            Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-            
+            Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))          
             return "Error: " + str(e)
     try:
         if msg.startswith("/note"):
@@ -360,17 +353,14 @@ def NOTEPAD(USER, msg):
                 
                 Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
                 return "Error: " + str(e)
-        except Exception as e:
-            
+        except Exception as e:      
             Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
             Gvar.DATA[USER][GETING_NOTEPAD_NAME] = 1
             return "send filename: "
     except Exception as e:
-        print(e)
-        
+        print(e)  
         Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
         return "Error: " + str(e)
-
 
 def WRITER(USER, msg):
     if msg.startswith("/note"):
@@ -383,16 +373,13 @@ def WRITER(USER, msg):
                 file = open(Gvar.DATA[USER][WRITING_FILEPATH], "a")
                 total = file.write(msg)
                 return f"Writed {total} bytes"
-            except Exception as e:
-                
+            except Exception as e:  
                 Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
                 return "Error writing file "+str(e)
         except Exception as e:
-            
             print(e)
             Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
             return "Error: " + str(e)
-
 
 def cat(USER, msg:str):
     if Gvar.DATA[USER][CATING] == 1:
@@ -409,9 +396,7 @@ def cat(USER, msg:str):
         try:
             msg = msg.split(' ')
             msg = msg[1]
-
         except Exception as e:    
-            
             Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
             print(e)
             Gvar.DATA[USER][CATING] = 1
@@ -422,13 +407,14 @@ def cat(USER, msg:str):
         file = open(msg, "r")
         return file.read(Gvar.MAX_MESSAGE_LENGTH)
     except Exception as e:
-        
         Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
         print("Error on cat:", e)
         return "Error on cat: " + str(e)
+
 def cp(a):
     return a
-def stats(F=1):
+
+def stats():
     seconds_uptime = round(cp(Gvar.UPTIME)) 
     minutes_uptime = round(seconds_uptime // 60)
     hours_uptime = round(minutes_uptime // 60)
@@ -490,7 +476,6 @@ def getusers(message:Message):
         return s
     else:
         return "access denied"
-    pass
 
 def upd(msg:pyrogram.types.Message,Ifile,Ofile):
     time.sleep(1)
@@ -566,18 +551,13 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
         do.download_video(msg.text)
         bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
-        try:
-            if do.file.endswith(".mp4") or do.file.endswith(".mkv") or do.file.endswith(".mpg"):
-                bot.send_video(msg.chat.id,do.file,progress=progress,progress_args=[FindUser(msg.chat.id),bot])    
-        except:
-            bot.send_document(msg.chat.id,do.file,progress=progress,progress_args=[FindUser(msg.chat.id),bot])
+        SendFile(msg.chat.id,do.file,bot,progress,[FindUser(msg.chat.id),bot]) 
         bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
     except Exception as e:
         msg.reply(str(e))
         Gvar.LOG.append(str(e))
         print(e)
-
 
 def send_file(bot:pyrogram.client.Client,message:Message,USER):
     try:
@@ -588,19 +568,14 @@ def send_file(bot:pyrogram.client.Client,message:Message,USER):
             dirs.sort()
             MSG = dirs[MSG-1]
         if(os.path.isdir(MSG)):
-            tar = tarfile.TarFile(MSG + ".7z","w")
-            tar.add(MSG)
-            tar.close()
-            MSG = MSG + ".7z"
-        bot.send_document(message.chat.id,MSG,progress=progress,progress_args=[FindUser(message.chat.id),bot])
+            MSG = DirToTar(MSG)
+        SendFile(message.chat.id,MSG,bot,progress,[FindUser(message.chat.id),bot])
         bot.delete_messages(Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
         return "uploaded"
     except Exception as e:
         Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
         return f"File not found E:\n{str(e)}"
-
-
 
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
@@ -618,7 +593,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return spider(USER,MSG)
     elif MSG.startswith("/cd"):
         return os.getcwd()
-    elif MSG.startswith("/getZ"):
+    elif MSG.startswith("/getZ") or MSG.startswith("/sz"):
         return str(getZ(MSG))
     elif MSG.startswith("/ls"):
         return ls(USER)
@@ -642,7 +617,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/getU"):
         return getusers(message)
     elif MSG.startswith("/link"):
-        return GenerateDirectLink(message,bot)
+        return GenerateDirectLink(message)
     elif MSG.startswith("/eval") and message.from_user.id in Gvar.ADMINS:
         exec(MSG.split(' ')[1])
     elif MSG.startswith('/send'):
@@ -661,16 +636,3 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         except Exception as e:
             return str(e)
     return 0
-
-def UPD_HOUR():
-    Gvar.UPTIME+=1
-def FUNC_QUEUE_HANDLER():
-    if len(Gvar.FUNC_QUEUE) > 0:
-        func,args = Gvar.FUNC_QUEUE[0]
-        Gvar.FUNC_QUEUE.pop(0)
-        func(*args)
-timer = Timer(
-    [UPD_HOUR,FUNC_QUEUE_HANDLER],
-    [1,1]
-)
-timer.start()

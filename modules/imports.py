@@ -1,4 +1,5 @@
 import modules.Gvar as Gvar
+from modules.telegramFuncs import *
 from pyrogram.client import *
 from pyrogram.connection import *
 from pyrogram.crypto import *
