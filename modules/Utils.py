@@ -546,14 +546,32 @@ def getZ(msg):
         return "file not found"
     return os.path.getsize(msg[1])
 
+def NoExt(s:str):
+    st = ""
+    for i in s:
+        st = i + st
+    st = st.split('.',1)[1]
+    s = ""
+    for i in st:
+        s = i + s
+    return s
+
 def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
     try:
         do = MyDownloader(bot,usr)
         do.download_video(msg.text)
         bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
-        thumb = None
+        thumb = os.path.realpath(NoExt(do.file) + ".jpg")
+        size = -1
+        try:
+            size = os.path.getsize(thumb)
+        except Exception as e:
+            Gvar.LOG.append(str(e))
+            thumb = None
         SendFile(msg.chat.id,do.file,bot,progress,[FindUser(msg.chat.id),bot],thumb) 
+        if(size != -1):
+            os.remove(thumb)
         bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
     except Exception as e:
