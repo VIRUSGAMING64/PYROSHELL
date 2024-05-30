@@ -659,9 +659,9 @@ def send_file(bot:pyrogram.client.Client,message:Message,USER):
 
 def queuesZ():
     s = f"DOWNLOADS: {len(Gvar.QUEUE_DOWNLOAD)}\n"
-    s = f"DOWNLOADS LINK: {len(Gvar.FUNC_QUEUE)}\n"
-    s = f"MESSAGES: {len(Gvar.QUEUE_DIRECT)}\n"
-    s = f"TO_SEND: {len(Gvar.QUEUE_TO_SEND)}\n"
+    s += f"DOWNLOADS LINK: {len(Gvar.FUNC_QUEUE)}\n"
+    s += f"MESSAGES: {len(Gvar.QUEUE_DIRECT)}\n"
+    s += f"TO_SEND: {len(Gvar.QUEUE_TO_SEND)}\n"
     return s
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
