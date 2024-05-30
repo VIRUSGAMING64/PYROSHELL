@@ -16,7 +16,7 @@ from modules.telegramFuncs import *
 from pyrogram.client import *
 import tarfile as tar
 
-def prog(cant,total,prec=2):
+def prog(cant,total,prec=2,UD = "uploading"):
     por = int((cant/total)*10)
     por2 = round((cant/total)*100)
     res = 10-por
@@ -24,10 +24,11 @@ def prog(cant,total,prec=2):
     s += f"{round(cant/(1024**2))}MB of {round(total/(1024**2))}MB\n"
     s += f"{pyrogram.emoji.BLACK_SMALL_SQUARE}"*por
     s += f"{pyrogram.emoji.WHITE_SMALL_SQUARE}"*res
+    s += f"\n{UD}"
     s += "\n"+str(round(Gvar.UPTIME/60))
     return s
 
-def progress(cant, total,USER,bot:pyrogram.client.Client):
+def progress(cant, total,USER,bot:pyrogram.client.Client,UD = "uploading"):
     if(Gvar.UPTIME % 5 != 0):
         return
     time.sleep(0.1)
@@ -38,7 +39,7 @@ def progress(cant, total,USER,bot:pyrogram.client.Client):
     else:
         try:
             bot.edit_message_text(
-                chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=prog(cant,total)
+                chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=prog(cant,total,UD)
             )
         except Exception as e:
             Gvar.LOG.append(str(e))
@@ -55,6 +56,7 @@ def GenerateDirectLink(message:Message):
 
 class MyDownloader:
     file = ""
+    arg = "downloading"
     def __init__(self, bot,user):
         self.bot = bot
         self.USER = user
@@ -75,9 +77,7 @@ class MyDownloader:
             except:
                 pass
             e=str(e)
-        #Gvar.FUNC_QUEUE.append([progress,[curr,total,self.USER,self.bot]])
-        if Gvar.UPTIME % 7 == 0:
-            progress(curr,total,self.USER,self.bot)
+        progress(curr,total,self.USER,self.bot,self.arg)
     def download_video(self, url):
         ydl_opts = {
             'format': 'best',"writethumbnail":True,
@@ -85,6 +85,7 @@ class MyDownloader:
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
+        
 
 def round(fl:float,prec:int=2):
     if prec > 1e3:
@@ -482,6 +483,8 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
     time.sleep(1)
     while 1:
         time.sleep(1)
+        if Gvar.END_THREAD == 1:
+            return
         try:
             total=os.path.getsize(Ifile)
             curr=os.path.getsize(Ofile)
@@ -493,7 +496,7 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
             print(e)
             time.sleep(1)
 def ffmpegW(Ifile,Ofile):
-    os.system(f'ffmpeg -i {Ifile} -cpu-used 5 -c:v libx265 -compression_level 10 -tune "ssim" -preset "fast" {Ofile}')
+    os.system(f'ffmpeg -i {Ifile} -c:v libx265 -compression_level 10 -tune "ssim" -preset "fast" {Ofile}')
 
 def ffmpegL(Ifile,Ofile):
     os.system(f'ffmpeg -i {Ifile} -c:v libx264 -compression_level 10 -tune "ssim" -preset "fast" {Ofile}')
@@ -524,13 +527,14 @@ def VidComp(message:pyrogram.types.Message):
     nms = message.reply("compressing...")
     while NoPass > 0:
         NoPass -= 1
-        Tth=th.Thread(target=upd,args=[nms,Ifile,Ofile],daemon=1)
+        Gvar.END_THREAD = 0
+        Tth=th.Thread(target=upd,args=[nms,Ifile,Ofile])
         Tth.start()
         if sys.platform != "win32":
             ffmpegW(Ifile,Ofile) 
         else:
             ffmpegL(Ifile,Ofile)
-        Tth.kill()
+        Gvar.END_THREAD = 1
         os.remove(Ifile)
         os.rename(Ofile,Ifile)
 
@@ -653,6 +657,12 @@ def send_file(bot:pyrogram.client.Client,message:Message,USER):
         Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
         return f"File not found E:\n{str(e)}"
 
+def queuesZ():
+    s = f"DOWNLOADS: {len(Gvar.QUEUE_DOWNLOAD)}\n"
+    s = f"DOWNLOADS LINK: {len(Gvar.FUNC_QUEUE)}\n"
+    s = f"MESSAGES: {len(Gvar.QUEUE_DIRECT)}\n"
+    s = f"TO_SEND: {len(Gvar.QUEUE_TO_SEND)}\n"
+    return s
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     if MSG.startswith("http"):
@@ -665,6 +675,8 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return "in progress"
     elif MSG.startswith("/help"):
         return Gvar.HELP
+    elif MSG.startswith("/queues"):
+        return queuesZ()
     elif MSG.startswith("/spider"):
         return spider(USER,MSG)
     elif MSG.startswith("/cd"):

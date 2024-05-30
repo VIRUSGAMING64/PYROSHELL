@@ -6,3 +6,5 @@ psutil
 flask 
 yt_dlp
 google-generativeai
+pillow
+regex

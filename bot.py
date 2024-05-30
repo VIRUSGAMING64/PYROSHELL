@@ -162,17 +162,39 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
     id=message.from_user.id
     gemini = GetAI(id)
     text = gemini.query(query)
-    message.answer(
-        results=[
-            InlineQueryResultArticle(
-                title="gemini-AI",
-                description=text[0:15]+"...",
+    results=[]
+    if message.query.startswith("/") == False:
+        results.append(
+        InlineQueryResultArticle(
+            title="gemini-AI",
+            description=text[0:15]+"...",
+            input_message_content=InputTextMessageContent(
+                message_text=text
+            ),               
+        ))
+    if message.query.startswith("/stats"):
+        results.append(
+        InlineQueryResultArticle(
+                title="stats",
+                description=Utils.stats()[0:10]+"...",
                 input_message_content=InputTextMessageContent(
-                    message_text=text
-                ),
-                
-            ),
-        ],
+                    message_text=Utils.stats()
+                ),               
+            )
+        )
+    
+    if message.query.startswith("/queues"):
+        results.append(
+        InlineQueryResultArticle(
+                title="queues",
+                description=Utils.queuesZ()[0:10]+"...",
+                input_message_content=InputTextMessageContent(
+                    message_text=Utils.queuesZ()
+                ),               
+            )
+        )
+    message.answer(
+        results=results,
         cache_time=1000
     )
 

@@ -11,6 +11,7 @@ RUNNING_THREADS = 0
 nulls_parents = 0
 GET_QUERYS = 0
 POST_QUERYS = 0
+END_THREAD = 1
 GOOGLE_API = os.getenv("GOOGLE")
 TOKEN = os.getenv("BOT_TOKEN")
 API_ID = os.getenv("API_ID")
