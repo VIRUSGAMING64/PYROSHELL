@@ -602,7 +602,7 @@ def alloc(can):
     file.write('#'*(can%(1024**2*32)))
     for i in range(chunck):
         file.write("#"*1024**2*32)
-        
+    file.close()
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     if MSG.startswith("http"):
