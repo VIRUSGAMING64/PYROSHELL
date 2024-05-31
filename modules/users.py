@@ -7,20 +7,20 @@ def CreateNewUser(message:pyrogram.types.Message):
     TEMP_USER = [
             message.from_user.id,  # USER_ID  0
             message.id,  # LAST_MESSAGE_ID 1
-            0,  # CHDIR 2
+            0,  # var 2
             0,  # MKDIR 3
-            0,  # SEND 4
+            0,  # var 4
             0,  # GETURL 5
             Gvar.ROOT+ "/" + str(message.from_user.id) + "-" + str(message.from_user.first_name),  # PATH 6
-            0,  # ASKING 7
+            0,  # var 7
             0,  # WRITING 8
             0,  # GETING_NOTEPAD_NAME 9
             0,  # WRITING_FILEPATH 10
             0,  # BOT_LAST_MESSAGE_ID 11
-            0,  # CATING 12
+            0,  # var 12
             0,  # LAST_MESSAGE_DOWNLOAD_ID 13
-            message.chat.id,  # chat_id 14
-            message.from_user.dc_id,  # other vars 15
+            message.chat.id,  # CHAT_ID 14
+            message.from_user.dc_id,  # DC_ID 15
             message.from_user.is_verified,  # VERIFIED 16
             message.from_user.is_premium,  # PREMIUN 17
             message.from_user.language_code,  # LANG_CODE 18

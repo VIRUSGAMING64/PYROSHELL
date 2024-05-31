@@ -1,5 +1,4 @@
 import modules.Gvar as Gvar
-from modules.telegramFuncs import *
 from pyrogram.client import *
 from pyrogram.connection import *
 from pyrogram.crypto import *
@@ -20,9 +19,6 @@ from pyrogram.raw import *
 from pyrogram.sync import *
 from pyrogram.handlers import *
 from pyrogram.parser import *
-from modules.Timer import Timer
-from modules.tempfile import *
-from modules.vec import *
 from math import *
 import time
 from modules.datatypes import *

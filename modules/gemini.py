@@ -6,6 +6,7 @@ class GenAI:
     def __init__(self):
         self.model = googleIA.GenerativeModel().start_chat()
     def query(self,qe:str):
+        return "don't working..."
         return self.model.send_message(qe).text
 
 chats = {}
@@ -21,5 +22,3 @@ def GetAI(id):
     except Exception as e:
         print(str(e))
         return NewChat(id)
-
-NewChat(1).query("hola")

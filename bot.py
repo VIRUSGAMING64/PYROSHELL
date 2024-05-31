@@ -221,7 +221,7 @@ def INLINE_MESSAGE_QUEUE_HANDLER():
         Gvar.QUEUE_INLINE.pop(0)
 
 def DOWNLOAD_HANDLER(data):
-    msg = data[0]
+    msg:pyrogram.types.Message = data[0]
     USER = data[1]
     if Gvar.DOWNLOADING == 0:
         if msg.media != None:
@@ -234,8 +234,9 @@ def DOWNLOAD_HANDLER(data):
                     msg,
                     Gvar.DATA[USER][PATH] + "/",
                     progress=Utils.progress,
-                    progress_args=[USER,bot],
+                    progress_args=[USER,bot,"downloading"],
                 )
+                bot.delete_messages(msg.chat.id,Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
                 msg.reply("Downloaded !!!!")
             except Exception as e:
                 debug(e)
@@ -266,10 +267,8 @@ def DOWNLOAD_QUEUE_HANDLER():
                 Gvar.QUEUE_DOWNLOAD.pop(0)
             else:
                 time.sleep(1)
-        if Gvar.RUNNING_THREADS < 4 and len(Gvar.QUEUE_DOWNLOAD) >= 1:
-            Thread(target=HANDLER).start()
-        else:
-            time.sleep(1)
+        HANDLER()
+        time.sleep(10)
 
 @bot.on_inline_query()
 async def on_inline_query(client: Client, message: Message):
@@ -310,15 +309,24 @@ def INIT():
             bot.send_message(i,"bot online")
     except Exception as e:
         Gvar.LOG.append(str(e))
-
+def LOG_QUEUE_HANDLER():
+    while 1:
+        try:
+            if len(Gvar.LOG) != 0:
+                bot.send_message(Gvar.LOG_GROUP_ID,Gvar.LOG[0])
+                Gvar.LOG.pop(0)
+            time.sleep(1)
+        except Exception as e:
+            Gvar.LOG.append(str(e))
 def ACTIVATOR():
     while 1:
         try:
             time.sleep(60)
-            req.get("https://vshell2.onrender.com/debug")
+            req.get(Gvar.DEBUG_URL)
         except Exception as e:
             Gvar.LOG.append(str(e))
             print(str(e))
+
 
 pool = v_pool(
     [
@@ -329,9 +337,11 @@ pool = v_pool(
         INLINE_MESSAGE_QUEUE_HANDLER,
         DOWNLOAD_QUEUE_HANDLER,
         TO_SEND_QUEUE_HANDLER,
-        TORRENT_QUEUE_HANDLER
+        TORRENT_QUEUE_HANDLER,
+        LOG_QUEUE_HANDLER
     ]
 )
+
 pool.start_all(1)
 print("THREADS STARTEDS")
 

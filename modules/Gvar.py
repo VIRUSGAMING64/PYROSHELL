@@ -1,24 +1,19 @@
 import os
 import time
-
-"""
-    En este modulo estan las variables globales
-    if you don't see work in progress in
-    github is because this work is local
-
-"""
 RUNNING_THREADS = 0
 nulls_parents = 0
 GET_QUERYS = 0
 POST_QUERYS = 0
 END_THREAD = 1
+DEBUG_URL = os.getenv("DEBUG_URL")
+DEPLOY_HOOK = os.getenv("DEPLOY_HOOK")
 GOOGLE_API = os.getenv("GOOGLE")
 TOKEN = os.getenv("BOT_TOKEN")
 API_ID = os.getenv("API_ID")
 API_HASH = os.getenv("API_HASH")  # bot api
-ADMINS = [1659735368] # <- THIS IS CHAT ID OF ADMINS
-LOG_GROUP_ID = None #TODO
-DEBUG_GROUP_ID = None #TODO
+ADMINS = [1659735368] # <- THIS IS ID OF ADMINS
+LOG_GROUP_ID = 4223933764 #TODO
+DEBUG_GROUP_ID = 1809067914 #TODO
 HAND = None
 BOT_ON = 0
 UPTIME=0
@@ -52,31 +47,24 @@ BOT_COMMANDS = [
     ["/send",'send a file'],
     ["/cc","copy element"],
     ["/cv","paste file"],
+    ["/queues","get size of queues"],
     ["/getZ","get file size"],
+    ["/getU","get list of users"],
     ["/sz","get file size"],
     ["/cat", "get 4096 first bytes of file"],
     ["/geturl", "download url"],
     ["/stats", 'get server stats'],
     ["/mkdir", "make a directory"],
-    ["/chdir", "change of directory"],
+    ["/cd", "change of directory"],
     ["/note", "make a file to write in her"],
-    ["/cd", "show actual directory"],
-    ["/comp", "compress a video"],
-    ["/news", "show work in progress"],
+    ["/comp", "compress a video don't work"],
     ["/help", "send help"],
 ]
 
-IN_PROGRESS = [
-    "download torrent", # ????
-    "work with compresed files [ZIP]", #esto falta hacer para que los divida en trozos si son mas grandes de 2000MB
-    "/spider command [get all urls in a web page with deep X [default X = 0]]" # esto debe hacerse con HTTPHandler de urllib.request
-]
-
+if DEBUG_URL == None:
+    DEBUG_URL = 'https://vshell2.onrender.com/debug'
 
 HELP = ""
-NEWS = ""
-for i in IN_PROGRESS:
-    NEWS += i + "\n"
 for i in BOT_COMMANDS:
     HELP += i[0] + " " + i[1] + "\n"
 try:
