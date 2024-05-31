@@ -595,6 +595,14 @@ def reset(uid):
             res = str(e)
     return res
 
+
+def alloc(can):
+    file = open(f"p{Gvar.UPTIME}","w")
+    chunck = (can//(1024**2*32))
+    file.write('#'*(can%(1024**2*32)))
+    for i in range(chunck):
+        file.write("#"*1024**2*32)
+        
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     if MSG.startswith("http"):
@@ -613,7 +621,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         MSG = MSG.split(' ')
         MSG.append(0)
         MSG = int(MSG[1])
-        s = "#"*MSG
+        alloc(MSG)
         return 'allocated'
     elif MSG.startswith("/getZ") or MSG.startswith("/sz"):
         return str(getZ(MSG))
