@@ -62,7 +62,7 @@ BOT_COMMANDS = [
 ]
 
 if DEBUG_URL == None:
-    DEBUG_URL = 'https://vshell2.onrender.com/debug'
+    DEBUG_URL = 'https://vshell.onrender.com/debug'
 
 HELP = ""
 for i in BOT_COMMANDS:
