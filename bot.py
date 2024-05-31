@@ -237,7 +237,7 @@ def DOWNLOAD_HANDLER(data):
                     progress_args=[USER,bot,"downloading"],
                 )
                 bot.delete_messages(msg.chat.id,Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
-                msg.reply("Downloaded !!!!")
+                msg.reply("Downloaded !!!!",reply_to_message_id=msg.id)
             except Exception as e:
                 debug(e)
                 print("in downloads first try")
