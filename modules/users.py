@@ -29,7 +29,7 @@ def CreateNewUser(message:pyrogram.types.Message):
             message.from_user.username,  # USERNAME 21
         ]
     lt = len(TEMP_USER)
-    for i in range(128-lt):
+    for i in range(60-lt):
         TEMP_USER.append(0)
     del lt
     return TEMP_USER

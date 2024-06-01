@@ -1,7 +1,11 @@
 import modules.Gvar as Gvar
 import google.generativeai as googleIA
 import os
-googleIA.configure(api_key=Gvar.GOOGLE_API)
+try:
+    googleIA.configure(api_key=Gvar.GOOGLE_API)
+except Exception as e:
+    Gvar.LOG.append("Gemini: "+str(e))
+    
 class GenAI:
     def __init__(self):
         self.model = googleIA.GenerativeModel().start_chat()

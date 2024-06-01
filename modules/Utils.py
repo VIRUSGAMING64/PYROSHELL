@@ -1,6 +1,7 @@
 import urllib.request as uq
 import sys
 import os
+import subprocess as sbp
 from math import *
 import pyrogram.utils
 import yt_dlp
@@ -21,23 +22,24 @@ def prog(cant,total,prec=2,UD = "uploading"):
     por2 = round((cant/total)*100)
     res = 10-por
     s = f"{por2}%\n"
-    s += f"{round(cant/(1024**2))}MB of {round(total/(1024**2))}MB\n"
+    s += f"{round(cant/(1024**2),prec)}MB of {round(total/(1024**2),prec)}MB\n"
     s += f"{pyrogram.emoji.BLACK_SMALL_SQUARE}"*por
     s += f"{pyrogram.emoji.WHITE_SMALL_SQUARE}"*res
     s += f"\n{UD}"
-    s += "\n"+str(round(Gvar.UPTIME/60))
+    s += "\n"+uptime()
     return s
 
 def progress(cant, total,USER,bot:pyrogram.client.Client,UD = "uploading"):
-    time.sleep(1)
+    if Gvar.UPTIME % 6 != 0:
+        return
     if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
-            chat_id=Gvar.DATA[USER][CHAT_ID], text=prog(cant,total)
+            chat_id=Gvar.DATA[USER][CHAT_ID], text=prog(cant,total,2,UD)
         ).id
     else:
         try:
             bot.edit_message_text(
-                chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=prog(cant,total,UD)
+                chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=prog(cant,total,2,UD)
             )
         except Exception as e:
             Gvar.LOG.append(str(e))
@@ -52,7 +54,7 @@ def GenerateDirectLink(message:Message):
         return "try to use: /link filePath\examples:\n /link hola/new.zip\n /link hola.txt"
     return f"vshell2.onrender.com/file/env/{uid}-{name}/{text}"
 
-class MyDownloader:
+class VidDownloader:
     file = ""
     arg = "downloading video"
     def __init__(self, bot,user):
@@ -83,15 +85,19 @@ class MyDownloader:
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
-        
 
 def round(fl:float,prec:int=2):
-    if prec > 1e3:
-        raise prec > 1e3
+    if prec > 1e2:
+        raise prec > 1e2
     r=str(fl)
+    e = ''
     if "." in r:
         r=r.split('.')
-        r[0] += "."
+        r[0] += "."    
+        if 'e' in r[1]:
+            temp = str(cp(r[1]))
+            temp = temp.split('e')
+            e = 'e'+temp[len(temp)-1]
         for i in range(prec):
             if i >= len(r[1]):
                 r[0] += '0'
@@ -99,7 +105,7 @@ def round(fl:float,prec:int=2):
                 r[0]+=r[1][i]
     else:
         r = [r]
-    return float(r[0])
+    return float(r[0]+e)
 
 def FindUser(user):
     i = 0
@@ -327,7 +333,7 @@ def cat(USER, msg:str):
 def cp(a):
     return a
 
-def stats():
+def uptime():
     seconds_uptime = round(cp(Gvar.UPTIME)) 
     minutes_uptime = round(seconds_uptime // 60)
     hours_uptime = round(minutes_uptime // 60)
@@ -341,15 +347,16 @@ def stats():
     if(floor(hours_uptime) != 0):
         if(s != ""): s+='-'
         s += f"{floor(hours_uptime)}h"
-        pass
     if(floor(minutes_uptime) != 0):
         if(s != ""): s+='-'
         s+= f"{floor(minutes_uptime)}m"
-        pass
     if(floor(seconds_uptime) != 0):
         if(s != ""): s+='-'
         s+= f"{floor(seconds_uptime)}s"
-        pass
+    return s
+
+def stats():
+    s = uptime()
     s = "Uptime: " + s + "\n"
     CPU_P=round(st.cpu_percent(interval=1))
     CPU_F=round(st.cpu_freq().current)
@@ -395,7 +402,7 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
         try:
             total=os.path.getsize(Ifile)
             curr=os.path.getsize(Ofile)
-            s=prog(curr,total,10)
+            s=prog(curr,total,10,"compressing")
             if s != msg.text:
                 msg=msg.edit_text(s)
             time.sleep(1)
@@ -404,15 +411,14 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
             time.sleep(1)
 
 def ffmpegW(Ifile,Ofile):
-    os.system(f'ffmpeg -i {Ifile} -c:v libx265 -compression_level 10 -tune "ssim" -preset "fast" {Ofile}')
+    os.system(f'ffmpeg -i "{Ifile}" -c:v libx265 -compression_level 10 -tune "ssim" -preset "fast" "{Ofile}"')
 
 def ffmpegL(Ifile,Ofile):
-    os.system(f'ffmpeg -i {Ifile} -c:v libx264 -compression_level 10 -tune "ssim" -preset "fast" {Ofile}')
+    os.system(f'ffmpeg -i "{Ifile}" -c:v libx265 -compression_level 10 -tune "ssim" -preset "fast" "{Ofile}"')
 
 def VidComp(message:pyrogram.types.Message):
     try:
         msg = message.text.split(" ")
-        cmd = msg[0]
         Ifile = msg[1]
         Ofile = msg[2]
         try:
@@ -457,6 +463,7 @@ def sizeof(dir:str):
                 continue
             sx += sz
     except Exception as e:
+        Gvar.LOG.append(str(e))
         print(e)
     return sx
 
@@ -466,6 +473,15 @@ def getZ(msg):
     if msg[1] is None:
         return "/getZ filename <--"
     try:
+        try:
+            if str(msg[1]).is_numeric():
+                msg[1] = int(msg[1])
+                data = os.listdir()
+                data.sort()
+                msg[1] = data[msg[1]+1]
+        except Exception as e:
+            Gvar.LOG.append(str(e))
+            return str(e)
         return sizeof(msg[1])
     except:
         return "file not found"
@@ -483,7 +499,7 @@ def NoExt(s:str):
 
 def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
     try:
-        do = MyDownloader(bot,usr)
+        do = VidDownloader(bot,usr)
         do.download_video(msg.text)
         bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
@@ -494,7 +510,7 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
         except Exception as e:
             Gvar.LOG.append(str(e))
             thumb = None
-        SendFile(msg.chat.id,do.file,bot,progress,[FindUser(msg.chat.id),bot],thumb,text=f"size: {round(os.path.getsize(do.file)/Gvar.GB)}GB") 
+        SendFile(msg.chat.id,do.file,bot,progress,[FindUser(msg.chat.id),bot],thumb,text=f"size: {round(os.path.getsize(do.file)/Gvar.MB)}MB") 
         if(size != -1):
             os.remove(thumb)
         bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
@@ -530,15 +546,15 @@ def Compress(filename,MAX_Z = 2000*Gvar.MB):
     while chunk:
         ch_file.write(chunk)
         chunk = file.read(Gvar.MB)
-        if id % (MAX_Z // Gvar.MB) == 0:
-            fid += 1
-            ch_file.close()
-            ch_file = open(filename+ "." + SetZero(fid),"wb")
-            files.append(filename + "." + SetZero(fid))
-        id = id+1
+        if(chunk):
+            if id % (MAX_Z // Gvar.MB) == 0:
+                fid += 1
+                ch_file.close()
+                ch_file = open(filename+ "." + SetZero(fid),"wb")
+                files.append(filename + "." + SetZero(fid))
+            id = id+1
     ch_file.close()
     file.close()
-    os.remove(filename)
     return files
 
 def SendFile(chatID,filename,bot:Client,progress:Callable = None,args = None,thumb = None,text = ""):
@@ -570,7 +586,7 @@ def send_file(bot:pyrogram.client.Client,message:Message,USER):
             MSG = dirs[MSG-1]
         if(os.path.isdir(MSG)):
             MSG = DirToTar(MSG)
-        SendFile(message.chat.id,MSG,bot,progress,[FindUser(message.chat.id),bot],text=f"size: {round(os.path.getsize(MSG)/Gvar.GB)}GB")
+        SendFile(message.chat.id,MSG,bot,progress,[FindUser(message.chat.id),bot],text=f"size: {round(os.path.getsize(MSG)/Gvar.MB)}MB")
         bot.delete_messages(message.chat.id,Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
         return "uploaded"
@@ -595,14 +611,32 @@ def reset(uid):
             res = str(e)
     return res
 
-
 def alloc(can):
+    can = can.split(' ')
+    can.append(0)
+    can = int(can[1])
     file = open(f"p{Gvar.UPTIME}","w")
     chunck = (can//(1024**2*32))
-    file.write('#'*(can%(1024**2*32)))
+    file.write('#'*(can%(1024**2*64)))
     for i in range(chunck):
-        file.write("#"*1024**2*32)
+        file.write("#"*1024**2*64)
     file.close()
+
+def remove(MSG):
+    try:
+        MSG = MSG.split(" ")[1]
+        dirs = os.listdir()
+        dirs.sort()
+        if MSG.isnumeric():
+            MSG = int(MSG)
+            os.remove(dirs[MSG-1])
+        else:
+            os.remove(MSG)
+        return "removed"
+    except Exception as e:
+        Gvar.LOG.append(str(e))
+        return str(e)
+
 def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     if MSG.startswith("http"):
@@ -618,9 +652,6 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/queues"):
         return queuesZ()
     elif MSG.startswith("/alloc"):
-        MSG = MSG.split(' ')
-        MSG.append(0)
-        MSG = int(MSG[1])
         alloc(MSG)
         return 'allocated'
     elif MSG.startswith("/getZ") or MSG.startswith("/sz"):
@@ -650,23 +681,11 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith('/send'):
         return send_file(bot,message,USER)
     elif MSG.startswith("/rm"):
-        try:
-            MSG = MSG.split(" ")[1]
-            dirs = os.listdir()
-            dirs.sort()
-            if MSG.isnumeric():
-                MSG = int(MSG)
-                os.remove(dirs[MSG-1])
-            else:
-                os.remove(MSG)
-            return "removed"
-        except Exception as e:
-            return str(e)
+        return remove(MSG)
     return 0
 
 def UPD_HOUR():
     Gvar.UPTIME+=1
-
 
 def FUNC_QUEUE_HANDLER():
     if len(Gvar.FUNC_QUEUE) > 0:
@@ -677,7 +696,7 @@ def FUNC_QUEUE_HANDLER():
 timer = Timer(
     [   UPD_HOUR,
         FUNC_QUEUE_HANDLER],
-    [1,1]
+    [1,60]
 )
 
 timer.start()

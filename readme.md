@@ -3,8 +3,6 @@
 * Download video from web
 * Download direct link
 * Upload to telegram
-## is free ?
-* Yes
 ## how to install ?
 ### add to env variables:
 * DEPLOY_HOOK ---> this is a link for deploy

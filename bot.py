@@ -1,4 +1,3 @@
-
 from modules.imports import *
 ############################################################
 def WEB():
@@ -19,7 +18,7 @@ def WEB():
                 if __name__ != "__main__":        
                     while bot.is_connected == None:
                         time.sleep(1)
-                    bot.send_message(-1001809067914,f"GET: {Gvar.GET_QUERYS} POST: {Gvar.POST_QUERYS}\n"+Utils.stats())
+                    bot.send_message(Gvar.DEBUG_GROUP_ID,f"GET: {Gvar.GET_QUERYS} POST: {Gvar.POST_QUERYS}\n"+Utils.stats())
                     pass
             return open(Gvar.FILEROOT+"/web/index.html","rb").read(2**31)        
         except Exception as e:
@@ -100,7 +99,7 @@ bot = Client(
 
 def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     try:
-        USER = Utils.FindUser(message.chat.id)
+        USER = Utils.FindUser(message.from_user.id)
     except Exception as e:
         print(e)
         return
@@ -268,7 +267,7 @@ def DOWNLOAD_QUEUE_HANDLER():
             else:
                 time.sleep(1)
         HANDLER()
-        time.sleep(10)
+        time.sleep(60)
 
 @bot.on_inline_query()
 async def on_inline_query(client: Client, message: Message):
@@ -291,33 +290,46 @@ async def on_edit_private_message(client, message:Message):
 
 def TO_SEND_QUEUE_HANDLER(): #TODO
     try:
-        pass
+        data = Gvar.QUEUE_TO_SEND[0]
+        Gvar.QUEUE_TO_SEND.pop(0)
+        for text in data[1]:
+            data[0].reply(text)
+            time.sleep(1.5)
     except Exception as e:
-        debug(e)
+        Gvar.LOG.append(str(e))
 
 def TORRENT_QUEUE_HANDLER(): #TODO
     try:
         pass
     except Exception as e:
+        Gvar.LOG.append(str(e))
         debug(e)
 
 def INIT():
     try:
-        while bot.is_connected == None:
+        while not bot.is_connected:
             time.sleep(1)
         for i in Gvar.ADMINS:
             bot.send_message(i,"bot online")
+        s:list = Utils.cp(Gvar.HELP)
+        s.pop(0)
+        coms = []
+        for com in s:
+            coms.append(BotCommand(com[0],com[1]))
+        bot.set_bot_commands(coms)
     except Exception as e:
         Gvar.LOG.append(str(e))
+
 def LOG_QUEUE_HANDLER():
     while 1:
         try:
             if len(Gvar.LOG) != 0:
-                bot.send_message(Gvar.LOG_GROUP_ID,Gvar.LOG[0])
+                bot.send_message(Gvar.DEBUG_GROUP_ID,Gvar.LOG[0])
                 Gvar.LOG.pop(0)
             time.sleep(1)
         except Exception as e:
             Gvar.LOG.append(str(e))
+
 def ACTIVATOR():
     while 1:
         try:
