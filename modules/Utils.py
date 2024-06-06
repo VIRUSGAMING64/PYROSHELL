@@ -198,7 +198,6 @@ def geturl(USER, msg: str):
             msg = msg.split(' ')
             return __geturl(msg[0],msg[1])
         except Exception as e:
-            
             Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
             return "incorrect link and filename format"   
 
