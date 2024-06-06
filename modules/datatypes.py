@@ -1,5 +1,6 @@
 USER_ID = 0 #web
 LAST_MESSAGE_ID = 1 #web
+CANCEL = 2
 MKDIR = 3
 GETURL = 5
 PATH = 6

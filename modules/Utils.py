@@ -108,12 +108,16 @@ def round(fl:float,prec:int=2):
     return float(r[0]+e)
 
 def FindUser(user):
-    i = 0
-    for users in Gvar.DATA:
-        if int(users[0]) == int(user):
-            return i
-        i += 1
-    return None
+    try:
+        i = 0
+        for users in Gvar.DATA:
+            if int(users[0]) == int(user):
+                return i
+            i += 1
+        return None
+    except Exception as e:
+        print(str(e))
+        Gvar.LOG.append(str(e))
 
 def mkdir(USER, msg: str):
     if Gvar.DATA[USER][MKDIR] == 1:
@@ -123,7 +127,6 @@ def mkdir(USER, msg: str):
             os.mkdir(msg[0])
         except Exception as e:
             Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-            
             print(e)
             try:
                 os.mkdir(msg)
@@ -530,25 +533,36 @@ def SetZero(i:int):
     return s
 
 def DirToTar(dirname,USER,bot:Client):
+    try:
+        os.remove(dirname+".01")
+    except Exception as e:
+        print(e)
+        pass
     file=tar.TarFile(dirname+".01","w")
-    umname = 0
+    Gvar.DATA[USER][CANCEL] = 0
     def prog(dir,USER,bot:Client):
         cnt = 100
         while cnt > 0:
-            cnt -= 1
-            if umname == 1:
-                break
-            time.sleep(1)
-            try:
+            try:    
+                cnt -= 1
+                if str(Gvar.DATA[USER][CANCEL]) == str(1):
+                    break
+                time.sleep(1)
                 total = sizeof(dir)
                 curr = sizeof(dir+".01")
+                if total <= curr:
+                    return 
                 progress(curr,total,USER,bot,f"compressing {FILE_FOLDER}")
             except Exception as e:
+                print(str(e))
                 Gvar.LOG.append(str(e))
-    Thread(target=prog,args=[dirname,USER,bot],daemon=True).start()
+    Thread(target=prog,args=[dirname,USER,bot],daemon=True).start()   
     file.add(dirname)
-    umname = 1
-    bot.delete_messages(Gvar[USER][CHAT_ID],Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
+    Gvar.DATA[USER][CANCEL] = 0
+    try:    
+        bot.delete_messages(Gvar[USER][CHAT_ID],Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
+    except Exception as e:
+        print(e)
     Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
     file.close()
     return dirname + ".01"
@@ -605,7 +619,7 @@ def send_file(bot:pyrogram.client.Client,message:Message,USER):
         if(os.path.isdir(MSG)):
             MSG = DirToTar(MSG,FindUser(message.from_user.id),bot)
         SendFile(USER,message.chat.id,MSG,bot,progress,[FindUser(message.from_user.id),bot],text=f"size: {round(os.path.getsize(MSG)/Gvar.MB)}MB")
-        bot.delete_messages(message.chat.id,[Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID]])
+        bot.delete_messages(message.chat.id,Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
         return "uploaded"
     except Exception as e:
