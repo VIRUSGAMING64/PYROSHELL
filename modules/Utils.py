@@ -605,7 +605,7 @@ def send_file(bot:pyrogram.client.Client,message:Message,USER):
         if(os.path.isdir(MSG)):
             MSG = DirToTar(MSG,FindUser(message.from_user.id),bot)
         SendFile(USER,message.chat.id,MSG,bot,progress,[FindUser(message.from_user.id),bot],text=f"size: {round(os.path.getsize(MSG)/Gvar.MB)}MB")
-        bot.delete_messages(message.chat.id,Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
+        bot.delete_messages(message.chat.id,[Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID]])
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
         return "uploaded"
     except Exception as e:
