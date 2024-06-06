@@ -140,3 +140,17 @@ class PoolQueueHandler:
     
     def resume(self):
         self.THREADS = self.T_THREADS
+
+class Counter:
+    init = -1
+    end = -1
+    def __init__(self):
+        pass
+    def start(self):
+        self.init = time.process_time_ns()
+    def stop(self):
+        self.end=time.process_time_ns()
+        if self.init == -1:
+            self.end = -1
+            raise "don't started"
+        self.elapsed = (self.end - self.init)

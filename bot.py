@@ -102,6 +102,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
         USER = Utils.FindUser(message.from_user.id)
     except Exception as e:
         print(e)
+        Gvar.LOG.append(str(e))
         return
     if USER == None:
         TEMP_USER = CreateNewUser(message)
@@ -110,7 +111,7 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     try:
         os.chdir(Gvar.DATA[USER][PATH])
     except Exception as e:
-        debug(e)
+        Gvar.LOG.append(str(e))
         print('\ndirect message')
         try:
             os.mkdir(Gvar.DATA[USER][PATH])
@@ -125,8 +126,9 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
                 debug(e)
                 return
             os.chdir(Gvar.DATA[USER][PATH])
-    Gvar.QUEUE_DOWNLOAD.append([message, USER])
-    
+    if message.media != None:
+        Gvar.QUEUE_DOWNLOAD.append([message, USER])
+        return 
     RES = Utils.USER_PROCCESS(USER, message,bot)    
     if not RES:
         return
@@ -244,7 +246,6 @@ def DOWNLOAD_HANDLER(data):
             finally:
                 Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
                 Gvar.DOWNLOADING = 0
-                
                 return 1
         else:
             return 1

@@ -221,8 +221,8 @@ def chdir(USER, msg):
             return None
         os.chdir(os.path.dirname(os.getcwd()))
         Gvar.DATA[USER][PATH] = os.getcwd()
-        return "changed"
-    re = "changed"
+        return "changed\n" + ls(USER)
+    re = "changed\n" + ls(USER)
     msg = Gvar.DATA[USER][PATH] + f"/{msg}"
     try:
         os.chdir(msg)
@@ -252,7 +252,6 @@ def ls(USER):
         Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
         print("Error: " + str(e))
         return "Error: " + str(e)
-
 
 def NOTEPAD(USER, msg):
     if Gvar.DATA[USER][GETING_NOTEPAD_NAME] == 1:
@@ -488,7 +487,6 @@ def getZ(msg):
     except:
         return "file not found"
     
-
 def NoExt(s:str):
     st = ""
     for i in s:
@@ -512,7 +510,7 @@ def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
         except Exception as e:
             Gvar.LOG.append(str(e))
             thumb = None
-        SendFile(msg.chat.id,do.file,bot,progress,[FindUser(msg.chat.id),bot],thumb,text=f"size: {round(os.path.getsize(do.file)/Gvar.MB)}MB") 
+        SendFile(FindUser(msg.from_user.id),msg.chat.id,do.file,bot,progress,[FindUser(msg.from_user.id),bot],thumb,text=f"size: {round(os.path.getsize(do.file)/Gvar.MB)}MB") 
         if(size != -1):
             os.remove(thumb)
         bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
@@ -532,19 +530,32 @@ def SetZero(i:int):
         s = "0"+s
     return s
 
-def DirToTar(dirname):
-    file=tar.TarFile(dirname+".001","w")
+def DirToTar(dirname,USER,bot:Client):
+    file=tar.TarFile(dirname+".01","w")
+    def prog(dir,USER,bot:Client):
+        cnt = 100
+        while cnt > 0:
+            cnt -= 1
+            time.sleep(1)
+            try:
+                total = sizeof(dir)
+                curr = sizeof(dir+".01")
+                progress(curr,total,USER,bot,f"compressing {FILE_FOLDER}")
+            except Exception as e:
+                Gvar.LOG.append(str(e))
+    Thread(target=prog,args=[dirname,USER,bot],daemon=True).start()
     file.add(dirname)
+    Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
     file.close()
-    return dirname + ".001"
+    return dirname + ".01"
 
 def Compress(filename,MAX_Z = 2000*Gvar.MB):
     id = 1
     fid = 1
     file = open(filename,"rb")
-    ch_file = open(filename + ".001","wb")
+    ch_file = open(filename + ".0001","wb")
     chunk = file.read(Gvar.MB)
-    files = [filename + ".001"]
+    files = [filename + ".0001"]
     while chunk:
         ch_file.write(chunk)
         chunk = file.read(Gvar.MB)
@@ -559,10 +570,10 @@ def Compress(filename,MAX_Z = 2000*Gvar.MB):
     file.close()
     return files
 
-def SendFile(chatID,filename,bot:Client,progress:Callable = None,args = None,thumb = None,text = ""):
+def SendFile(USER,chatID,filename,bot:Client,progress:Callable = None,args = None,thumb = None,text = ""):
     try:
         if os.path.isdir(filename):
-            filename = DirToTar(filename)
+            filename = DirToTar(filename,USER,bot)
         size = os.path.getsize(filename)
         files = [filename]
         if size > Gvar.MB * 2000:
@@ -575,6 +586,7 @@ def SendFile(chatID,filename,bot:Client,progress:Callable = None,args = None,thu
                 bot.send_photo(chatID,file,progress=progress,progress_args=args,thumb=thumb,caption=text)
             else:
                 bot.send_document(chatID,file,progress=progress,progress_args=args,thumb=thumb,caption=text)
+        Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
     except Exception as e:
         return str(e)
 
@@ -588,7 +600,7 @@ def send_file(bot:pyrogram.client.Client,message:Message,USER):
             MSG = dirs[MSG-1]
         if(os.path.isdir(MSG)):
             MSG = DirToTar(MSG)
-        SendFile(message.chat.id,MSG,bot,progress,[FindUser(message.chat.id),bot],text=f"size: {round(os.path.getsize(MSG)/Gvar.MB)}MB")
+        SendFile(USER,message.chat.id,MSG,bot,progress,[FindUser(message.from_user.id),bot],text=f"size: {round(os.path.getsize(MSG)/Gvar.MB)}MB")
         bot.delete_messages(message.chat.id,Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
         return "uploaded"
