@@ -30,7 +30,7 @@ def prog(cant,total,prec=2,UD = "uploading"):
     return s
 
 def progress(cant, total,USER,bot:pyrogram.client.Client,UD = "uploading"):
-    if Gvar.UPTIME % 6 != 0:
+    if Gvar.UPTIME % 10 != 0:
         return
     if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
         Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
@@ -214,6 +214,7 @@ def chdir(USER, msg):
             data.sort()
             msg = data[int(msg)-1]
         except Exception as e:
+            Gvar.LOG.append(str(e))
             return str(e)
     if msg == '..':
         if os.path.dirname(os.getcwd()) == Gvar.ROOT:
@@ -222,6 +223,7 @@ def chdir(USER, msg):
         Gvar.DATA[USER][PATH] = os.getcwd()
         return "changed"
     re = "changed"
+    msg = Gvar.DATA[USER][PATH] + f"/{msg}"
     try:
         os.chdir(msg)
         Gvar.DATA[USER][PATH] = os.getcwd()
@@ -651,7 +653,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return Gvar.HELP
     elif MSG.startswith("/queues"):
         return queuesZ()
-    elif MSG.startswith("/alloc"):
+    elif MSG.startswith("/alloc") and message.from_user.id in Gvar.ADMINS:
         alloc(MSG)
         return 'allocated'
     elif MSG.startswith("/getZ") or MSG.startswith("/sz"):
@@ -660,7 +662,7 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
         return ls(USER)
     elif MSG.startswith("/note") or Gvar.DATA[USER][GETING_NOTEPAD_NAME]:
         return NOTEPAD(USER, MSG)
-    elif MSG.startswith("/restart"):
+    elif MSG.startswith("/restart") :
         return reset(message.from_user.id)
     elif MSG.startswith("/cd"):
         return chdir(USER, MSG)

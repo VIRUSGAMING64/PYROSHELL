@@ -244,6 +244,7 @@ def DOWNLOAD_HANDLER(data):
             finally:
                 Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
                 Gvar.DOWNLOADING = 0
+                
                 return 1
         else:
             return 1
@@ -264,10 +265,10 @@ def DOWNLOAD_QUEUE_HANDLER():
                 res = 1
             if res == 1:
                 Gvar.QUEUE_DOWNLOAD.pop(0)
+                time.sleep(60)
             else:
                 time.sleep(1)
         HANDLER()
-        time.sleep(60)
 
 @bot.on_inline_query()
 async def on_inline_query(client: Client, message: Message):

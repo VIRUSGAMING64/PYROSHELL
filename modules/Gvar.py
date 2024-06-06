@@ -5,12 +5,6 @@ nulls_parents = 0
 GET_QUERYS = 0
 POST_QUERYS = 0
 END_THREAD = 1
-DEBUG_URL = os.getenv("DEBUG_URL")
-DEPLOY_HOOK = os.getenv("DEPLOY_HOOK")
-GOOGLE_API = os.getenv("GOOGLE")
-TOKEN = os.getenv("BOT_TOKEN")
-API_ID = os.getenv("API_ID")
-API_HASH = os.getenv("API_HASH")  # bot api
 ADMINS = [1659735368] # <- THIS IS CHAT_ID OF ADMINS
 DEBUG_GROUP_ID = -1001809067914 #TODO
 HAND = None
@@ -28,7 +22,7 @@ QUEUE_DOWNLOAD = [] # queue of downloads
 USER_VARIABLES = 127 
 DEBUG_MODE = True
 DOWNLOADING = 0 # if 1 user downloading 
-DATA = [] # all users and `variables
+DATA = [] # all users and variables
 MAX_MESSAGE_LENGTH = 4096 
 WORKERS = os.cpu_count()  
 LOG = []
@@ -59,6 +53,13 @@ BOT_COMMANDS = [
     ["/comp", "compress a video don't work"],
     ["/help", "send help"],
 ]
+
+DEBUG_URL = os.getenv("DEBUG_URL")
+DEPLOY_HOOK = os.getenv("DEPLOY_HOOK")
+GOOGLE_API = os.getenv("GOOGLE")
+TOKEN = os.getenv("BOT_TOKEN")
+API_ID = os.getenv("API_ID")
+API_HASH = os.getenv("API_HASH") 
 
 if DEBUG_URL == None:
     DEBUG_URL = 'https://vshell.onrender.com/debug'

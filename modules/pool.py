@@ -1,6 +1,8 @@
 from threading import *
 import time
 import os
+import typing as types
+
 class TempFile():
     def __init__(self,name,mode):
         self.name = os.path.realpath(name)
@@ -97,3 +99,44 @@ class v_pool:
         self.funcs.append(func)
         if(start):
             self.funcs[len(self.funcs)].start()
+
+class PoolQueueHandler:
+    def __init__(self,func:callable,QUEUE:list = [],threads:int = os.cpu_count()+4,ttl:int = 1):
+        self.QUEUE=QUEUE
+        self.ERRORS = []
+        self.THREADS = threads
+        self.activator = func
+        self.T_THREADS = threads
+        self.TTL = ttl
+        self.running = 0
+        self.daemon = 0
+    
+    def Factivator(self,args):
+        self.activator(*args)
+        self.running -= 1
+    
+    def __run(self):
+        while True:
+            while self.running < self.THREADS:
+                if len(self.QUEUE) == 0:
+                    break
+                self.running += 1            
+                Thread(target=self.Factivator,daemon=self.daemon,args=[self.QUEUE[0]]).start()
+                self.QUEUE.pop(0)
+            time.sleep(self.TTL)      
+    
+    def run(self,daemon = False):
+        self.daemon = daemon
+        Thread(target=self.__run,daemon=daemon).start()
+
+    def add(self,args:types.Iterable):
+        lis : list = []
+        for i in args:
+            lis.append(i)
+        self.QUEUE.append(lis)
+    
+    def pause(self):
+        self.THREADS = 0
+    
+    def resume(self):
+        self.THREADS = self.T_THREADS
