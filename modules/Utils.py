@@ -531,12 +531,12 @@ def SetZero(i:int):
 
 def DirToTar(dirname,USER,bot:Client):
     file=tar.TarFile(dirname+".01","w")
-    btc = 0
+    umname = 0
     def prog(dir,USER,bot:Client):
         cnt = 100
         while cnt > 0:
             cnt -= 1
-            if btc == 1:
+            if umname == 1:
                 break
             time.sleep(1)
             try:
@@ -547,7 +547,7 @@ def DirToTar(dirname,USER,bot:Client):
                 Gvar.LOG.append(str(e))
     Thread(target=prog,args=[dirname,USER,bot],daemon=True).start()
     file.add(dirname)
-    btc = 1
+    umname = 1
     bot.delete_messages(Gvar[USER][CHAT_ID],Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
     Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
     file.close()
