@@ -309,8 +309,7 @@ def TORRENT_QUEUE_HANDLER(): #TODO
 
 def INIT():
     try:
-        while not bot.is_connected:
-            time.sleep(1)
+        time.sleep(60)
         for i in Gvar.ADMINS:
             bot.send_message(i,"bot online")
         s:list = Utils.cp(Gvar.HELP)
@@ -323,6 +322,7 @@ def INIT():
         Gvar.LOG.append(str(e))
 
 def LOG_QUEUE_HANDLER():
+    time.sleep(60)
     while 1:
         try:
             if len(Gvar.LOG) != 0:
