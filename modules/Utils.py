@@ -20,17 +20,17 @@ from pyrogram.client import *
 import tarfile as tar
 
 def prog(cant,total,prec=2,UD = "uploading"):
-    por = int((cant/total)*10)
-    por2 = round((cant/total)*100)
-    res = 10-por
-    s = f"{por2}%\n"
+    per = int((cant/total)*10)
+    per2 = round((cant/total)*100)
+    res = 10-per
+    s = f"{per2}%\n"
     s += f"{round(cant/(1024**2),prec)}MB of {round(total/(1024**2),prec)}MB\n"
-    if por2 <= 33.333:
-        s += f"{pyrogram.emoji.RED_CIRCLE}"*por
-    elif por2 <= 66.666:
-        s += f"{pyrogram.emoji.ORANGE_CIRCLE}"*por
+    if per2 <= 33.333:
+        s += f"{pyrogram.emoji.RED_CIRCLE}"*per
+    elif per2 <= 66.666:
+        s += f"{pyrogram.emoji.ORANGE_CIRCLE}"*per
     else:
-        s += f"{pyrogram.emoji.GREEN_CIRCLE}"*por
+        s += f"{pyrogram.emoji.GREEN_CIRCLE}"*per
     s += f"{pyrogram.emoji.WHITE_CIRCLE}"*res
     s += f"\n{UD}"
     s += "\n"+uptime()
