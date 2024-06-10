@@ -98,66 +98,13 @@ bot = Client(
 )
 
 def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
+    temp_user = GetUser(message)
+    Gvar.QUEUE_DOWNLOAD.append([message,temp_user])
+    data = Utils.USER_PROCCESS(temp_user,message,bot)
     try:
-        USER = Utils.FindUser(message.from_user.id)
+        message.reply(data)
     except Exception as e:
-        print(e)
-        Gvar.LOG.append(str(e))
-        return
-    if USER == None:
-        TEMP_USER = CreateNewUser(message)
-        USER = len(Gvar.DATA)
-        Gvar.DATA.append(TEMP_USER)
-    try:
-        os.chdir(Gvar.DATA[USER][PATH])
-    except Exception as e:
-        Gvar.LOG.append(str(e))
-        print('\ndirect message')
-        try:
-            os.mkdir(Gvar.DATA[USER][PATH])
-            os.chdir(Gvar.DATA[USER][PATH])
-        except Exception as e:
-            debug(e)
-            bot.send_message(message.chat.id, "invalid directoy:    " + str(e))
-            try:
-                Gvar.DATA[USER][PATH] = Gvar.ROOT+ "/" + str(message.from_user.id)+'-'+str(message.from_user.first_name)
-                os.mkdir(Gvar.DATA[USER][PATH])
-            except Exception as e:
-                debug(e)
-                return
-            os.chdir(Gvar.DATA[USER][PATH])
-    if message.media != None:
-        Gvar.QUEUE_DOWNLOAD.append([message, USER])
-        return 
-    RES = Utils.USER_PROCCESS(USER, message,bot)    
-    if not RES:
-        return
-    T_TO_SEND = []
-    if(len(RES) > Gvar.MAX_MESSAGE_LENGTH):
-        i = 0
-        aux = ""
-        while(i < len(RES)):
-            for j in range(Gvar.MAX_MESSAGE_LENGTH):
-                if(i + j == len(RES)):
-                    break
-                aux += RES[i+j]
-            i += Gvar.MAX_MESSAGE_LENGTH
-            T_TO_SEND.append(aux)
-            aux = ''
-        Gvar.QUEUE_TO_SEND.append([message,T_TO_SEND])
-        Gvar.HAND.save()
-        return
-    try:
-        Gvar.DATA[USER][BOT_LAST_MESSAGE_ID] = bot.send_message(message.chat.id, RES).id
-    except exceptions.flood_420.FloodWait as err:
-        print(err," VALUE::: ",err.value)
-        if err.value is str:
-            err.value = int(err.value)
-        time.sleep(err.value+1)
         pass
-    Gvar.DATA[USER][LAST_MESSAGE_ID] = message.id
-    Gvar.HAND.save()
-
 def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard    
     query = message.query
     id=message.from_user.id
@@ -202,12 +149,12 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
 def DIRECT_MESSAGE_QUEUE_HANDLER():
     while True:
         try:
-            if len(Gvar.QUEUE_DIRECT) == 0:
+            if len(Gvar.QUEUE_DIRECT) <= 0:
                 time.sleep(0.01)
                 continue
             DIRECT_REQUEST_HANDLER(Gvar.QUEUE_DIRECT[0][0], Gvar.QUEUE_DIRECT[0][1])
         except Exception as e:
-            Gvar.LOG.append(str(e))
+            Gvar.LOG.append(str(e) + " DIRECT_MESSAGE_QUEUE_HANDLER")
         Gvar.QUEUE_DIRECT.pop(0)
 
 def INLINE_MESSAGE_QUEUE_HANDLER():
@@ -223,29 +170,19 @@ def INLINE_MESSAGE_QUEUE_HANDLER():
 
 def DOWNLOAD_HANDLER(data):
     msg:pyrogram.types.Message = data[0]
-    USER = data[1]
+    user: t_user = data[1]
     if Gvar.DOWNLOADING == 0:
         if msg.media != None:
             try:
-                Gvar.DOWNLOADING = 1
-                Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
-                    Gvar.DATA[USER][CHAT_ID], "Donloading..."
-                ).id
-                bot.download_media(
-                    msg,
-                    Gvar.DATA[USER][PATH] + "/",
-                    progress=Utils.progress,
-                    progress_args=[USER,bot,"downloading"],
-                )
-                bot.delete_messages(msg.chat.id,Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
+                bot.download_media(msg,user.current_dir+"/",progress=Utils.progress,progress_args=[user,bot,"downloading"])
+                bot.delete_messages(user.chat,user.download_id)
                 msg.reply("Downloaded !!!!",reply_to_message_id=msg.id)
             except Exception as e:
                 debug(e)
                 print("in downloads first try")
                 msg.reply("Error downloading media")
             finally:
-                Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
-                Gvar.DOWNLOADING = 0
+                user.download_id = -1 #TODO Lace Colling github & Jia Tan
                 return 1
         else:
             return 1
@@ -290,15 +227,19 @@ async def on_group_message(client: Client, message: Message):
 async def on_edit_private_message(client, message:Message):
     await on_private_message(client, message)
 
-def TO_SEND_QUEUE_HANDLER(): #TODO
-    try:
-        data = Gvar.QUEUE_TO_SEND[0]
-        Gvar.QUEUE_TO_SEND.pop(0)
-        for text in data[1]:
-            data[0].reply(text)
-            time.sleep(1.5)
-    except Exception as e:
-        Gvar.LOG.append(str(e))
+def TO_SEND_QUEUE_HANDLER(): 
+    while 1:
+        try:
+            if len(Gvar.QUEUE_TO_SEND) <= 0:
+                time.sleep(0.1)
+                continue
+            data = Gvar.QUEUE_TO_SEND[0]
+            Gvar.QUEUE_TO_SEND.pop(0)
+            for text in data[1]:
+                data[0].reply(text)
+                time.sleep(1.5)
+        except Exception as e:
+            Gvar.LOG.append(str(e))
 
 def TORRENT_QUEUE_HANDLER(): #TODO
     try:
@@ -312,12 +253,6 @@ def INIT():
         time.sleep(60)
         for i in Gvar.ADMINS:
             bot.send_message(i,"bot online")
-        s:list = Utils.cp(Gvar.HELP)
-        s.pop(0)
-        coms = []
-        for com in s:
-            coms.append(BotCommand(com[0],com[1]))
-        bot.set_bot_commands(coms)
     except Exception as e:
         Gvar.LOG.append(str(e))
 

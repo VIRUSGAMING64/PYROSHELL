@@ -1,6 +1,8 @@
 import urllib.request as uq
 import sys
 import os
+from modules.VidDown import *
+from modules.users import *
 import subprocess as sbp
 from math import *
 import pyrogram.utils
@@ -23,27 +25,23 @@ def prog(cant,total,prec=2,UD = "uploading"):
     res = 10-por
     s = f"{por2}%\n"
     s += f"{round(cant/(1024**2),prec)}MB of {round(total/(1024**2),prec)}MB\n"
-    s += f"{pyrogram.emoji.BLACK_SMALL_SQUARE}"*por
-    s += f"{pyrogram.emoji.WHITE_SMALL_SQUARE}"*res
+    if por2 <= 33.333:
+        s += f"{pyrogram.emoji.RED_CIRCLE}"*por
+    elif por2 <= 66.666:
+        s += f"{pyrogram.emoji.ORANGE_CIRCLE}"*por
+    else:
+        s += f"{pyrogram.emoji.GREEN_CIRCLE}"*por
+    s += f"{pyrogram.emoji.WHITE_CIRCLE}"*res
     s += f"\n{UD}"
     s += "\n"+uptime()
     return s
 
-def progress(cant, total,USER,bot:pyrogram.client.Client,UD = "uploading"):
-    if Gvar.UPTIME % 10 != 0:
-        return
-    if Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] == 0:
-        Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = bot.send_message(
-            chat_id=Gvar.DATA[USER][CHAT_ID], text=prog(cant,total,2,UD)
-        ).id
+def progress(cant, total,user:t_user,bot:pyrogram.client.Client,UD = "uploading"):
+    cant = prog(cant,total,UD=UD)
+    if user.download_id == -1:
+        user.download_id = bot.send_message(user.chat,cant).id
     else:
-        try:
-            bot.edit_message_text(
-                chat_id=Gvar.DATA[USER][CHAT_ID],message_id=Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID], text=prog(cant,total,2,UD)
-            )
-        except Exception as e:
-            Gvar.LOG.append(str(e))
-    pass
+        user.download_id = bot.edit_message_text(user.chat,user.download_id,cant).id
 
 def GenerateDirectLink(message:Message):
     try:
@@ -52,39 +50,7 @@ def GenerateDirectLink(message:Message):
         name = message.from_user.first_name
     except:
         return "try to use: /link filePath\examples:\n /link hola/new.zip\n /link hola.txt"
-    return f"vshell2.onrender.com/file/env/{uid}-{name}/{text}"
-
-class VidDownloader:
-    file = ""
-    arg = "downloading video"
-    def __init__(self, bot,user):
-        self.bot = bot
-        self.USER = user
-        self.file = None
-    def my_hook(self, down):
-        curr = 0
-        try:
-            curr = down["downloaded_bytes"]
-            self.file = down["filename"]
-        except:
-            pass
-        total = curr * 2
-        try:
-            total = down["total_bytes"]
-        except Exception as e:
-            try:
-                total = int(down["total_bytes_estimate"])
-            except:
-                pass
-            e=str(e)
-        progress(curr,total,self.USER,self.bot,self.arg)
-    def download_video(self, url):
-        ydl_opts = {
-            'format': 'best',"writethumbnail":True,
-            'progress_hooks': [self.my_hook],
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
+    return f"vshell.onrender.com/file/env/{uid}-{name}/{text}"
 
 def round(fl:float,prec:int=2):
     if prec > 1e2:
@@ -106,50 +72,6 @@ def round(fl:float,prec:int=2):
     else:
         r = [r]
     return float(r[0]+e)
-
-def FindUser(user):
-    try:
-        i = 0
-        for users in Gvar.DATA:
-            if int(users[0]) == int(user):
-                return i
-            i += 1
-        return None
-    except Exception as e:
-        print(str(e))
-        Gvar.LOG.append(str(e))
-
-def mkdir(USER, msg: str):
-    if Gvar.DATA[USER][MKDIR] == 1:
-        Gvar.DATA[USER][MKDIR] = 0
-        try:
-            msg = msg.split(" ")
-            os.mkdir(msg[0])
-        except Exception as e:
-            Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-            print(e)
-            try:
-                os.mkdir(msg)
-                return "Directory created"
-            except Exception as e:
-                Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-                
-                print(e)
-                return "Error on create directory"
-            pass
-        return "Directory created"
-    try:
-        msg = msg.split(" ")
-        os.mkdir(msg[1])
-        return "Directory created"
-    except Exception as e:
-        print(e)
-        Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-        
-        Gvar.DATA[USER][3] = 1
-        return "Send directory name"
-        pass
-
 
 def __geturl(url,filename,USER):
     ret = "Downloaded..."
@@ -204,135 +126,6 @@ def geturl(USER, msg: str):
             Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
             return "incorrect link and filename format"   
 
-def chdir(USER, msg):
-    msg = msg.split(' ')
-    msg.append(None)
-    msg = msg[1]
-    if msg == None:
-        return "correct use: /cd DIRNAME or INDEX"
-    if msg.isnumeric():
-        try:
-            data = os.listdir()
-            data.sort()
-            msg = data[int(msg)-1]
-        except Exception as e:
-            Gvar.LOG.append(str(e))
-            return str(e)
-    if msg == '..':
-        if os.path.dirname(os.getcwd()) == Gvar.ROOT:
-            return None
-        os.chdir(os.path.dirname(os.getcwd()))
-        Gvar.DATA[USER][PATH] = os.getcwd()
-        return "changed\n" + ls(USER)
-    re = "changed\n" + ls(USER)
-    msg = Gvar.DATA[USER][PATH] + f"/{msg}"
-    try:
-        os.chdir(msg)
-        Gvar.DATA[USER][PATH] = os.getcwd()
-    except Exception as e:
-        re = str(e)
-    return re
-
-def ls(USER):
-    try:
-        sstr = "in " + os.getcwd() + ": \n"
-        ls = os.listdir()
-        ls.sort()
-        j = 1
-        for i in ls:
-            if os.path.isdir(i):
-                sstr += f"{j} {FILE_FOLDER} " + i + "\n"
-            elif os.path.isfile(i):
-                sstr += f"{j} {PAGE_FACING_UP} " + i + "\n"
-            elif os.path.islink(i):
-                sstr += f"{j} {LINK} " + i + "\n"
-            else:
-                sstr += f"[{j}][other] " + i + "\n"
-            j+=1
-        return sstr
-    except Exception as e:  
-        Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-        print("Error: " + str(e))
-        return "Error: " + str(e)
-
-def NOTEPAD(USER, msg):
-    if Gvar.DATA[USER][GETING_NOTEPAD_NAME] == 1:
-        Gvar.DATA[USER][GETING_NOTEPAD_NAME] = 0
-        try:
-            msg = msg.split(" ")
-            msg = msg[0]
-            file = open(msg, "w")
-            Gvar.DATA[USER][WRITING_FILEPATH] = msg
-            Gvar.DATA[USER][WRITING] = 1
-            file.close()
-            return "file created"
-        except Exception as e:
-            print(e)
-            Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))          
-            return "Error: " + str(e)
-    try:
-        if msg.startswith("/note"):
-            msg = msg.split(" ")
-        try:
-            msg = msg[1]
-            try:
-                file = open(msg, "w")
-                file.close()
-                Gvar.DATA[USER][WRITING] = 1
-                Gvar.DATA[USER][WRITING_FILEPATH] = msg
-            except Exception as e:
-                
-                Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-                return "Error: " + str(e)
-        except Exception as e:      
-            Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-            Gvar.DATA[USER][GETING_NOTEPAD_NAME] = 1
-            return "send filename: "
-    except Exception as e:
-        print(e)  
-        Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-        return "Error: " + str(e)
-
-def WRITER(USER, msg):
-    if msg.startswith("/note"):
-        Gvar.DATA[USER][WRITING] = 0
-        Gvar.DATA[USER][WRITING_FILEPATH] = 0
-        return "Closed file"
-    else:
-        try:
-            try:
-                file = open(Gvar.DATA[USER][WRITING_FILEPATH], "a")
-                total = file.write(msg)
-                return f"Writed {total} bytes"
-            except Exception as e:  
-                Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-                return "Error writing file "+str(e)
-        except Exception as e:
-            print(e)
-            Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-            return "Error: " + str(e)
-
-def cat(USER, msg:str):
-    try:
-        msg = msg.split(' ')
-        msg = str(msg[1])
-        if msg.isnumeric():
-            data = os.listdir()
-            data.sort()
-            msg = data[int(msg)-1]
-    except Exception as e:    
-        Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-        return "Send with file name"
-    try:
-        file = open(msg, "r")
-        data = file.read(Gvar.MAX_MESSAGE_LENGTH)
-        file.close()
-        return data
-    except Exception as e:
-        Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
-        print("Error on cat:", e)
-        return "Error on cat: " + str(e)
-
 def cp(a):
     return a
 
@@ -386,15 +179,6 @@ def stats():
     s += f"DISK USED: {DISK_USED}%\n" 
     s += f"DISK FREE: {DISK_FREE}GB\n"
     return s
-
-def getusers(message:Message):
-    s = ""
-    if message.from_user.id in Gvar.ADMINS:
-        for USER in Gvar.DATA:
-            s+=USER[USERNAME]+"\n"
-        return s
-    else:
-        return "access denied"
 
 def upd(msg:pyrogram.types.Message,Ifile,Ofile):
     time.sleep(1)
@@ -454,40 +238,6 @@ def VidComp(message:pyrogram.types.Message):
         Gvar.END_THREAD = 1
         os.remove(Ifile)
         os.rename(Ofile,Ifile)
-
-def sizeof(dir:str):
-    try:
-        if os.path.isfile(dir):
-            return os.path.getsize(dir)
-        sx = 0
-        for pth in os.listdir(dir):
-            sz=sizeof(dir+"/"+pth)
-            if str(sz).isnumeric() == False:
-                continue
-            sx += sz
-    except Exception as e:
-        Gvar.LOG.append(str(e))
-        print(e)
-    return sx
-
-def getZ(msg):
-    msg = msg.split(" ")
-    msg.append(None)
-    if msg[1] is None:
-        return "/getZ filename <--"
-    try:
-        try:
-            if str(msg[1]).is_numeric():
-                msg[1] = int(msg[1])
-                data = os.listdir()
-                data.sort()
-                msg[1] = data[msg[1]+1]
-        except Exception as e:
-            Gvar.LOG.append(str(e))
-            return str(e)
-        return sizeof(msg[1])
-    except:
-        return "file not found"
     
 def NoExt(s:str):
     st = ""
@@ -499,24 +249,22 @@ def NoExt(s:str):
         s = i + s
     return s
 
-def vid_down(usr,msg:Message,bot:pyrogram.client.Client):
+def vid_down(user:t_user,msg:Message,bot:pyrogram.client.Client):
     try:
-        do = VidDownloader(bot,usr)
+        do = VidDownloader(bot,user,msg.chat.id)
         do.download_video(msg.text)
-        bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
-        Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
-        thumb = os.path.realpath(NoExt(do.file) + ".jpg")
+        file = do.file
+        del do
+        thumb = os.path.realpath(NoExt(file) + ".jpg")
         size = -1
         try:
             size = os.path.getsize(thumb)
         except Exception as e:
             Gvar.LOG.append(str(e))
             thumb = None
-        SendFile(FindUser(msg.from_user.id),msg.chat.id,do.file,bot,progress,[FindUser(msg.from_user.id),bot],thumb,text=f"size: {round(os.path.getsize(do.file)/Gvar.MB)}MB") 
+        SendFile(user,file,bot,progress,[user,bot,"uploading video"],thumb,str(size))
         if(size != -1):
             os.remove(thumb)
-        bot.delete_messages(msg.chat.id,Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID])
-        Gvar.DATA[usr][LAST_MESSAGE_DOWNLOAD_ID] = 0
     except Exception as e:
         msg.reply(str(e))
         Gvar.LOG.append(str(e))
@@ -532,38 +280,14 @@ def SetZero(i:int):
         s = "0"+s
     return s
 
-def DirToTar(dirname,USER,bot:Client):
+def DirToTar(dirname,user:t_user,bot:Client):
     try:
         os.remove(dirname+".01")
     except Exception as e:
         print(e)
         pass
     file=tar.TarFile(dirname+".01","w")
-    Gvar.DATA[USER][CANCEL] = 0
-    def prog(dir,USER,bot:Client):
-        cnt = 100
-        while cnt > 0:
-            try:    
-                cnt -= 1
-                if str(Gvar.DATA[USER][CANCEL]) == str(1):
-                    break
-                time.sleep(1)
-                total = sizeof(dir)
-                curr = sizeof(dir+".01")
-                if total <= curr:
-                    return 
-                progress(curr,total,USER,bot,f"compressing {FILE_FOLDER}")
-            except Exception as e:
-                print(str(e))
-                Gvar.LOG.append(str(e))
-    Thread(target=prog,args=[dirname,USER,bot],daemon=True).start()   
     file.add(dirname)
-    Gvar.DATA[USER][CANCEL] = 0
-    try:    
-        bot.delete_messages(Gvar[USER][CHAT_ID],Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
-    except Exception as e:
-        print(e)
-    Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
     file.close()
     return dirname + ".01"
 
@@ -588,10 +312,10 @@ def Compress(filename,MAX_Z = 2000*Gvar.MB):
     file.close()
     return files
 
-def SendFile(USER,chatID,filename,bot:Client,progress:Callable = None,args = None,thumb = None,text = ""):
+def SendFile(user:t_user,filename,bot:Client,progress:Callable = None,args = None,thumb = None,text = ""):
     try:
         if os.path.isdir(filename):
-            filename = DirToTar(filename,USER,bot)
+            filename = DirToTar(filename,user,bot)
         size = os.path.getsize(filename)
         files = [filename]
         if size > Gvar.MB * 2000:
@@ -599,31 +323,31 @@ def SendFile(USER,chatID,filename,bot:Client,progress:Callable = None,args = Non
         file:str =""
         for file in files:
             if file.endswith(".mp4") or file.endswith(".mpg") or file.endswith('.mkv'):
-                bot.send_video(chatID,file,progress=progress,progress_args=args,thumb=thumb,caption=text)
+                bot.send_video(user.chat,file,progress=progress,progress_args=args,thumb=thumb,caption=text)
             elif file.endswith(".jpg") or file.endswith(".png"):
-                bot.send_photo(chatID,file,progress=progress,progress_args=args,thumb=thumb,caption=text)
+                bot.send_photo(user.chat,file,progress=progress,progress_args=args,thumb=thumb,caption=text)
             else:
-                bot.send_document(chatID,file,progress=progress,progress_args=args,thumb=thumb,caption=text)
-        Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
+                bot.send_document(user.chat,file,progress=progress,progress_args=args,thumb=thumb,caption=text)
+            bot.delete_messages(user.chat,user.download_id)
+            user.download_id = -1
     except Exception as e:
         return str(e)
+    
 
-def send_file(bot:pyrogram.client.Client,message:Message,USER):
+def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
     try:
         MSG = message.text.split(' ')[1]
         if MSG.isnumeric():
             MSG = int(MSG)
-            dirs = os.listdir()
+            dirs = os.listdir(user.current_dir)
             dirs.sort()
-            MSG = dirs[MSG-1]
+            MSG = user.current_dir+"/"+dirs[MSG-1]
         if(os.path.isdir(MSG)):
-            MSG = DirToTar(MSG,FindUser(message.from_user.id),bot)
-        SendFile(USER,message.chat.id,MSG,bot,progress,[FindUser(message.from_user.id),bot],text=f"size: {round(os.path.getsize(MSG)/Gvar.MB)}MB")
-        bot.delete_messages(message.chat.id,Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID])
-        Gvar.DATA[USER][LAST_MESSAGE_DOWNLOAD_ID] = 0
+            MSG = DirToTar(MSG,user,bot)
+        SendFile(user,MSG,bot,progress,args=[user,bot])
         return "uploaded"
     except Exception as e:
-        Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
+        Gvar.LOG.append(str(e))
         return f"File not found E:\n{str(e)}"
 
 def queuesZ():
@@ -669,12 +393,17 @@ def remove(MSG):
         Gvar.LOG.append(str(e))
         return str(e)
 
-def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
+def ClearCommand(command:str):
+    command = command.split(" ",1)
+    while len(command) < 2:
+        command.append(None)
+    return command
+
+def USER_PROCCESS(user:t_user, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
+    command = ClearCommand(MSG)[1]
     if MSG.startswith("http"):
-        Gvar.FUNC_QUEUE.append([vid_down,[USER,message,bot]])
-    elif Gvar.DATA[USER][WRITING] == 1:
-        return WRITER(USER, MSG)
+        Gvar.FUNC_QUEUE.append([vid_down,[0,message,bot]])
     elif MSG.startswith("/comp"):
         tth=th.Thread(target=VidComp,args=[message],daemon=True)
         tth.start()
@@ -686,32 +415,28 @@ def USER_PROCCESS(USER, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith("/alloc") and message.from_user.id in Gvar.ADMINS:
         alloc(MSG)
         return 'allocated'
-    elif MSG.startswith("/getZ") or MSG.startswith("/sz"):
-        return str(getZ(MSG))
+    elif MSG.startswith("/sz"):
+        return user.size(command)
     elif MSG.startswith("/ls"):
-        return ls(USER)
-    elif MSG.startswith("/note") or Gvar.DATA[USER][GETING_NOTEPAD_NAME]:
-        return NOTEPAD(USER, MSG)
+        return user.ls()
     elif MSG.startswith("/restart") :
         return reset(message.from_user.id)
     elif MSG.startswith("/cd"):
-        return chdir(USER, MSG)
+        user.chdir(command)
+        return "Changed !!!"
     elif MSG.startswith("/mkdir"):
-        return mkdir(USER, MSG)
-    elif MSG.startswith("/geturl") or Gvar.DATA[USER][GETURL] or os.path.islink(MSG):
-        return geturl(USER, MSG)
-    elif MSG.startswith("/cat"):
-        return cat(USER, MSG)
+        user.mkdir(command)
+        return "Created !!!"
+    elif MSG.startswith("/geturl"):
+        return "" #TODO
     elif MSG.startswith('/stats'):
         return stats()
-    elif MSG.startswith("/getU"):
-        return getusers(message)
     elif MSG.startswith("/link"):
         return GenerateDirectLink(message)
     elif MSG.startswith("/eval") and message.from_user.id in Gvar.ADMINS:
-        exec(MSG.split(' ')[1])
+        exec(command)
     elif MSG.startswith('/send'):
-        return send_file(bot,message,USER)
+        return send_file(bot,message,user)
     elif MSG.startswith("/rm"):
         return remove(MSG)
     return 0
@@ -728,7 +453,6 @@ def FUNC_QUEUE_HANDLER():
 timer = Timer(
     [   UPD_HOUR,
         FUNC_QUEUE_HANDLER],
-    [1,60]
+    [1,10]
 )
-
 timer.start()

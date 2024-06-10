@@ -33,5 +33,3 @@ from ctypes import *
 from flask import *
 from json.encoder import JSONEncoder
 from json.decoder import JSONDecoder
-
-Gvar.HAND = CSV()

@@ -1,3 +1,4 @@
+INVALID = -1
 USER_ID = 0 #web
 LAST_MESSAGE_ID = 1 #web
 CANCEL = 2

@@ -22,7 +22,7 @@ def Time(func:callable,tm:int):
         func()
     pass
 class Timer:
-    def __init__(self,func=None,time:list=[]):
+    def __init__(self,func=None,time:list=[],deamons:list=0):
         self.time = time
         if func is None:
             self.funcs = []

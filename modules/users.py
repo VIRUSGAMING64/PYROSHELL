@@ -1,82 +1,144 @@
-
+import os
 import pyrogram
 import modules.Gvar as Gvar
 from modules.datatypes import *
+from pyrogram.emoji import *
 
-def CreateNewUser(message:pyrogram.types.Message):
-    TEMP_USER = [
-            message.from_user.id,  # USER_ID  0
-            message.id,  # LAST_MESSAGE_ID 1
-            0,  # var 2
-            0,  # MKDIR 3
-            0,  # var 4
-            0,  # GETURL 5
-            Gvar.ROOT+ "/" + str(message.from_user.id) + "-" + str(message.from_user.first_name),  # PATH 6
-            0,  # var 7
-            0,  # WRITING 8
-            0,  # GETING_NOTEPAD_NAME 9
-            0,  # WRITING_FILEPATH 10
-            0,  # BOT_LAST_MESSAGE_ID 11
-            0,  # var 12
-            0,  # LAST_MESSAGE_DOWNLOAD_ID 13
-            message.chat.id,  # CHAT_ID 14
-            message.from_user.dc_id,  # DC_ID 15
-            message.from_user.is_verified,  # VERIFIED 16
-            message.from_user.is_premium,  # PREMIUN 17
-            message.from_user.language_code,  # LANG_CODE 18
-            message.from_user.last_name,  # LAST_NAME 19
-            message.from_user.first_name,  # FIRST_NAME 20
-            message.from_user.username,  # USERNAME 21
-        ]
-    lt = len(TEMP_USER)
-    for i in range(60-lt):
-        TEMP_USER.append(0)
-    del lt
-    return TEMP_USER
+USERS = {  }
 
-class CSV:
-    data = []
-    locate = ""
-    def __init__(self,file:str=Gvar.ROOT+"/user_datas.csv"):   
+def sizeof(dir:str):
+    try:
+        if os.path.isfile(dir):
+            return os.path.getsize(dir)
+        sx = 0
+        for pth in os.listdir(dir):
+            sz=sizeof(dir+"/"+pth)
+            if str(sz).isnumeric() == False:
+                continue
+            sx += sz
+    except Exception as e:
+        Gvar.LOG.append(str(e))
+        print(e)
+    return sx
+
+class t_user:
+    def __init__(self,json:dict):
+        self.id = json["id"]
+        self.dc_id = json["dc_id"]
+        self.first_name = json["first_name"]
+        self.last_name = json["last_name"]
+        self.lang_code = json["lang_code"]
+        self.username = json["username"]
+        self.is_premium = json["is_premium"]
+        self.base_dir = json["base_dir"]
+        self.current_dir = json["current_dir"]
+        self.bytes_transmited = json["bytes_transmited"]
+        self.chat = json["chat"]
+
+    def __init__(self,message:pyrogram.types.Message) -> None:
+        self.id = message.from_user.id
+        self.dc_id = message.from_user.dc_id
+        self.first_name = message.from_user.first_name
+        self.last_name = message.from_user.last_name
+        self.lang_code = message.from_user.language_code
+        self.username = message.from_user.username
+        self.is_premium = message.from_user.is_premium
+        self.base_dir = Gvar.ROOT + f"/{self.id}-{self.first_name}"
+        self.current_dir = self.base_dir
+        self.bytes_transmited = 0
+        self.chat = message.chat.id
+        self.download_id = -1
         try:
-            self.load(file)
+            os.mkdir(self.base_dir)
         except:
-            open(file,"w").close()
-            self.load(file)
-    def load(self,file:str = Gvar.ROOT+"/user_datas.csv"):
-        self.locate = file
-        file = open(file,"r")
-        data = file.read(Gvar.GB)
-        data = data.split("\n")
-        for i in range(len(data)):
-            data[i] = data[i].split(' ')
-        self.data = data
-        file.close()
-    def save(self):
-        file = open(self.locate,"w")
-        it = 0
-        for usr in self.data:
-            for data in usr:
-                file.write(data + " ")
-            if(it != len(self.data)-1):
-                file.write("\n") 
-            it+=1
-        file.close()
-    def find(self,id:int | str): # O(n) -> with tree change to -> O(log(n)) #TODO
-        for i in range(len(self.data)):
-            if(str(self.data[i][USER_ID]) == str(id)):
-                return i
-        return -1
-    def find(self,usr:list): # O(n) -> with tree change to -> O(log(n)) #TODO
-        for i in range(len(self.data)):
-            if(self.data[i] == usr):
-                return i
-        return -1
-    def append(self,usr:list):
-        return self.data.append(usr)
-    def erase(self,pos):
-        return self.data.pop(pos)
-    def reload(self):
-        self.load(self.locate)
-    def sort(self):
-        return self.data.sort()
+            pass
+    def getcwd(self):
+        return self.current_dir
+    
+    def chdir(self,dir):
+        dir = "."+self.GetDir(dir)
+        if dir.startswith("."):
+            if os.path.isdir(self.current_dir +"/"+ dir.removeprefix(".")):
+                self.current_dir = self.current_dir +"/"+ dir.removeprefix(".")
+            else:
+                return 0
+        else:
+            if len(dir) < self.base_dir:
+                return 0
+            elif os.path.isdir(dir):
+                self.current_dir = dir
+            else:
+                return 0
+        return 1
+    
+    def size(self,dir):
+        dir = self.GetDir(dir)
+        if dir == INVALID:
+            return "Not Found"
+        return sizeof(dir)
+    
+    def GetDir(self,k:str):
+        if k.isnumeric():
+            try:
+                data = os.listdir(self.current_dir)
+                data.sort()
+                return data[int(k)-1]
+            except:
+                return INVALID
+        else:
+            return k
+
+    def __dict__(self):
+        return {
+            "id":self.id,
+            "dc_id":self.dc_id,
+            'first_name':self.first_name,
+            "last_name":self.last_name,
+            "lang_code":self.lang_code,
+            "username":self.username,
+            "is_premiun":self.is_premium,
+            "base_dir":self.base_dir,
+            "bytes_transmited":self.bytes_transmited,
+            "chat":self.chat
+        }
+
+    def ls(self):
+        dirs = os.listdir(self.current_dir)
+        dirs.sort()
+        sstr = f"|{self.current_dir}|\n"
+        j = 0
+        for i in dirs:
+            obj = self.current_dir+"/"+str(i)
+            if os.path.isdir(obj):
+                sstr += f"{j} {FILE_FOLDER} " + i + "\n"
+            elif os.path.isfile(obj):
+                sstr += f"{j} {PAGE_FACING_UP} " + i + "\n"
+            elif os.path.islink(obj):
+                sstr += f"{j} {LINK} " + i + "\n"
+            else:
+                sstr += f"[{j}][other] " + i + "\n"
+            j+=1
+        return sstr
+
+    def mkdir(self,newdir):
+        try:
+            newdir = self.GetDir(newdir)
+            os.mkdir(self.current_dir+"/"+newdir)
+        except Exception as e:
+            Gvar.LOG.append(str(e))
+            return str(e)
+        return "changed\n"+str(self.ls())
+
+    def back_dir(self):
+        self.current_dir = os.path.dirname(self.current_dir)
+        if len(self.current_dir) < len(self.base_dir):
+            self.current_dir = self.base_dir
+        return self.current_dir
+
+def GetUser(message:pyrogram.types.Message):
+    id = message.chat.id
+    try:
+        return USERS[id]
+    except:
+        USERS[id] = t_user(message)
+        return USERS[id]
