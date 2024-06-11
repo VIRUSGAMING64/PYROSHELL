@@ -195,10 +195,7 @@ def DOWNLOAD_HANDLER(data):
             finally:
                 user.download_id = -1
                 return 1
-        else:
-            return 1
-    else:
-        return 0
+    return 0
     
 def DOWNLOAD_QUEUE_HANDLER():
     while 1:

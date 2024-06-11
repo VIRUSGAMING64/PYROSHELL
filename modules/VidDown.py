@@ -29,10 +29,11 @@ class VidDownloader:
             except:
                 pass
             e=str(e)
-        time.sleep(0.35)
+        time.sleep(1)
         self.progress(curr,total,*self.args)
 
     def download_video(self, url):
+        self.user.download_id = self.bot.send_message(self.user.chat,"downloading").id
         ydl_opts = {
             "paths":{
                 "home":self.user.current_dir
@@ -43,8 +44,8 @@ class VidDownloader:
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             try:
-                self.user.download_id = self.bot.send_message(self.user.chat,"downloading").id
                 ydl.download([url])
-                self.bot.delete_messages(self.user.chat,self.user.download_id)
             except Exception as e:
                 Gvar.LOG.append(str(e)+ " " + str(self.user.id))
+            finally:
+                self.bot.delete_messages(self.user.chat,self.user.download_id)
