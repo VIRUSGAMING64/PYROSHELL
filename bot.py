@@ -258,7 +258,7 @@ def TORRENT_QUEUE_HANDLER(): #TODO
 
 def INIT():
     try:
-        time.sleep(60)
+        time.sleep(20)
         for i in Gvar.ADMINS:
             bot.send_message(i,"bot online")
     except Exception as e:

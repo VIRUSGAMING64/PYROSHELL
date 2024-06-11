@@ -391,16 +391,16 @@ def reset(uid):
             res = str(e)
     return res
 
-def remove(MSG):
+def remove(MSG,user:t_user):
     try:
         MSG = MSG.split(" ")[1]
-        dirs = os.listdir()
+        dirs = os.listdir(user.current_dir)
         dirs.sort()
         if MSG.isnumeric():
             MSG = int(MSG)
-            os.remove(dirs[MSG-1])
+            os.remove(user.current_dir+"/"+dirs[MSG-1])
         else:
-            os.remove(MSG)
+            os.remove(user.current_dir+'/'+MSG)
         return "removed"
     except Exception as e:
         Gvar.LOG.append(str(e))
