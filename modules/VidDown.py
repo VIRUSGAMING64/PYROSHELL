@@ -49,3 +49,4 @@ class VidDownloader:
                 Gvar.LOG.append(str(e)+ " " + str(self.user.id))
             finally:
                 self.bot.delete_messages(self.user.chat,self.user.download_id)
+                self.user.download_id = -1

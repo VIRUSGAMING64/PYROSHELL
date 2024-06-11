@@ -450,7 +450,7 @@ def USER_PROCCESS(user:t_user, message: Message,bot:pyrogram.client.Client):
     elif MSG.startswith('/send'):
         return send_file(bot,message,user)
     elif MSG.startswith("/rm"):
-        return remove(MSG)
+        return remove(MSG,user)
     return 0
 
 def UPD_HOUR():
