@@ -29,8 +29,8 @@ class VidDownloader:
             except:
                 pass
             e=str(e)
-        time.sleep(1)
-        self.progress(curr,total,*self.args)
+        if (time.time_ns()//10**9)%5 == 0:
+            self.progress(curr,total,*self.args)
 
     def download_video(self, url):
         self.user.download_id = self.bot.send_message(self.user.chat,"downloading").id
