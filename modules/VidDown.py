@@ -1,7 +1,7 @@
 import yt_dlp
 from pyrogram.types import *
 from pyrogram.client import *
-import Gvar
+import modules.Gvar as Gvar
 class VidDownloader:
     file = ""
     arg = "downloading video"

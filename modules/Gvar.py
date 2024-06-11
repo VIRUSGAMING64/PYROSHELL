@@ -61,6 +61,8 @@ TOKEN = os.getenv("BOT_TOKEN")
 API_ID = os.getenv("API_ID")
 API_HASH = os.getenv("API_HASH") 
 
+TESTING_DEPENDENCY = 0
+
 if DEBUG_URL == None:
     DEBUG_URL = 'https://vshell.onrender.com/debug'
 

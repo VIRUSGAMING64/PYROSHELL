@@ -1,6 +1,7 @@
 from threading import *
 import time
 import os
+import modules.Gvar as Gvar
 import typing as types
 
 class TempFile():
@@ -17,10 +18,12 @@ class TempFile():
         os.remove(self.name)
 
 def Time(func:callable,tm:int):
+    if Gvar.TESTING_DEPENDENCY == 1:
+        return
     while 1:
         time.sleep(tm)
         func()
-    pass
+
 class Timer:
     def __init__(self,func=None,time:list=[],deamons:list=0):
         self.time = time
