@@ -1,4 +1,5 @@
 import yt_dlp
+import time
 from pyrogram.types import *
 from pyrogram.client import *
 import modules.Gvar as Gvar
@@ -28,6 +29,7 @@ class VidDownloader:
             except:
                 pass
             e=str(e)
+        time.sleep(0.35)
         self.progress(curr,total,*self.args)
 
     def download_video(self, url):
