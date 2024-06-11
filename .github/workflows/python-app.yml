@@ -7,10 +7,9 @@ on:
 jobs:
   installing:
     runs-on: ubuntu-latest
-
+      using: 'node20'
     steps:
       - name: Set up Python 3.10
-        using: 'node20'
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
