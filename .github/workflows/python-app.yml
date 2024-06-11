@@ -1,19 +1,15 @@
-name: Generate Stats Images
+name: test dependency
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   installing:
     runs-on: ubuntu-latest
 
     steps:
-      # Run using Python 3.10 for consistency and aiohttp
+      
       - name: Set up Python 3.10
         
         with:
