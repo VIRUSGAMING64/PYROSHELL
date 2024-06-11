@@ -62,10 +62,22 @@ def WEB():
             except Exception as e:
                 print(e)
         enc = JSONEncoder()
-        
-        stats = enc.encode(stats)
-        
+        stats = enc.encode(stats)       
         return Response(stats,mimetype="application/json")
+    
+    @web.route("/api/queues")
+    def QUEUES_SIZES():
+        queues = Utils.queuesZ()
+        queues = queues.split("\n")
+        for i in range(len(queues)):
+            queues[i] = queues[i].split(":")[1]
+        di = {
+            "downloads":queues[0],
+            "download_links":queues[1],
+            "messages":queues[2],
+            "to_send":queues[3]
+        }
+        return Response(di,mimetype="application/json")
     
     @web.route("/api/commands")
     def api_command():
@@ -73,7 +85,6 @@ def WEB():
         BOT_COMMANDS = Gvar.BOT_COMMANDS.copy()
         BOT_COMMANDS.pop(0)        
         return Response(enc.encode(BOT_COMMANDS),mimetype="application/json")
-    
     
     @web.route("/")
     def main():
@@ -182,7 +193,7 @@ def DOWNLOAD_HANDLER(data):
                 print("in downloads first try")
                 msg.reply("Error downloading media")
             finally:
-                user.download_id = -1 #TODO Lace Colling github & Jia Tan
+                user.download_id = -1
                 return 1
         else:
             return 1

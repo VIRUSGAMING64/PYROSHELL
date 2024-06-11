@@ -73,7 +73,7 @@ def round(fl:float,prec:int=2):
         r = [r]
     return float(r[0]+e)
 
-def __geturl(url,filename,USER):
+def __geturl(url,filename,user:t_user):
     ret = "Downloaded..."
     try:
         Dn = uq.urlopen(url)
@@ -83,8 +83,7 @@ def __geturl(url,filename,USER):
             file.write(D)
             D = Dn.read(1024 * 1024)
     except Exception as e:
-        
-        Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
+        Gvar.LOG.append(str(e) +" "+ str(user.id))
         ret = "Error: " + str(e) 
     finally:
         file.close()
@@ -102,10 +101,10 @@ def GetParent(url):
         Gvar.nulls_parents += 1
         return f"null{Gvar.nulls_parents}"
     
-def geturl(USER, msg: str):
+def geturl(user:t_user, msg: str):
     if(os.path.islink(msg)):
         try:
-            return __geturl(msg,GetParent(msg),USER)
+            return __geturl(msg,GetParent(msg),user)
         except Exception as e:
             return str(e)
     elif msg.startswith("/geturl"):
@@ -113,17 +112,17 @@ def geturl(USER, msg: str):
             msg = msg.split(' ')
             if len(msg) == 2:
                 msg.append(GetParent(msg[1]))
-            return __geturl(msg[1],msg[2],USER)
+            return __geturl(msg[1],msg[2],user)
         except Exception as e:
             
-            Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
+            Gvar.LOG.append(str(e) +" "+ str(user.id))
             return "command sintaxis: /geturl URL FILENAME"
     else:
         try:
             msg = msg.split(' ')
             return __geturl(msg[0],msg[1])
         except Exception as e:
-            Gvar.LOG.append(str(e) +" "+ str(Gvar.DATA[USER][USER_ID]))
+            Gvar.LOG.append(str(e) +" "+ str(user.id))
             return "incorrect link and filename format"   
 
 def cp(a):
@@ -279,17 +278,40 @@ def SetZero(i:int):
     elif len(s) == 3:
         s = "0"+s
     return s
+class Compressor:
+    def __init__(self,user:t_user, bot:Client):
+        self.size = -1
+        self.running = -1
+        self.name = -1
+        self.curr = 0
+        self.total = 0
+        self.bot = bot
+        self.user= user
 
-def DirToTar(dirname,user:t_user,bot:Client):
-    try:
-        os.remove(dirname+".01")
-    except Exception as e:
-        print(e)
-        pass
-    file=tar.TarFile(dirname+".01","w")
-    file.add(dirname)
-    file.close()
-    return dirname + ".01"
+    def progress(self):
+        while self.running:
+            time.sleep(1)
+            try:
+                self.curr = sizeof(self.name)
+                progress(self.curr,self.total,self.user,self.bot,"compressing")
+            except Exception as e:
+                print(str(e))
+                Gvar.LOG.append(str(e))
+    
+    def DirToTar(self,dirname,user:t_user,bot:Client):
+        try:
+            os.remove(dirname+".01")
+        except Exception as e:
+            print(e)
+        self.running = 1
+        file=tar.TarFile(dirname+".01","w")
+        self.total = sizeof(dirname)
+        self.name = dirname + ".01"
+        Thread(self.progress).start()
+        file.add(dirname)
+        self.running = 0
+        file.close()
+        return dirname + ".01"
 
 def Compress(filename,MAX_Z = 2000*Gvar.MB):
     id = 1
@@ -315,7 +337,8 @@ def Compress(filename,MAX_Z = 2000*Gvar.MB):
 def SendFile(user:t_user,filename,bot:Client,progress:Callable = None,args = None,thumb = None,text = ""):
     try:
         if os.path.isdir(filename):
-            filename = DirToTar(filename,user,bot)
+            comp = Compressor(user,bot)
+            filename = comp.DirToTar(filename,user,bot)
         size = os.path.getsize(filename)
         files = [filename]
         if size > Gvar.MB * 2000:
@@ -343,7 +366,8 @@ def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
             dirs.sort()
             MSG = user.current_dir+"/"+dirs[MSG-1]
         if(os.path.isdir(MSG)):
-            MSG = DirToTar(MSG,user,bot)
+            comp = Compressor(user,bot)
+            MSG = comp.DirToTar(MSG,user,bot)
         SendFile(user,MSG,bot,progress,args=[user,bot])
         return "uploaded"
     except Exception as e:
@@ -351,10 +375,10 @@ def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
         return f"File not found E:\n{str(e)}"
 
 def queuesZ():
-    s = f"DOWNLOADS: {len(Gvar.QUEUE_DOWNLOAD)}\n"
-    s += f"DOWNLOADS LINK: {len(Gvar.FUNC_QUEUE)}\n"
-    s += f"MESSAGES: {len(Gvar.QUEUE_DIRECT)}\n"
-    s += f"TO_SEND: {len(Gvar.QUEUE_TO_SEND)}\n"
+    s = f"DOWNLOADS:{len(Gvar.QUEUE_DOWNLOAD)}\n"
+    s += f"DOWNLOADS LINK:{len(Gvar.FUNC_QUEUE)}\n"
+    s += f"MESSAGES:{len(Gvar.QUEUE_DIRECT)}\n"
+    s += f"TO_SEND:{len(Gvar.QUEUE_TO_SEND)}\n"
     return s
 
 def reset(uid):
@@ -366,17 +390,6 @@ def reset(uid):
         except Exception as e:
             res = str(e)
     return res
-
-def alloc(can):
-    can = can.split(' ')
-    can.append(0)
-    can = int(can[1])
-    file = open(f"p{Gvar.UPTIME}","w")
-    chunck = (can//(1024**2*32))
-    file.write('#'*(can%(1024**2*64)))
-    for i in range(chunck):
-        file.write("#"*1024**2*64)
-    file.close()
 
 def remove(MSG):
     try:
@@ -412,9 +425,6 @@ def USER_PROCCESS(user:t_user, message: Message,bot:pyrogram.client.Client):
         return Gvar.HELP
     elif MSG.startswith("/queues"):
         return queuesZ()
-    elif MSG.startswith("/alloc") and message.from_user.id in Gvar.ADMINS:
-        alloc(MSG)
-        return 'allocated'
     elif MSG.startswith("/sz"):
         return user.size(command)
     elif MSG.startswith("/ls"):
@@ -428,7 +438,7 @@ def USER_PROCCESS(user:t_user, message: Message,bot:pyrogram.client.Client):
         user.mkdir(command)
         return "Created !!!"
     elif MSG.startswith("/geturl"):
-        return "" #TODO
+        return geturl(user,message.text)
     elif MSG.startswith('/stats'):
         return stats()
     elif MSG.startswith("/link"):

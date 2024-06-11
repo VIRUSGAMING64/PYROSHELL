@@ -1,13 +1,15 @@
 import yt_dlp
 from pyrogram.types import *
 from pyrogram.client import *
-
+import Gvar
 class VidDownloader:
     file = ""
     arg = "downloading video"
-    def __init__(self, bot:Client,user,chat_id):
+    def __init__(self, bot:Client,user,chat_id,progress:callable,args:list):
         self.bot = bot
-        self.USER = user
+        self.progress = progress
+        self.args = args
+        self.user = user
         self.chat_id = chat_id
         self.file = None
     def my_hook(self, down):
@@ -26,7 +28,8 @@ class VidDownloader:
             except:
                 pass
             e=str(e)
-        #TODO poner progress args
+        self.progress(*self.args)
+
     def download_video(self, url):
         ydl_opts = {
             'format': 'best',
@@ -34,5 +37,9 @@ class VidDownloader:
             'progress_hooks': [self.my_hook],
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
-            #TODO eliminar menssage generado por la descarga
+            try:
+                self.user.download_id = self.bot.send_message(self.user.chat,"downloading").id
+                ydl.download([url])
+                self.bot.delete_messages(self.user.chat,self.user.download_id)
+            except Exception as e:
+                Gvar.LOG.append(str(e)+ " " + str(self.user.id))
