@@ -7,8 +7,10 @@ on:
 jobs:
   installing:
     runs-on: ubuntu-latest
-      using: 'node20'
+    
     steps:
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.0.2         
       - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
