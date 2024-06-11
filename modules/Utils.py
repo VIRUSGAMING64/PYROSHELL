@@ -250,7 +250,7 @@ def NoExt(s:str):
 
 def vid_down(user:t_user,msg:Message,bot:pyrogram.client.Client):
     try:
-        do = VidDownloader(bot,user,msg.chat.id)
+        do = VidDownloader(bot,user,user.chat,progress,[user,bot,"downloading video..."])
         do.download_video(msg.text)
         file = do.file
         del do
@@ -416,13 +416,15 @@ def USER_PROCCESS(user:t_user, message: Message,bot:pyrogram.client.Client):
     MSG = str(message.text)
     command = ClearCommand(MSG)[1]
     if MSG.startswith("http"):
-        Gvar.FUNC_QUEUE.append([vid_down,[0,message,bot]])
+        Gvar.FUNC_QUEUE.append([vid_down,[user,message,bot]])
     elif MSG.startswith("/comp"):
         tth=th.Thread(target=VidComp,args=[message],daemon=True)
         tth.start()
         return "in progress"
     elif MSG.startswith("/help"):
         return Gvar.HELP
+    elif MSG.startswith("/dir"):
+        return user.current_dir
     elif MSG.startswith("/queues"):
         return queuesZ()
     elif MSG.startswith("/sz"):

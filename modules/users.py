@@ -57,6 +57,8 @@ class t_user:
     
     def chdir(self,dir):
         dir = "."+self.GetDir(dir)
+        if dir == "...":
+            return self.back_dir()
         if dir.startswith("."):
             if os.path.isdir(self.current_dir +"/"+ dir.removeprefix(".")):
                 self.current_dir = self.current_dir +"/"+ dir.removeprefix(".")

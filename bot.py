@@ -70,7 +70,7 @@ def WEB():
         queues = Utils.queuesZ()
         queues = queues.split("\n")
         for i in range(len(queues)):
-            queues[i] = queues[i].split(":")[1]
+            queues[i] = queues[i].split(":")
         di = {
             "downloads":queues[0],
             "download_links":queues[1],

@@ -28,10 +28,13 @@ class VidDownloader:
             except:
                 pass
             e=str(e)
-        self.progress(*self.args)
+        self.progress(curr,total,*self.args)
 
     def download_video(self, url):
         ydl_opts = {
+            "paths":{
+                "home":self.user.current_dir
+            },
             'format': 'best',
             'writethumbnail': True,
             'progress_hooks': [self.my_hook],
