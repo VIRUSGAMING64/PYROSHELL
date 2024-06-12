@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vshell ftp</title>
+</head>
+
+</html>
+
+<script>
+
+    function add(){
+        var a = []//|&&&|
+        for(var i = 0; i<a.length; i++){
+            var di = document.createElement('a')
+            if (a[i][1] == "folder") {
+                di.href = "/"+a[i][2]
+            }
+            di.style.display = "block"
+            di.id = a[i][1]
+            di.innerHTML+= a[i][0]
+            
+            document.getElementsByTagName('body')[0].appendChild(di);
+        }
+    }
+    add()
+</script>

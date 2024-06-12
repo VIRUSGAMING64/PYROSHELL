@@ -108,7 +108,7 @@ class t_user:
         dirs = os.listdir(self.current_dir)
         dirs.sort()
         sstr = f"|{self.current_dir}|\n"
-        j = 0
+        j = 1
         for i in dirs:
             obj = self.current_dir+"/"+str(i)
             if os.path.isdir(obj):

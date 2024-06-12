@@ -37,11 +37,12 @@ def prog(cant,total,prec=2,UD = "uploading"):
     return s
 
 def progress(cant, total,user:t_user,bot:pyrogram.client.Client,UD = "uploading"):
-    cant = prog(cant,total,UD=UD)
-    if user.download_id == -1:
-        user.download_id = bot.send_message(user.chat,cant).id
-    else:
-        user.download_id = bot.edit_message_text(user.chat,user.download_id,cant).id
+    if (time.time_ns()//10**9)%5 == 0:
+        cant = prog(cant,total,UD=UD)
+        if user.download_id == -1:
+            user.download_id = bot.send_message(user.chat,cant).id
+        else:
+            user.download_id = bot.edit_message_text(user.chat,user.download_id,cant).id
 
 def GenerateDirectLink(message:Message):
     try:
@@ -254,14 +255,14 @@ def vid_down(user:t_user,msg:Message,bot:pyrogram.client.Client):
         do.download_video(msg.text)
         file = do.file
         del do
-        thumb = os.path.realpath(NoExt(file) + ".jpg")
+        thumb = user.current_dir+"/"+(NoExt(file) + ".jpg")
         size = -1
         try:
-            size = os.path.getsize(thumb)
+            size = os.path.getsize(user.current_dir+"/"+thumb)
         except Exception as e:
             Gvar.LOG.append(str(e))
             thumb = None
-        SendFile(user,file,bot,progress,[user,bot,"uploading video"],thumb,str(size))
+        SendFile(user,user.current_dir+"/"+file,bot,progress,[user,bot,"uploading video"],thumb,str(size))
         if(size != -1):
             os.remove(thumb)
     except Exception as e:
@@ -278,6 +279,7 @@ def SetZero(i:int):
     elif len(s) == 3:
         s = "0"+s
     return s
+
 class Compressor:
     def __init__(self,user:t_user, bot:Client):
         self.size = -1
@@ -290,7 +292,7 @@ class Compressor:
 
     def progress(self):
         while self.running:
-            time.sleep(1)
+            time.sleep(3)
             try:
                 self.curr = sizeof(self.name)
                 progress(self.curr,self.total,self.user,self.bot,"compressing")
@@ -299,10 +301,6 @@ class Compressor:
                 Gvar.LOG.append(str(e))
     
     def DirToTar(self,dirname,user:t_user,bot:Client):
-        try:
-            os.remove(dirname+".01")
-        except Exception as e:
-            print(e)
         self.running = 1
         file=tar.TarFile(dirname+".01","w")
         self.total = sizeof(dirname)
@@ -343,7 +341,7 @@ def SendFile(user:t_user,filename,bot:Client,progress:Callable = None,args = Non
         files = [filename]
         if size > Gvar.MB * 2000:
             files = Compress(filename)
-        file:str =""
+        file:str = ""
         for file in files:
             if file.endswith(".mp4") or file.endswith(".mpg") or file.endswith('.mkv'):
                 bot.send_video(user.chat,file,progress=progress,progress_args=args,thumb=thumb,caption=text)
@@ -364,7 +362,8 @@ def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
             MSG = int(MSG)
             dirs = os.listdir(user.current_dir)
             dirs.sort()
-            MSG = user.current_dir+"/"+dirs[MSG-1]
+            MSG = dirs[MSG-1]
+        MSG = user.current_dir + "/" + MSG
         if(os.path.isdir(MSG)):
             comp = Compressor(user,bot)
             MSG = comp.DirToTar(MSG,user,bot)

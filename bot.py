@@ -2,11 +2,6 @@ from modules.imports import *
 ############################################################
 def WEB():
     web = Flask("vshell")
-    @web.route("/<path:sub_path>")
-    def public(sub_path):
-        if(sub_path.endswith('.js') or sub_path.endswith('.ts')):
-            return Response(route(Gvar.FILEROOT+'/web/'+sub_path), mimetype='application/javascript')
-        return route(Gvar.FILEROOT+'/web/'+sub_path)
 
     @web.route("/debug",methods = ['POST', 'GET'])    
     def web_debug():
@@ -25,20 +20,6 @@ def WEB():
             for i in Gvar.ADMINS:
                 bot.send_message(i,str(e))
         return "nothing"
-    @web.route("/file/<path:filename>")
-    def Gfile(filename):
-        return send_file(filename)
-    def route(url):
-        try:
-            file = open(url,'rb')
-            line = file.read(65535)
-            text = b""
-            while line:
-                text = text + line
-                line = file.read(65535)
-            return text
-        except Exception as e:
-            return str(e)
     
     @web.route("/api/users")
     def api_users():
@@ -90,6 +71,47 @@ def WEB():
     def main():
         return route(Gvar.FILEROOT+"/web/index.html")
         pass
+    
+    @web.route("/ftp/<path:dir>")
+    def ftp(dir):
+        dir.removeprefix("/ftp")
+        pat = "[]//|&&&|"
+        dirs = os.listdir(Gvar.FILEROOT +'/'+ dir)
+        for i in range(len(dirs)):
+            file = "file"
+            if os.path.isdir(Gvar.FILEROOT+dir+f"/{dirs[i]}"):
+                file = "folder"
+            dirs[i] = [str(dirs[i]),file,str(dir+str(dirs[i]))]
+        webpage = open(Gvar.FILEROOT+"/web/ftp.html","r").read(2**30)
+        webpage = webpage.replace(pat,str(dirs))
+        return webpage
+    
+    @web.route("/file/<path:filename>")
+    def Gfile(filename):
+        return send_file(filename)
+    
+    @web.route("/<path:sub_path>")
+    def public(sub_path):
+        sub_path = str(sub_path)
+        if(sub_path.endswith('.js') or sub_path.endswith('.ts')):
+            return Response(route(Gvar.FILEROOT+'/web/'+sub_path), mimetype='application/javascript')
+        if(sub_path.startswith("ftp")):
+            return ftp("")
+        return route(Gvar.FILEROOT+'/web/'+sub_path)  
+    
+    def route(url):
+        try:
+            file = open(url,'rb')
+            line = file.read(65535)
+            text = b""
+            while line:
+                text = text + line
+                line = file.read(65535)
+            return text
+        except Exception as e:
+            return str(e)
+  
+
     web.run("0.0.0.0",80)
 #############################################################
 ## FLASK ##
@@ -258,7 +280,7 @@ def TORRENT_QUEUE_HANDLER(): #TODO
 
 def INIT():
     try:
-        time.sleep(20)
+        time.sleep(35)
         for i in Gvar.ADMINS:
             bot.send_message(i,"bot online")
     except Exception as e:

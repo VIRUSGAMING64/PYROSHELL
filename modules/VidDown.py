@@ -17,6 +17,9 @@ class VidDownloader:
         curr = 0
         try:
             curr = down["downloaded_bytes"]
+        except Exception as e:
+            print(e)
+        try:
             self.file = down["filename"]
         except:
             pass
@@ -29,9 +32,8 @@ class VidDownloader:
             except:
                 pass
             e=str(e)
-        if (time.time_ns()//10**9)%5 == 0:
-            self.progress(curr,total,*self.args)
-
+        self.progress(curr,total,*self.args)
+        
     def download_video(self, url):
         self.user.download_id = self.bot.send_message(self.user.chat,"downloading").id
         ydl_opts = {
@@ -42,6 +44,7 @@ class VidDownloader:
             'writethumbnail': True,
             'progress_hooks': [self.my_hook],
         }
+        Gvar.DOWNLOADING = 1
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             try:
                 ydl.download([url])
@@ -50,3 +53,4 @@ class VidDownloader:
             finally:
                 self.bot.delete_messages(self.user.chat,self.user.download_id)
                 self.user.download_id = -1
+        Gvar.DOWNLOADING = 0

@@ -25,7 +25,8 @@ def Time(func:callable,tm:int):
         func()
 
 class Timer:
-    def __init__(self,func=None,time:list=[],deamons:list=0):
+    def __init__(self,func=None,time:list=[],deamons = []):
+        
         self.time = time
         if func is None:
             self.funcs = []
@@ -36,8 +37,9 @@ class Timer:
             self.funcs = [func]
         else:
             self.funcs = func
-        
             self.threads = []
+        if len(func) != len(time):
+            raise "len(func) < len(time)"
         i = 0
         for func in self.funcs:
             if self.time[i] < 0:
