@@ -82,7 +82,7 @@ def WEB():
             if os.path.isdir(Gvar.FILEROOT+dir+f"/{dirs[i]}"):
                 file = "folder"
             dirs[i] = [str(dirs[i]),file,str(dir+str(dirs[i]))]
-        webpage = open(Gvar.FILEROOT+"/web/ftp.html","r").read(2**30)
+        webpage = open(Gvar.FILEROOT+"/templates/ftp.html","r").read(2**30)
         webpage = webpage.replace(pat,str(dirs))
         return webpage
     
@@ -246,12 +246,21 @@ async def on_inline_query(client: Client, message: Message):
 async def on_private_message(client: Client, message: Message):
     if message.from_user.phone_number in Gvar.MUTED_USERS:
         return
+    if message.text == '/start':
+        message.reply("BOT ONLINE")
+        return
     Gvar.QUEUE_DIRECT.append([client, message])
 
 @bot.on_message(filters.group)
 async def on_group_message(client: Client, message: Message):
+    if message.from_user.phone_number in Gvar.MUTED_USERS:
+        return
+    if message.text == '/start':
+        message.reply("BOT ONLINE")
+        return
     if message.mentioned:
         await on_private_message(client,message)
+    
 
 @bot.on_edited_message(filters.private)
 async def on_edit_private_message(client, message:Message):

@@ -1,5 +1,6 @@
 import os
 import pyrogram
+from tarfile import TarFile
 import modules.Gvar as Gvar
 from modules.datatypes import *
 from pyrogram.emoji import *
@@ -22,7 +23,7 @@ def sizeof(dir:str):
     return sx
 
 class t_user:
-    def __init__(self,json:dict):
+    def fron_json(self,json:dict):
         self.id = json["id"]
         self.dc_id = json["dc_id"]
         self.first_name = json["first_name"]
@@ -35,19 +36,22 @@ class t_user:
         self.bytes_transmited = json["bytes_transmited"]
         self.chat = json["chat"]
 
-    def __init__(self,message:pyrogram.types.Message) -> None:
-        self.id = message.from_user.id
-        self.dc_id = message.from_user.dc_id
-        self.first_name = message.from_user.first_name
-        self.last_name = message.from_user.last_name
-        self.lang_code = message.from_user.language_code
-        self.username = message.from_user.username
-        self.is_premium = message.from_user.is_premium
-        self.base_dir = Gvar.ROOT + f"/{self.id}-{self.first_name}"
-        self.current_dir = self.base_dir
-        self.bytes_transmited = 0
-        self.chat = message.chat.id
-        self.download_id = -1
+    def __init__(self,message:pyrogram.types.Message|dict) -> None:
+        try:
+            self.id = message.from_user.id
+            self.dc_id = message.from_user.dc_id
+            self.first_name = message.from_user.first_name
+            self.last_name = message.from_user.last_name
+            self.lang_code = message.from_user.language_code
+            self.username = message.from_user.username
+            self.is_premium = message.from_user.is_premium
+            self.base_dir = Gvar.ROOT + f"/{self.id}-{self.first_name}"
+            self.current_dir = self.base_dir
+            self.bytes_transmited = 0
+            self.chat = message.chat.id
+            self.download_id = -1
+        except:
+            self.fron_json(message)
         try:
             os.mkdir(self.base_dir)
         except:
@@ -90,8 +94,8 @@ class t_user:
         else:
             return k
 
-    def __dict__(self):
-        return {
+    def __str__(self):
+        dic = {
             "id":self.id,
             "dc_id":self.dc_id,
             'first_name':self.first_name,
@@ -103,6 +107,7 @@ class t_user:
             "bytes_transmited":self.bytes_transmited,
             "chat":self.chat
         }
+        return str(dic).replace("'",'"').replace("True","true").replace("False","false")
 
     def ls(self):
         dirs = os.listdir(self.current_dir)
@@ -144,3 +149,13 @@ def GetUser(message:pyrogram.types.Message):
     except:
         USERS[id] = t_user(message)
         return USERS[id]
+
+def save_users():
+    tar = TarFile("users.7z","w")
+    for name in USERS.keys():
+        file = open(str(name)+".json","w")
+        file.write(str(USERS[name]))
+        file.close()
+        tar.add(str(name)+".json")
+        os.remove(str(name)+".json")
+    tar.close()

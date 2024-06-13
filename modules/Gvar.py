@@ -1,32 +1,33 @@
 import os
 import time
-RUNNING_THREADS = 0
-nulls_parents = 0
-GET_QUERYS = 0
-POST_QUERYS = 0
-END_THREAD = 1
+
+FILEROOT = os.getcwd() #for process
+ROOT = os.getcwd() + "/env"  # for user envs
+
+QUEUE_INLINE = [] #inline query
 ADMINS = [1659735368] # <- THIS IS CHAT_ID OF ADMINS
-DEBUG_GROUP_ID = -1001809067914 #TODO
-HAND = None
-BOT_ON = 0
-UPTIME=0
-FILEROOT = os.getcwd()
-ROOT = os.getcwd() + "/env"  # for envs
-QUEUE_INLINE = []
 MUTED_USERS = [] #Use in format "code"+"number"
 QUEUE_DIRECT = [] #queue for direct messages
-FUNC_QUEUE = []
+FUNC_QUEUE = [] #function queues [func,args]
 QUEUE_TO_SEND = [] #queue of larges messages
 QUEUE_TORRENT = [] #torrent downloads
 QUEUE_DOWNLOAD = [] # queue of downloads
-USER_VARIABLES = 127 
-DEBUG_MODE = True
-DOWNLOADING = 0 # if 1 user downloading 
 DATA = [] # all users and variables
-MAX_MESSAGE_LENGTH = 4096 
-WORKERS = max(os.cpu_count(),64)
-LOG = []
+LOG = [] #erros and logs
+
 START_TIME = time.time_ns()
+RUNNING_THREADS = 0
+nulls_parents = 0
+TESTING_DEPENDENCY = 0
+GET_QUERYS = 0
+POST_QUERYS = 0
+END_THREAD = 1
+BOT_ON = 0
+UPTIME=0
+DEBUG_MODE = 1
+DOWNLOADING = 0
+MAX_MESSAGE_LENGTH = 4096 
+DEBUG_GROUP_ID = -1001809067914 #TODO
 SECOND = 10**9
 B  = 1024**0
 KB = 1024**1
@@ -34,6 +35,8 @@ MB = 1024**2
 GB = 1024**3
 TB = 1024**4
 YB = 1024**5
+WORKERS = max(os.cpu_count(),64)
+
 BOT_COMMANDS = [
     ["BOT","COMMANDS"],
     ["/ls", "send files and dirs in this rute"],
@@ -60,8 +63,6 @@ GOOGLE_API = os.getenv("GOOGLE")
 TOKEN = os.getenv("BOT_TOKEN")
 API_ID = os.getenv("API_ID")
 API_HASH = os.getenv("API_HASH") 
-
-TESTING_DEPENDENCY = 0
 
 if DEBUG_URL == None:
     DEBUG_URL = 'https://vshell.onrender.com/debug'

@@ -3,6 +3,7 @@ import time
 from pyrogram.types import *
 from pyrogram.client import *
 import modules.Gvar as Gvar
+from modules.users import t_user
 class VidDownloader:
     file = ""
     arg = "downloading video"
@@ -13,27 +14,31 @@ class VidDownloader:
         self.user = user
         self.chat_id = chat_id
         self.file = None
+        
     def my_hook(self, down):
-        curr = 0
         try:
-            curr = down["downloaded_bytes"]
-        except Exception as e:
-            print(e)
-        try:
-            self.file = down["filename"]
-        except:
-            pass
-        total = curr * 2
-        try:
-            total = down["total_bytes"]
-        except Exception as e:
+            curr = 0
             try:
-                total = int(down["total_bytes_estimate"])
+                curr = down["downloaded_bytes"]
+            except Exception as e:
+                print(e)
+            try:
+                self.file = down["filename"]
             except:
                 pass
-            e=str(e)
-        self.progress(curr,total,*self.args)
-        
+            total = curr * 2
+            try:
+                total = down["total_bytes"]
+            except Exception as e:
+                try:
+                    total = int(down["total_bytes_estimate"])
+                except:
+                    pass
+                e=str(e)
+            self.progress(curr,total,*self.args)
+        except Exception as e:
+            Gvar.LOG.append(str(e))
+
     def download_video(self, url):
         self.user.download_id = self.bot.send_message(self.user.chat,"downloading").id
         ydl_opts = {
@@ -50,6 +55,8 @@ class VidDownloader:
                 ydl.download([url])
             except Exception as e:
                 Gvar.LOG.append(str(e)+ " " + str(self.user.id))
+                self.bot.edit_message_text(self.chat_id,self.user.download_id,"unknow error\n"+str(e))
+                time.sleep(60)
             finally:
                 self.bot.delete_messages(self.user.chat,self.user.download_id)
                 self.user.download_id = -1

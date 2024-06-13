@@ -464,6 +464,6 @@ def FUNC_QUEUE_HANDLER():
 timer = Timer(
     [   UPD_HOUR,
         FUNC_QUEUE_HANDLER],
-    [1,10]
+    [1,60]
 )
 timer.start()
