@@ -142,7 +142,7 @@ def WEB():
 #############################################################
 ## FLASK ##
 ###########
-WEB()
+
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
