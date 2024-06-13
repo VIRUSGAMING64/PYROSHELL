@@ -72,27 +72,56 @@ def WEB():
         return route(Gvar.FILEROOT+"/web/index.html")
         pass
     
+    @web.route("/file/<path:filename>")
+    def Gfile(filename):
+        return send_file(filename)
+    TANGERINE
     @web.route("/ftp/<path:dir>")
     def ftp(dir):
-        dir.removeprefix("/ftp")
+        dir = str(dir)
+        if(dir.endswith('.css')):
+            if dir.startswith("ftp"):
+                dir.removeprefix("ftp")
+        if(dir.endswith('.css')):
+            while dir.startswith("/"):
+                dir = dir.removeprefix("/")
+            return Response(route(Gvar.FILEROOT+'/web/'+dir), mimetype='text/css')
+        
+        if(dir.endswith('.svg')):
+            if dir.startswith("ftp"):
+                dir.removeprefix("ftp")
+        if(dir.endswith('.svg')):
+            while dir.startswith("/"):
+                dir = dir.removeprefix("/")
+            return Response(route(Gvar.FILEROOT+'/web/'+dir), mimetype='image/svg+xml')
+
+
+
+       
         pat = "[]//|&&&|"
         dirs = os.listdir(Gvar.FILEROOT +'/'+ dir)
         for i in range(len(dirs)):
-            file = "file"
-            if os.path.isdir(Gvar.FILEROOT+dir+f"/{dirs[i]}"):
-                file = "folder"
-            dirs[i] = [str(dirs[i]),file,str(dir+str(dirs[i]))]
+            if os.path.isdir(Gvar.FILEROOT+"/"+dir+f"/{dirs[i]}"):    
+                href = str("ftp/"+dir+"/"+str(dirs[i]))
+                if dir == "":
+                    href = "ftp/"+str(dirs[i])
+                dirs[i] = [str(dirs[i]),"folder",href]
+            else:    
+                href = str("file/"+dir+"/"+str(dirs[i]))
+                if dir == "":
+                    href = "file/"+str(dirs[i])
+                dirs[i] = [str(dirs[i]),"file",href]
         webpage = open(Gvar.FILEROOT+"/templates/ftp.html","r").read(2**30)
         webpage = webpage.replace(pat,str(dirs))
         return webpage
     
-    @web.route("/file/<path:filename>")
-    def Gfile(filename):
-        return send_file(filename)
-    
     @web.route("/<path:sub_path>")
-    def public(sub_path):
+    def public(sub_path):   
         sub_path = str(sub_path)
+        if (sub_path.endswith('.svg')):
+            return Response(route(Gvar.FILEROOT+'/web/'+sub_path), mimetype='image/svg+xml')
+        if(sub_path.endswith('.css')):
+            return Response(route(Gvar.FILEROOT+'/web/'+sub_path), mimetype='text/css')
         if(sub_path.endswith('.js') or sub_path.endswith('.ts')):
             return Response(route(Gvar.FILEROOT+'/web/'+sub_path), mimetype='application/javascript')
         if(sub_path.startswith("ftp")):
@@ -116,7 +145,7 @@ def WEB():
 #############################################################
 ## FLASK ##
 ###########
-
+WEB()
 def debug(e):
     _debug = open("debug-bot.txt","a")
     _debug.write(str(e) + "\n")
