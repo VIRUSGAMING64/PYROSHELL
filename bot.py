@@ -274,7 +274,7 @@ async def on_private_message(client: Client, message: Message):
     if message.from_user.phone_number in Gvar.MUTED_USERS:
         return
     if message.text == '/start':
-        message.reply("BOT ONLINE")
+        await message.reply("BOT ONLINE")
         return
     Gvar.QUEUE_DIRECT.append([client, message])
 
