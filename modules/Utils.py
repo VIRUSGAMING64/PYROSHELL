@@ -254,15 +254,15 @@ def vid_down(user:t_user,msg:Message,bot:pyrogram.client.Client):
         do = VidDownloader(bot,user,user.chat,progress,[user,bot,"downloading video..."])
         do.download_video(msg.text)
         file = do.file
-        thumb = user.current_dir+"/"+(NoExt(file) + ".jpg")
+        thumb = (NoExt(file) + ".jpg")
         size = -1
         try:
             size = os.path.getsize(thumb)
-            size = os.path.getsize(user.current_dir+"/"+file)
+            size = os.path.getsize(file)
         except Exception as e:
             Gvar.LOG.append(str(e)+f"\nthumb: {thumb}")
             thumb = None
-        SendFile(user,user.current_dir+"/"+file,bot,progress,[user,bot,"uploading video"],thumb,str(size))
+        SendFile(user,file,bot,progress,[user,bot,"uploading video"],thumb,str(size))
         if(size != -1):
             os.remove(thumb)
     except Exception as e:
@@ -367,7 +367,7 @@ def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
         if(os.path.isdir(MSG)):
             comp = Compressor(user,bot)
             MSG = user.current_dir+"/"+comp.DirToTar(MSG,user,bot)
-        SendFile(user,MSG,bot,progress,args=[user,bot],thumb=f"{NoExt(MSG)}+.jpg")
+        SendFile(user,MSG,bot,progress,args=[user,bot],thumb=f"{NoExt(MSG)}.jpg")
         return "uploaded"
     except Exception as e:
         Gvar.LOG.append(str(e))
