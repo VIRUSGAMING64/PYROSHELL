@@ -75,7 +75,7 @@ def WEB():
     @web.route("/file/<path:filename>")
     def Gfile(filename):
         return send_file(filename)
-    TANGERINE
+    
     @web.route("/ftp/<path:dir>")
     def ftp(dir):
         dir = str(dir)
