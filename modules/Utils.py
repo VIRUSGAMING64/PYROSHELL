@@ -258,9 +258,9 @@ def vid_down(user:t_user,msg:Message,bot:pyrogram.client.Client):
         thumb = user.current_dir+"/"+(NoExt(file) + ".jpg")
         size = -1
         try:
-            size = os.path.getsize(user.current_dir+"/"+thumb)
+            size = os.path.getsize(+thumb)
         except Exception as e:
-            Gvar.LOG.append(str(e))
+            Gvar.LOG.append(str(e)+f"\nthumb: {thumb}")
             thumb = None
         SendFile(user,user.current_dir+"/"+file,bot,progress,[user,bot,"uploading video"],thumb,str(size))
         if(size != -1):
