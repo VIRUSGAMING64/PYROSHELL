@@ -14,7 +14,7 @@ def WEB():
                     while bot.is_connected == None:
                         time.sleep(1)
                     bot.send_message(Gvar.DEBUG_GROUP_ID,f"GET: {Gvar.GET_QUERYS} POST: {Gvar.POST_QUERYS}\n"+Utils.stats())
-                    pass
+                    
             return open(Gvar.FILEROOT+"/web/index.html","rb").read(2**31)        
         except Exception as e:
             for i in Gvar.ADMINS:
@@ -70,12 +70,11 @@ def WEB():
     @web.route("/")
     def main():
         return route(Gvar.FILEROOT+"/web/index.html")
-        pass
     
     @web.route("/file/<path:filename>")
     def Gfile(filename):
         return send_file(filename)
-    TANGERINE
+    
     @web.route("/ftp/<path:dir>")
     def ftp(dir):
         dir = str(dir)
@@ -94,10 +93,7 @@ def WEB():
             while dir.startswith("/"):
                 dir = dir.removeprefix("/")
             return Response(route(Gvar.FILEROOT+'/web/'+dir), mimetype='image/svg+xml')
-
-
-
-       
+        
         pat = "[]//|&&&|"
         dirs = os.listdir(Gvar.FILEROOT +'/'+ dir)
         for i in range(len(dirs)):
@@ -111,6 +107,7 @@ def WEB():
                 if dir == "":
                     href = "file/"+str(dirs[i])
                 dirs[i] = [str(dirs[i]),"file",href]
+
         webpage = open(Gvar.FILEROOT+"/templates/ftp.html","r").read(2**30)
         webpage = webpage.replace(pat,str(dirs))
         return webpage

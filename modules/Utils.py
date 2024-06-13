@@ -357,7 +357,7 @@ def SendFile(user:t_user,filename,bot:Client,progress:Callable = None,args = Non
 
 def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
     try:
-        MSG = message.text.split(' ')[1]
+        MSG = str(message.text.split(' ')[1])
         if MSG.isnumeric():
             MSG = int(MSG)
             dirs = os.listdir(user.current_dir)
@@ -366,7 +366,7 @@ def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
         MSG = user.current_dir + "/" + MSG
         if(os.path.isdir(MSG)):
             comp = Compressor(user,bot)
-            MSG = comp.DirToTar(MSG,user,bot)
+            MSG = user.current_dir+"/"+comp.DirToTar(MSG,user,bot)
         SendFile(user,MSG,bot,progress,args=[user,bot])
         return "uploaded"
     except Exception as e:
