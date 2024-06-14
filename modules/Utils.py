@@ -369,7 +369,7 @@ def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
         if(os.path.isdir(MSG)):
             comp = Compressor(user,bot)
             MSG = user.current_dir+"/"+comp.DirToTar(MSG,user,bot)
-        SendFile(user,MSG,bot,progress,args=[user,bot],thumb=f"{NoExt(MSG)}.jpg")
+        SendFile(user,MSG,bot,progress,args=[user,bot])
         return "uploaded"
     except Exception as e:
         Gvar.LOG.append(str(e))
