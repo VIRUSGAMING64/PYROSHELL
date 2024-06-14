@@ -352,6 +352,8 @@ def SendFile(user:t_user,filename,bot:Client,progress:Callable = None,args = Non
             bot.delete_messages(user.chat,user.download_id)
             user.download_id = -1
     except Exception as e:
+        Gvar.LOG.append(str(e))
+        print(str(e))
         return str(e)
     
 
