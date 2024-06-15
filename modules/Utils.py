@@ -261,7 +261,14 @@ def vid_down(user:t_user,msg:Message,bot:pyrogram.client.Client):
             size = os.path.getsize(file)
         except Exception as e:
             Gvar.LOG.append(str(e)+f"\nthumb: {thumb}")
-            thumb = None
+            thumb = (NoExt(file) + ".webp")
+            size = -1
+            try:
+                size = os.path.getsize(thumb)
+                size = os.path.getsize(file)
+            except Exception as e:
+                Gvar.LOG.append(str(e)+f"\nthumb: {thumb}")
+                thumb = None
         SendFile(user,file,bot,progress,[user,bot,"uploading video"],thumb,str(size))
         if(size != -1):
             os.remove(thumb)
@@ -290,7 +297,7 @@ class Compressor:
         self.bot = bot
         self.user= user
 
-    def progress(self):
+    def t_progress(self):
         while self.running:
             time.sleep(3)
             try:
@@ -298,14 +305,14 @@ class Compressor:
                 progress(self.curr,self.total,self.user,self.bot,"compressing")
             except Exception as e:
                 print(str(e))
-                Gvar.LOG.append(str(e))
+                Gvar.LOG.append("compressing progress: " + str(e))
     
     def DirToTar(self,dirname,user:t_user,bot:Client):
         self.running = 1
         file=tar.TarFile(dirname+".01","w")
         self.total = sizeof(dirname)
         self.name = dirname + ".01"
-        Thread(self.progress).start()
+        Thread(self.t_progress).start()
         file.add(dirname)
         self.running = 0
         file.close()
@@ -364,10 +371,13 @@ def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
             dirs = os.listdir(user.current_dir)
             dirs.sort()
             MSG = dirs[MSG-1]
+        
         MSG = user.current_dir + "/" + MSG
+        
         if(os.path.isdir(MSG)):
             comp = Compressor(user,bot)
             MSG = user.current_dir+"/"+comp.DirToTar(MSG,user,bot)
+
         SendFile(user,MSG,bot,progress,args=[user,bot])
         return "uploaded"
     except Exception as e:
