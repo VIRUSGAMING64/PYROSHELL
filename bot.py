@@ -164,7 +164,8 @@ def DIRECT_REQUEST_HANDLER(client: Client, message: Message):
     try:
         message.reply(data)
     except Exception as e:
-        pass
+        Gvar.LOG.append(str(e))
+
 def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard    
     query = message.query
     id=message.from_user.id
@@ -201,6 +202,7 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
                 ),               
             )
         )
+
     message.answer(
         results=results,
         cache_time=1000
@@ -261,8 +263,6 @@ def DOWNLOAD_QUEUE_HANDLER():
             if res == 1:
                 Gvar.QUEUE_DOWNLOAD.pop(0)
                 time.sleep(60)
-            else:
-                time.sleep(1)
         HANDLER()
 
 @bot.on_inline_query()
@@ -288,7 +288,6 @@ async def on_group_message(client: Client, message: Message):
         return
     if message.mentioned:
         await on_private_message(client,message)
-    
 
 @bot.on_edited_message(filters.private)
 async def on_edit_private_message(client, message:Message):

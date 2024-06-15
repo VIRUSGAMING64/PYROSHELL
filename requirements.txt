@@ -1,9 +1,9 @@
 requests
 pyrogram    
-TgCrypto
 asyncio
 psutil
 flask 
 yt_dlp
 google-generativeai
 regex
+tgcrypto
