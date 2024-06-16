@@ -198,10 +198,10 @@ def upd(msg:pyrogram.types.Message,Ifile,Ofile):
             time.sleep(1)
 
 def ffmpegW(Ifile,Ofile):
-    os.system(f'ffmpeg -i "{Ifile}" -c:v libx265 -compression_level 10 -tune "ssim" -preset "fast" "{Ofile}"')
+    os.system(f'ffmpeg -i "{Ifile}" -c:v libx265 -compression_level 10 -tune "ssim" -preset "medium" "{Ofile}"')
 
 def ffmpegL(Ifile,Ofile):
-    os.system(f'ffmpeg -i "{Ifile}" -c:v libx265 -compression_level 10 -tune "ssim" -preset "fast" "{Ofile}"')
+    os.system(f'ffmpeg -i "{Ifile}" -c:v libx265 -compression_level 10 -tune "ssim" -preset "medium" "{Ofile}"')
 
 def VidComp(message:pyrogram.types.Message):
     try:
@@ -378,7 +378,7 @@ def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
             comp = Compressor(user,bot)
             MSG = user.current_dir+"/"+comp.DirToTar(MSG,user,bot)
 
-        SendFile(user,MSG,bot,progress,args=[user,bot])
+        SendFile(user,MSG,bot,progress,[user,bot])
         return "uploaded"
     except Exception as e:
         Gvar.LOG.append(str(e))

@@ -256,13 +256,13 @@ def DOWNLOAD_QUEUE_HANDLER():
                     time.sleep(1)
                     return
                 res = DOWNLOAD_HANDLER(Gvar.QUEUE_DOWNLOAD[0])
-                time.sleep(60)
             except Exception as e:
                 Gvar.LOG.append(str(e))
                 print(e)
-                res = 1
+                Gvar.QUEUE_DOWNLOAD.pop(0)
             if res == 1:
                 Gvar.QUEUE_DOWNLOAD.pop(0)
+                time.sleep(60)
         HANDLER()
 
 @bot.on_inline_query()
