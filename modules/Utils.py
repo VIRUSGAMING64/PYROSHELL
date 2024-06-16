@@ -37,7 +37,7 @@ def prog(cant,total,prec=2,UD = "uploading"):
     return s
 
 def progress(cant, total,user:t_user,bot:pyrogram.client.Client,UD = "uploading"):
-    if (time.time_ns()//10**8)%50 == 0:
+    if (time.time_ns()//10**8)%5 == 0:
         cant = prog(cant,total,UD=UD)
         if user.download_id == -1:
             user.download_id = bot.send_message(user.chat,cant).id
@@ -378,7 +378,12 @@ def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
             comp = Compressor(user,bot)
             MSG = user.current_dir+"/"+comp.DirToTar(MSG,user,bot)
 
-        SendFile(user,MSG,bot,progress,[user,bot])
+        try:
+            SendFile(user,MSG,bot,progress,[user,bot])
+        except Exception as e:
+            Gvar.LOG.append(str(e))
+            return "error sending: "+str(e) 
+        
         return "uploaded"
     except Exception as e:
         Gvar.LOG.append(str(e))
