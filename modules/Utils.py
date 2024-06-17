@@ -298,8 +298,8 @@ class Compressor:
         self.user= user
 
     def t_progress(self):
+        time.sleep(3)
         while self.running:
-            time.sleep(3)
             try:
                 self.curr = sizeof(self.name)
                 progress(self.curr,self.total,self.user,self.bot,"compressing")
@@ -312,7 +312,10 @@ class Compressor:
         file=tar.TarFile(dirname+".01","w")
         self.total = sizeof(dirname)
         self.name = dirname + ".01"
-        Thread(self.t_progress).start()
+        try:
+            Thread(target=self.t_progress).start()
+        except Exception as e:
+            Gvar.LOG.append(str(e))
         file.add(dirname)
         self.running = 0
         file.close()
@@ -365,7 +368,7 @@ def SendFile(user:t_user,filename,bot:Client,progress:Callable = None,args = Non
 
 def send_file(bot:pyrogram.client.Client,message:Message,user:t_user):
     try:
-        MSG = str(message.text.split(' ')[1])
+        MSG = str(message.text.split(' ',1)[1])
         if MSG.isnumeric():
             MSG = int(MSG)
             dirs = os.listdir(user.current_dir)
