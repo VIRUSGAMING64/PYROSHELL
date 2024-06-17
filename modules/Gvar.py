@@ -12,7 +12,6 @@ FUNC_QUEUE = [] #function queues [func,args]
 QUEUE_TO_SEND = [] #queue of larges messages
 QUEUE_TORRENT = [] #torrent downloads
 QUEUE_DOWNLOAD = [] # queue of downloads
-DATA = [] # all users and variables
 LOG = [] #erros and logs
 
 START_TIME = time.time_ns()
@@ -28,6 +27,7 @@ DEBUG_MODE = 1
 DOWNLOADING = 0
 MAX_MESSAGE_LENGTH = 4096 
 DEBUG_GROUP_ID = -1001809067914 #TODO
+
 SECOND = 10**9
 B  = 1024**0
 KB = 1024**1

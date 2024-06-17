@@ -27,7 +27,7 @@ def prog(cant,total,prec=2,UD = "uploading"):
     s += f"{round(cant/(1024**2),prec)}MB of {round(total/(1024**2),prec)}MB\n"
     if per2 <= 33.333:
         s += f"{pyrogram.emoji.RED_CIRCLE}"*per
-    elif per2 <= 66.666:
+    elif per2 <= 80.0:
         s += f"{pyrogram.emoji.ORANGE_CIRCLE}"*per
     else:
         s += f"{pyrogram.emoji.GREEN_CIRCLE}"*per

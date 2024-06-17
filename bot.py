@@ -24,7 +24,10 @@ def WEB():
     @web.route("/api/users")
     def api_users():
         enc = JSONEncoder()        
-        return Response(enc.encode(Gvar.DATA),mimetype="application/json")
+        dic = {}
+        for i in USERS.keys():
+            dic[i] = str(USERS[i])
+        return Response(enc.encode(dic),mimetype="application/json")
     
     @web.route("/api/logs")
     def bot_logs():
@@ -185,7 +188,7 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
         results.append(
         InlineQueryResultArticle(
                 title="stats",
-                description=Utils.stats()[0:10]+"...",
+                description=Utils.stats()[0:20]+"...",
                 input_message_content=InputTextMessageContent(
                     message_text=Utils.stats()
                 ),               
@@ -196,7 +199,7 @@ def INLINE_REQUEST_HANDLER(client, message: InlineQuery):  # this is hard
         results.append(
         InlineQueryResultArticle(
                 title="queues",
-                description=Utils.queuesZ()[0:10]+"...",
+                description=Utils.queuesZ()[0:20]+"...",
                 input_message_content=InputTextMessageContent(
                     message_text=Utils.queuesZ()
                 ),               
