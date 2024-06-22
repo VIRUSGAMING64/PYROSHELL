@@ -241,6 +241,7 @@ def DOWNLOAD_HANDLER(data):
                 bot.download_media(msg,user.current_dir+"/",progress=Utils.progress,progress_args=[user,bot,"downloading"])
                 bot.delete_messages(user.chat,user.download_id)
                 msg.reply("Downloaded !!!!",reply_to_message_id=msg.id)
+                time.sleep(60)
             except Exception as e:
                 debug(e)
                 print("in downloads first try")
@@ -264,7 +265,6 @@ def DOWNLOAD_QUEUE_HANDLER():
                 Gvar.QUEUE_DOWNLOAD.pop(0)
             if res == 1:
                 Gvar.QUEUE_DOWNLOAD.pop(0)
-                time.sleep(60)
         HANDLER()
 
 @bot.on_inline_query()
