@@ -23,11 +23,11 @@ POST_QUERYS = 0
 END_THREAD = 1
 BOT_ON = 0
 UPTIME=0
+MANUAL = 0
 DEBUG_MODE = 1
 DOWNLOADING = 0
 MAX_MESSAGE_LENGTH = 4096 
 DEBUG_GROUP_ID = -1001809067914 #TODO
-
 SECOND = 10**9
 B  = 1024**0
 KB = 1024**1
@@ -35,6 +35,7 @@ MB = 1024**2
 GB = 1024**3
 TB = 1024**4
 YB = 1024**5
+
 WORKERS = max(os.cpu_count(),64)
 
 BOT_COMMANDS = [
@@ -55,6 +56,7 @@ BOT_COMMANDS = [
     ["/note", "make a file to write in her"],
     ["/comp", "compress a video don't work"],
     ["/help", "send help"],
+    ["/7z", "compress a dir"],
 ]
 
 DEBUG_URL = os.getenv("DEBUG_URL")
@@ -64,13 +66,15 @@ TOKEN = os.getenv("BOT_TOKEN")
 API_ID = os.getenv("API_ID")
 API_HASH = os.getenv("API_HASH") 
 
-if API_ID == None:
-    API_ID = input("API_ID: ")
-    
-if API_HASH == None:
-    API_HASH = input("API_ID: ")
-if TOKEN == None:
-    TOKEN = input("TOKEN: ")
+
+if MANUAL == 1:
+    if API_ID == None:
+        API_ID = input("API_ID: ")
+        
+    if API_HASH == None:
+        API_HASH = input("API_HASH: ")
+    if TOKEN == None:
+        TOKEN = input("TOKEN: ")
 
 if DEBUG_URL == None:
     DEBUG_URL = 'https://vshell.onrender.com/debug'

@@ -238,6 +238,7 @@ def DOWNLOAD_HANDLER(data):
     if Gvar.DOWNLOADING == 0:
         if msg.media != None:
             try:
+                Gvar.DOWNLOADING = 1
                 bot.download_media(msg,user.current_dir+"/",progress=Utils.progress,progress_args=[user,bot,"downloading"])
                 bot.delete_messages(user.chat,user.download_id)
                 msg.reply("Downloaded !!!!",reply_to_message_id=msg.id)
@@ -247,6 +248,7 @@ def DOWNLOAD_HANDLER(data):
                 print("in downloads first try")
                 msg.reply("Error downloading media")
             finally:
+                Gvar.DOWNLOADING = 0
                 user.download_id = -1
                 return 1
     return 0
