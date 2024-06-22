@@ -139,7 +139,6 @@ def WEB():
             return text
         except Exception as e:
             return str(e)
-  
 
     web.run("0.0.0.0",80)
 

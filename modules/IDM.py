@@ -4,7 +4,6 @@ from threading import *
 import time
 import os
 
-
 class downloader:
     def __init__(self,progress:callable = None,threads = os.cpu_count()):
         self.index = [] #TODO

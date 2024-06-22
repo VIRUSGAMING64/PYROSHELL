@@ -252,6 +252,9 @@ def NoExt(s:str):
 def vid_down(user:t_user,msg:Message,bot:pyrogram.client.Client):
     try:
         do = VidDownloader(bot,user,user.chat,progress,[user,bot,"downloading video..."])
+        link = msg.text
+        if "instagram" in link:
+            msg.text=link.replace("ddinstagram","instagram")
         do.download_video(msg.text)
         file = do.file
         thumb = (NoExt(file) + ".jpg")
@@ -410,15 +413,20 @@ def reset(uid):
     return res
 
 def remove(MSG,user:t_user):
+    DIRECT = ""
     try:
         MSG = MSG.split(" ")[1]
         dirs = os.listdir(user.current_dir)
         dirs.sort()
         if MSG.isnumeric():
             MSG = int(MSG)
-            os.remove(user.current_dir+"/"+dirs[MSG-1])
+            DIRECT = user.current_dir+"/"+dirs[MSG-1]
         else:
-            os.remove(user.current_dir+'/'+MSG)
+            DIRECT = user.current_dir+'/'+MSG
+        if os.path.isdir(DIRECT):
+            os.removedirs(DIRECT)
+        else:
+            os.remove(DIRECT)
         return "removed"
     except Exception as e:
         Gvar.LOG.append(str(e))
