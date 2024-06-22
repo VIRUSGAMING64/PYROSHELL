@@ -264,9 +264,7 @@ def DOWNLOAD_QUEUE_HANDLER():
             except Exception as e:
                 Gvar.LOG.append(str(e))
                 print(e)
-                Gvar.QUEUE_DOWNLOAD.pop(0)
-            if res == 1:
-                Gvar.QUEUE_DOWNLOAD.pop(0)
+            Gvar.QUEUE_DOWNLOAD.pop(0)
         HANDLER()
 
 @bot.on_inline_query()
