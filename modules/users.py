@@ -51,6 +51,7 @@ class t_user:
             self.bytes_transmited = 0
             self.chat = message.chat.id
             self.download_id = -1
+            self.last_edit_time = 0
         except:
             self.fron_json(message)
         try:
