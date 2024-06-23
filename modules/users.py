@@ -35,6 +35,7 @@ class t_user:
         self.current_dir = json["current_dir"]
         self.bytes_transmited = json["bytes_transmited"]
         self.chat = json["chat"]
+        self.last_edit_time = 0
 
     def __init__(self,message:pyrogram.types.Message|dict) -> None:
         try:

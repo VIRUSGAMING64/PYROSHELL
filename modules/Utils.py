@@ -36,8 +36,18 @@ def prog(cant,total,prec=2,UD = "uploading"):
     s += "\n"+uptime()
     return s
 
-def progress(cant, total,user:t_user,bot:pyrogram.client.Client,UD = "uploading"):
+def get_speed(cant:int,user:t_user):
+    L = user.last_edit_time
+    R = time.time_ns()
+    time_elapsed = (R-L+1)
+    user.last_edit_time = R
+    mb_in_time = (cant - user.bytes_transmited) / (1024**2)
+    user.bytes_transmited = cant
+    return round(mb_in_time / time_elapsed)
+
+def progress(cant, total,user:t_user,bot:pyrogram.client.Client,UD = "uploading\n"):
     if (time.time_ns()//10**8)%5 == 0:
+        UD += f"{get_speed(cant,user)}MB/S"
         cant = prog(cant,total,UD=UD)
         if user.download_id == -1:
             user.download_id = bot.send_message(user.chat,cant).id

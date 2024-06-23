@@ -331,9 +331,10 @@ def LOG_QUEUE_HANDLER():
             if len(Gvar.LOG) != 0:
                 bot.send_message(Gvar.DEBUG_GROUP_ID,Gvar.LOG[0])
                 Gvar.LOG.pop(0)
-            time.sleep(1)
+            time.sleep(3)
         except Exception as e:
-            Gvar.LOG.append(str(e))
+            print(str(e))     
+            #Gvar.LOG.append(str(e))
 
 def ACTIVATOR():
     while 1:
